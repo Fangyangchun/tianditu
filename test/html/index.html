@@ -30,9 +30,18 @@
     //   });
       
       </script>
+      <style>
+          #backBtn {
+              position: absolute;
+              left: 0;
+              bottom: 20px;
+              z-index: 100000;
+          }
+      </style>
 </head>
 
 <body onload="init()"  style="margin : 0; ">
+    <button id="backBtn">返回起始位置</button>
     <div id="map" class="map" style ="position:absolute;bottom:0px;top:0px;width:100%"></div>
 
     <script src="../sdk_web/leafletSDK/js/uuid.js"></script>
@@ -43,7 +52,7 @@
     <script src="//code.jquery.com/jquery-3.2.1.min.js"></script>
     <script>
         function init(){
-            var map = L.map('map',{crs:L.CRS.CustomEPSG4326,center: {lon:120.07, lat:29.30},zoom: 26,inertiaDeceleration:15000});
+            var map = L.map('map',{crs:L.CRS.CustomEPSG4326,center: {lon:120.07, lat:29.30},minZoom: 5, zoom: 10,inertiaDeceleration:15000, zoomControl: false});
             //添加底图
             var layer = new L.GXYZ('http://ditu.zjzwfw.gov.cn/mapserver/vmap/zjvmap/getMAP?x={x}&y={y}&l={z}&styleId=tdt_biaozhunyangshi_2017',{tileSize:512,attribution: '&copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors',});
             map.addLayer(layer);
@@ -145,7 +154,7 @@
                         newRoutelalon.forEach(function (val) {
                             latlngs.push([parseFloat(val.split(",")[1]), parseFloat(val.split(",")[0])]);
                         })
-                        // drawPolyLine(latlngs);
+                        drawPolyLine(latlngs);
                         
                     },
                     error: function (err) {
@@ -171,6 +180,15 @@
                 var polyline = L.polyline(latlngs, {color: 'blue'}).addTo(map);
                 map.fitBounds(polyline.getBounds());
             }
+
+
+            // 返回中心位置
+            $('#backBtn').on('click', function () {
+                // map.locate({
+                //     setView: true,
+                //     maxZoom: 16
+                // });
+            });
 
 
         }
