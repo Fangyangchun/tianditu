@@ -1,0 +1,99 @@
+﻿<!DOCTYPE html>
+<html  style="overflow : hidden; ">
+<head>
+    <title>天地图矢量瓦片</title>
+    <meta name="keywords" content="矢量瓦片,矢量索引">
+    <meta name="description" content="矢量瓦片">
+    <meta name="content-type" content="text/html; charset=UTF-8">
+    <meta name="viewport" content="width=device-width,target-densitydpi=high-dpi,initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+    <link rel="stylesheet" href="css/leaflet.css" />
+
+    <script src="js/jquery-3.1.1.js"></script>
+    <script src="js/uuid.js"></script>
+    <script src="js/leaflet-src.js"></script>
+    <script src="js/CustomWebSDK.js"></script>
+
+    <script src="js/layer/vector/stylejs/GGroup.js"></script>
+    <script src="js/layer/vector/stylejs/GLevels.js"></script>
+    <script src="js/layer/vector/stylejs/GStyleItem.js"></script>
+
+    <script src="js/layer/vector/GDynamicMap.js"></script>
+
+</head>
+
+<body onload="init()"  style="margin : 0; ">
+<div id="map" class="map" style ="position:absolute;bottom:0px;top:0px;width:100%"></div>
+
+
+<script>
+    function init(){
+        var map = L.map('map',{crs:L.CRS.CustomEPSG4326,center: {lon:120.15, lat:30.268},zoom: 8,inertiaDeceleration:15000});
+        //添加底图
+        var layer = new L.GDynamicMap('http://118.178.118.175/mapserver/data/zjvmap/getData?x={x}&y={y}&l={z}&styleId=tdt_biaozhunyangshi_2017',{tileSize:512});
+        //创建层级对象
+        var gLevels = new Custom.GLevels(7,20);
+        //根据图层名称创建样式对象
+        var styleItem = new Custom.GStyleItem('行政区划面','行政区划面');
+        styleItem.queryFilter('');
+        //设置样式
+        styleItem.setStyle([{
+            "strokeWidth": 0,
+            "strokeColor": "#FFFFFF",
+            "shadowColor": "",
+            "fillColor": "#Ff0000",
+            "fill": true,
+            "fillOpacity": 1,
+            "stroke": false,
+            "strokeOpacity": 1,
+            "dash": null,
+            "lineCap": "butt",
+            "lineJoin": "miter",
+            "sparsity": 1
+        }]);
+        //将样式添加到层级中
+        gLevels.addStyleItem(styleItem);
+
+        //根据组名称创建组
+        var gGroup = new Custom.GGroup('道路');
+        //创建具体样式对象
+        var styleItem1 = new Custom.GStyleItem('公路','公路');
+        //设置过滤条件
+        styleItem1.queryFilter('display  in  ("4202010413","4206000313","4200010313","4201010413")',
+            {"display":{"name":"display","type":"String"}});
+
+        //设置样式
+        styleItem1.setStyle([
+            {
+                "stroke": false,
+                "strokeWidth": 1.9,
+                "strokeColor": "#8f61d1",
+                "strokeOpacity": 1,
+                "dash": null,
+                "lineCap": null,
+                "sparsity": 4
+            },
+            {
+                "stroke": true,
+                "strokeWidth": 1.5,
+                "strokeOpacity": 1,
+                "strokeColor": "#c29ef3",
+                "dash": null,
+                "lineCap": "round",
+                "sparsity": 4
+            }
+        ]);
+
+        //把样式添加到组中
+        gGroup.addStyle(styleItem1);
+        //把组添加到层级中
+        gLevels.addGroup(gGroup);
+        //把层级添加到layer中
+        layer.addLevels(gLevels);
+        //layer加到map中
+        map.addLayer(layer);
+    }
+
+</script>
+
+</body>
+</html>

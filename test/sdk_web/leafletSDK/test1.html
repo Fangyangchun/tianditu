@@ -1,0 +1,32 @@
+﻿<!DOCTYPE html>
+<html  style="overflow : hidden; ">
+<head>
+    <title>天地图矢量瓦片</title>
+    <meta name="keywords" content="矢量瓦片,矢量索引">
+    <meta name="description" content="矢量瓦片">
+    <meta name="content-type" content="text/html; charset=UTF-8">
+    <meta name="viewport" content="width=device-width,target-densitydpi=high-dpi,initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+    <link rel="stylesheet" href="css/leaflet.css" />
+
+    <<script src="js/jquery-3.1.1.js"></script>
+    <script src="js/uuid.js"></script>
+    <script src="js/leaflet.js"></script>
+    <script src="js/CustomWebSDK.min.js"></script>
+
+
+</head>
+
+<body onload="init()"  style="margin : 0; ">
+<div id="map" class="map" style ="position:absolute;bottom:0px;top:0px;width:100%"></div>
+
+<script>
+    function init(){
+        var map = L.map('map',{crs:L.CRS.CustomEPSG4326,center: {lon:120.15, lat:30.268},zoom: 8,inertiaDeceleration:15000});
+        var layer = new L.GXYZ('http://sdi.zjzwfw.gov.cn/mapserver/vmap/zjvmap/getMAP?x={x}&y={y}&l={z}&styleId=tdt_biaozhunyangshi_2017');
+        map.addLayer(layer);
+    }
+
+</script>
+
+</body>
+</html>

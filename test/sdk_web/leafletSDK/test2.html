@@ -1,0 +1,67 @@
+﻿<!DOCTYPE html>
+<html  style="overflow : hidden; ">
+<head>
+    <title>天地图矢量瓦片</title>
+    <meta name="keywords" content="矢量瓦片,矢量索引">
+    <meta name="description" content="矢量瓦片">
+    <meta name="content-type" content="text/html; charset=UTF-8">
+    <meta name="viewport" content="width=device-width,target-densitydpi=high-dpi,initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+    <link rel="stylesheet" href="css/leaflet.css" />
+
+    <script src="js/jquery-3.1.1.js"></script>
+    <script src="js/uuid.js"></script>
+    <script src="js/leaflet.js"></script>
+    <script src="js/CustomWebSDK.min.js"></script>
+</head>
+
+<body onload="init()"  style="margin : 0; ">
+<div id="map" class="map" style ="position:absolute;bottom:0px;top:0px;width:100%"></div>
+
+
+<script>
+    function init(){
+        var map = L.map('map',{crs:L.CRS.CustomEPSG4326,center: {lon:120.15, lat:30.268},zoom: 13,inertiaDeceleration:15000});
+        //添加底图
+        var layer = new L.GXYZ('http://118.178.118.175/mapserver/vmap/zjvmap/getMAP?x={x}&y={y}&l={z}&styleId=tdt_biaozhunyangshi_2017');
+        map.addLayer(layer);
+
+        //添加注记图层,注记服务还在完善中，等服务完成后，再使用
+        var labelLayer = new L.GWVTAnno("GWVTAnno");
+        var dataSource = new Custom.URLDataSource();
+        dataSource.url = 'http://118.178.118.175/mapserver/label/zjvmap/getDatas?x=${x}&y=${y}&l=${z}&styleId=tdt_biaozhunyangshi_2017';
+
+        //过滤条件
+        var filter = new Custom.Filter();
+        filter.otherDisplay=false;
+        var filterLayer = new Custom.FilterLayer();
+        filterLayer.id = '交通_交通注记_公路';
+//        filterLayer.idFilter ='2141635';
+        filterLayer.addFilterField('Q_fname_S_EQ','杭长高速');
+        filter.addFilterLayer(filterLayer);
+//        dataSource.setFilter(filter);
+        labelLayer.addDataSource(dataSource);
+        map.addLayer(labelLayer);
+
+        map.on('click', function(e) {
+            var event = e.originalEvent;
+            var feature =  labelLayer.getFeatureByXY(event.x,event.y);
+            if(feature){
+                var options = {
+                    maxWidth:200,
+                    maxHeight:50,
+                    autoClose:true,
+                    closeButton:true,//是否使用popup的关闭按钮
+                    offset:[0,0]//设置偏移量，适用于自定义popup
+                };
+               var popup =  L.popup(options)
+                    .setLatLng(e.latlng)
+                    .setContent('<div>'+feature.label+'</div>')
+                   .openOn(map);
+            }
+        });
+    }
+
+</script>
+
+</body>
+</html>

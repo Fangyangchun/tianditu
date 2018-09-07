@@ -1,0 +1,64 @@
+﻿<!DOCTYPE html>
+<html  style="overflow : hidden; ">
+<head>
+    <title>天地图矢量瓦片</title>
+    <meta name="keywords" content="矢量瓦片,矢量索引">
+    <meta name="description" content="矢量瓦片">
+    <meta name="content-type" content="text/html; charset=UTF-8">
+    <meta name="viewport" content="width=device-width,target-densitydpi=high-dpi,initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+    <link rel="stylesheet" href="css/leaflet.css" />
+
+    <script src="js/jquery-3.1.1.js"></script>
+    <script src="js/uuid.js"></script>
+    <script src="js/leaflet.js"></script>
+    <script src="js/CustomWebSDK.min.js"></script>
+
+
+</head>
+
+<body onload="init()"  style="margin : 0; ">
+<div id="map" class="map" style ="position:absolute;bottom:0px;top:0px;width:100%"></div>
+
+
+
+
+<script>
+    function init(){
+        var map = L.map('map',{crs:L.CRS.CustomEPSG4326,center: {lon:120.15, lat:30.268},zoom: 8,inertiaDeceleration:15000});
+        //添加底图
+        var layer = new L.GXYZ('http://sdi.zjzwfw.gov.cn/mapserver/vmap/zjvmap/getMAP?x={x}&y={y}&l={z}&styleId=tdt_biaozhunyangshi_2017');
+        map.addLayer(layer);
+
+        //添加注记图层,注记服务还在完善中，等服务完成后，再使用
+        var labelLayer = new L.GWVTAnno("GWVTAnno");
+        var dataSource = new Custom.URLDataSource();
+        dataSource.url = 'http://sdi.zjzwfw.gov.cn/mapserver/label/zjvmap/getDatas?x=${x}&y=${y}&l=${z}&styleId=tdt_biaozhunyangshi_2017';
+        labelLayer.addDataSource(dataSource);
+        map.addLayer(labelLayer);
+
+        var circle = L.circle([30.268,120.20], {
+            color: 'green',
+            fillColor: '#f03',
+            fillOpacity: 0.5,
+            radius: 10000
+        }).addTo(map);
+
+        // add a polygon
+        var polygon = L.polygon([
+            [30.05, 120.10],
+            [30.16, 120.10],
+            [30.28, 120.36],
+            [30.05, 120.10]
+        ],{
+            color: 'green',
+            fillColor: '#0000ff',
+            fillOpacity: 0.5,
+            radius: 10000
+        }).addTo(map);
+
+    }
+
+</script>
+
+</body>
+</html>

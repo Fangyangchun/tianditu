@@ -1,0 +1,84 @@
+﻿<!DOCTYPE html>
+<html  style="overflow : hidden; ">
+<head>
+    <title>天地图矢量瓦片</title>
+    <meta name="keywords" content="矢量瓦片,矢量索引">
+    <meta name="description" content="矢量瓦片">
+    <meta name="content-type" content="text/html; charset=UTF-8">
+    <meta name="viewport" content="width=device-width,target-densitydpi=high-dpi,initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+
+
+    <!--<script src="js/jquery-3.1.1.js"></script>-->
+    <script src="js/uuid.js"></script>
+    <script src="js/OpenLayers.debug.min.js"></script>
+    <script src="js/CustomWebSDK.js"></script>
+    <!--<script src="js/hidpi-canvas.js"></script>-->
+    <!--<script src="js/Version.js"></script>-->
+    <!--<script src="js/CanvasLayer.js"></script>-->
+    <!--<script src="js/LabelDrawer.js"></script>-->
+    <!--<script src="js/DataSource.js"></script>-->
+    <!--<script src="js/URLDataSource.js"></script>-->
+    <!--<script src="js/Filter.js"></script>-->
+    <!--<script src="js/FilterLayer.js"></script>-->
+    <!--<script src="js/LocalDataSource.js"></script>-->
+    <!--<script src="js/Feature.js"></script>-->
+    <!--<script src="js/GWVTAnno.js"></script>-->
+    <!--<script src="js/GAnnoAvoid.js"></script>-->
+    <!--<script src="js/GDistance.js"></script>-->
+    <!--<script src="js/GXYZ.js"></script>-->
+    <!--<script src="js/GXYZUtil.js"></script>-->
+    <!--<script src="js/GFRONT.js"></script>-->
+    <!--<script src="js/QueryFilter.js"></script>-->
+</head>
+
+<body onload="init()"  style="margin : 0; ">
+<div id="map" class="map" style ="position:absolute;bottom:0px;top:0px;width:100%"></div>
+
+
+
+
+<script>
+    function init() {
+        var map = new OpenLayers.Map({
+            div: "map",
+            projection: "EPSG:4326",
+            maxExtent: new OpenLayers.Bounds(-180, -90, 180, 90),
+            numZoomLevels: 19
+        });
+
+        var a = 10.9;
+        console.log(parseInt(a));
+
+        var size = new OpenLayers.Size(512,512);
+        var layer = new OpenLayers.Layer.GXYZ("layer",
+            'http://127.0.0.1/mapserver/vmap/kongjianTest/getMAP?x=${x}&y=${y}&l=${z}&styleId=kongjiantest1',
+            {sphericalMercator: false, isBaseLayer: true,tileSize:size});
+        map.addLayer(layer);
+
+        var labelLayer = new OpenLayers.Layer.GWVTAnno({tileSize:512});
+        var dataSource = new Custom.URLDataSource();
+        dataSource.url = 'http://127.0.0.1/mapserver/label/kongjianTest/getDatas?x=${x}&y=${y}&l=${z}&styleId=kongjiantest1';
+
+        labelLayer.addDataSource(dataSource);
+//        map.addLayer(labelLayer);
+        map.setCenter(new OpenLayers.LonLat( 120.15, 30.268), 11);
+
+
+        map.events.register("mouseup", this, function(event){
+            if(map.dragging){
+                return;
+            }
+
+            //拾取要素
+            var features = layer.getFeatureByXY(event.xy.x,event.xy.y,function(layerFeatures){
+                //高亮
+                layer.highlightFeatures(layerFeatures,{color:"red",opacity:0.3})
+            });
+        });
+    }
+
+
+</script>
+
+</body>
+</html>

@@ -1,0 +1,64 @@
+﻿<!DOCTYPE html>
+<html  style="overflow : hidden; ">
+<head>
+    <title>天地图矢量瓦片</title>
+    <meta name="keywords" content="矢量瓦片,矢量索引">
+    <meta name="description" content="矢量瓦片">
+    <meta name="content-type" content="text/html; charset=UTF-8">
+    <meta name="viewport" content="width=device-width,target-densitydpi=high-dpi,initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+    <link rel="stylesheet" href="css/leaflet.css" />
+
+    <script src="js/leaflet.js"></script>
+    <script src="js/CustomWebSDK.js"></script>
+</head>
+
+<body onload="init()"  style="margin : 0; ">
+<div id="map" class="map" style ="position:absolute;bottom:0px;top:0px;width:100%"></div>
+
+
+<script>
+    function init(){
+        var map = L.map('map',{crs:L.CRS.CustomEPSG4326,center: {lon:120.20, lat:30.268},zoom: 12,inertiaDeceleration:15000});
+        //添加底图
+        var layer = new L.GXYZ('http://118.178.118.175/mapserver/vmap/zjvmap/getMAP?x={x}&y={y}&l={z}&styleId=tdt_biaozhunyangshi_2017',{tileSize:512,maxZoom: 21});
+        map.addLayer(layer);
+
+//        var layer = new L.GXYZ('http://127.0.0.1:8091/mapserver/label/zjvmap/getImg?x={x}&y={y}&l={z}&styleId=tdt_biaozhunyangshi_2017',{tileSize:512,maxZoom: 21});
+//        map.addLayer(layer);
+
+        //添加注记图层
+//        var labelLayer = new L.GWVTAnno({tileSize:256});
+//        var dataSource = new Custom.URLDataSource();
+//        dataSource.url = 'http://118.178.118.175/mapserver/label/zjvmap/getDatas?x=${x}&y=${y}&l=${z}&styleId=tdt_biaozhunyangshi_2017';
+//        labelLayer.addDataSource(dataSource);
+//        map.addLayer(labelLayer);
+
+        var colors = ['#ff0000','#ffff00','#ff00ff','#0000ff','#000000','#99ff00','#ff9900','#999999',
+        '#cc00cc','#00ccaa','#aa3333'];
+
+        map.on('click', function(e) {
+            var latlng =e.latlng;
+            var event = e.originalEvent;
+            //拾取要素
+            var features = layer.getFeatureByXY(event.x,event.y,function(layerFeatures){
+                var index = 0;
+                for(var layerId in layerFeatures){
+                    var fs = layerFeatures[layerId];
+                    var layerStyle = fs.style;
+                    var hasFid = false;
+                    for(var fid in fs){
+                        var feature = fs[fid];
+                        feature.style = {color:colors[index]};
+                        index++;
+                    }
+                }
+                //高亮
+                layer.highlightEveryFeatures(layerFeatures,0.4);
+            });
+        });
+    }
+
+</script>
+
+</body>
+</html>

@@ -1,0 +1,28 @@
+﻿<jscompress public="http://www.jscompress.cn/" command="import-combineset">
+<combinefile path="CustomWebSDK.js">
+    <auto value="0" />
+    <sourcefile path=".\uuid.js" />
+    <sourcefile path=".\Version.js" />
+    <sourcefile path=".\hidpi-canvas.js" />
+    <sourcefile path=".\es6-promise.js" />
+    <sourcefile path=".\filter\Filter.js" />
+    <sourcefile path=".\filter\FilterLayer.js" />
+    <sourcefile path=".\filter\QueryFilter.js" />
+    <sourcefile path=".\layer\datasource\DataSource.js" />
+    <sourcefile path=".\layer\datasource\LocalDataSource.js" />
+    <sourcefile path=".\layer\datasource\MapStyle.js" />
+    <sourcefile path=".\layer\datasource\URLDataSource.js" />
+    <sourcefile path=".\layer\label\avoid\GAnnoAvoid.js" />
+    <sourcefile path=".\layer\label\avoid\GDistance.js" />
+    <sourcefile path=".\layer\label\draw\CanvasLayer.js" />
+    <sourcefile path=".\layer\label\draw\GDrawGeomerty.js" />
+    <sourcefile path=".\layer\label\draw\LabelDrawer.js" />
+    <sourcefile path=".\layer\label\feature\Feature.js" />
+    <sourcefile path=".\layer\label\GWVTAnno.js" />
+    <sourcefile path=".\layer\vector\draw\GXYZUtil.js" />
+    <sourcefile path=".\layer\vector\draw\VectorDraw.js" />
+    <sourcefile path=".\layer\vector\GXYZ.js" />
+    <sourcefile path=".\layer\vector\GFRONT.js" />
+    <sourcefile path=".\layer\GServiceGroup.js" />
+</combinefile>
+</jscompress>

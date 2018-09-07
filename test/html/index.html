@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html  style="overflow : hidden; ">
+<head>
+    <title>天地图矢量瓦片</title>
+    <meta name="keywords" content="矢量瓦片,矢量索引">
+    <meta name="description" content="矢量瓦片">
+    <meta name="content-type" content="text/html; charset=UTF-8">
+    <meta name="viewport" content="width=device-width,target-densitydpi=high-dpi,initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+    <link rel="stylesheet" href="../sdk_web/leafletSDK/css/leaflet.css" />
+    <!-- <script src="https://appx/web-view.min.js"></script> -->
+    <script>
+    //     if (navigator.userAgent.indexOf('AlipayClient') > -1) {
+    //       document.writeln('<script src="https://appx/web-view.min.js"' + '>' + '<' + '/' + 'script>');
+    //     }
+      
+    //   // javascript
+    // //   my.navigateTo({url: '../get-user-info/get-user-info'});
+      
+    //   // 网页向小程序 postMessage 消息
+    //   my.postMessage({name:"测试web-view"});
+      
+    //   // 接收来自小程序的消息。
+    //   my.onMessage = function(e) {
+    //     console.log(e); //{'sendToWebView': '1'}
+    //   }
+      
+    //   // 判断是否运行在小程序环境里
+    //   my.getEnv(function(res) {
+    //     console.log(res.miniprogram) // true
+    //   });
+      
+      </script>
+</head>
+
+<body onload="init()"  style="margin : 0; ">
+    <div id="map" class="map" style ="position:absolute;bottom:0px;top:0px;width:100%"></div>
+
+    <script src="../sdk_web/leafletSDK/js/uuid.js"></script>
+    <script src="../sdk_web/leafletSDK/js/leaflet-src.js"></script>
+    <script src="../sdk_web/leafletSDK/js/leaflet.js"></script>
+    <script src="../sdk_web/leafletSDK/js/CustomWebSDK.min.js"></script> 
+    <!-- <script src="../libs/jquery-1.12.3.min.js"></script> -->
+    <script src="//code.jquery.com/jquery-3.2.1.min.js"></script>
+    <script>
+        function init(){
+            var map = L.map('map',{crs:L.CRS.CustomEPSG4326,center: {lon:120.07, lat:29.30},zoom: 10,inertiaDeceleration:15000});
+            //添加底图
+            var layer = new L.GXYZ('http://ditu.zjzwfw.gov.cn/mapserver/vmap/zjvmap/getMAP?x={x}&y={y}&l={z}&styleId=tdt_biaozhunyangshi_2017',{tileSize:512,attribution: '&copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors',});
+            map.addLayer(layer);
+            map.attributionControl.setPrefix('汇信科技');
+
+            // 添加注记图层
+            var labelLayer = new L.GWVTAnno({tileSize:512});
+            map.on('click', function(e) {
+                // console.log(map.getCenter());
+                var latlng =e.latlng;
+                var event = e.originalEvent;
+                // 拾取要素
+                var features = layer.getFeatureByXY(event.x,event.y,function(layerFeatures){
+                    //高亮
+                    delete layerFeatures['政区境界_行政区划面'];
+                    layer.highlightFeatures(layerFeatures,{color:"#ff00ff",opacity:0.4})
+                });
+
+                // popup框
+                var event = e.originalEvent;
+                var feature =  labelLayer.getFeatureByXY(event.x,event.y);
+                if(feature){
+                    var options = {
+                        maxWidth:200,
+                        maxHeight:50,
+                        autoClose:true,
+                        closeButton:true,//是否使用popup的关闭按钮
+                        offset:[0,0]//设置偏移量，适用于自定义popup
+                    };
+                    var popup =  L.popup(options)
+                        .setLatLng(e.latlng)
+                        .setContent('<div>'+feature.label+'</div>')
+                        .openOn(map);
+                }
+
+            });
+            var dataSource = new Custom.URLDataSource();
+            dataSource.url = 'http://ditu.zjzwfw.gov.cn/mapserver/label/zjvmap/getDatas?x=${x}&y=${y}&l=${z}&styleId=tdt_biaozhunyangshi_2017';
+            labelLayer.addDataSource(dataSource);
+            map.addLayer(labelLayer);
+
+
+            // 自定义标注
+            var customIcon = L.icon({ 
+                iconUrl: '../sdk_web/leafletSDK/js/theme/default/img/add_point_on.png', 
+                //以下都是可选参数 
+                // iconSize: [38, 95], // 自定义图标size 
+                // iconAnchor:   [22, 94], // 自定义锚点去适应icon的位置
+            }); 
+            var marker = L.marker( 
+                [map.getCenter().lat, map.getCenter().lng], 
+                { 
+                draggable: false,// 使图标可拖拽
+                title: '义乌市',// 添加一个标题
+                opacity: 1,
+                icon: customIcon//添加自定义的图标
+                }
+            ).addTo(map);
+            //创建标注对象
+            // var marker = L.marker([map.getCenter().lat, map.getCenter().lng], {title: '义乌市'}).addTo(map);
+
+            // 轨迹规划
+            var polyLineUrl = encodeURI("http://dh.ditu.zj.cn:18006/geocoding/getLatLonByAddress.jsonp?&city=义乌市&keyword=火车站&width=500&height=430&pn=1&customer=2&encode=UTF-8");
+            $.ajax({
+                url: polyLineUrl,
+                dataType: "jsonp",
+                // jsonp: "callback",
+                success: function(res) {
+                    var orig = 120.186792 + "," + 29.329037;
+                    getPolyLineData(orig, res.strlatlon)
+                },
+                error: function (err) {
+
+                }
+            });
+            function getPolyLineData (orig, dest) {
+                var polyLineDataUrl = encodeURI("http://dh.ditu.zj.cn:18008/routec/getDriveByLatLon.jsonp?&orig=" + orig + "&dest=" + dest + "&width=500&height=430&encode=UTF-8&inGb=g02&outGb=g02");
+                $.ajax({
+                    url: polyLineDataUrl,
+                    dataType: "jsonp",
+                    // jsonp: "callback",
+                    success: function(res) {
+                        // console.log(res);
+                        var preData = Math.round(res.duration / 60), h, m, str, latlngs = [], newRoutelalon;
+                        h = Math.floor(preData / 60)
+                        m = preData % 60;
+                        if (m == 0 && h == 0) {
+                            str = "距离太短，无法规划路径"
+                        }
+                        if (m == 0) {
+                            str = "全程" + res.distance + "公里,大约需要" + h + "小时"
+                        } else if (h == 0) {
+                            str = "全程" + res.distance + "公里,大约需要" + m + "分钟"
+                        } else {
+                            str = "全程" + res.distance + "公里,大约需要" + h + "小时" + m + "分钟"
+                        }
+                        newRoutelalon = res.routelatlon.split(";");
+                        newRoutelalon.pop();
+                        newRoutelalon.forEach(function (val) {
+                            latlngs.push([parseFloat(val.split(",")[1]), parseFloat(val.split(",")[0])]);
+                        })
+                        drawPolyLine(latlngs);
+                        
+                    },
+                    error: function (err) {
+                        console.log("服务器出错");
+                    }
+                });
+            }
+
+            function drawPolyLine (latlngs) {
+                // var polylinePoints = [];
+                // latlngs.forEach(function (val) {
+                //     polylinePoints.push(new L.LatLng(val[0], val[1]));
+                // })
+                // var polylineOptions = {
+                //     color: 'blue',
+                //     weight: 6,
+                //     opacity: 0.9
+                // };
+                // var polyline = new L.Polyline(polylinePoints, polylineOptions);
+                // map.addLayer(polyline);                        
+                // // zoom the map to the polyline
+                // map.fitBounds(polyline.getBounds());
+
+                var polyline = L.polyline(latlngs, {color: 'blue'}).addTo(map);
+                map.fitBounds(polyline.getBounds());
+            }
+
+
+        }
+
+    </script>
+
+</body>
+</html>

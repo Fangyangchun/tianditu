@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html  style="overflow : hidden; ">
+<head>
+    <title>叠加天地图wms底图</title>
+    <meta name="keywords" content="矢量瓦片,矢量索引">
+    <meta name="description" content="矢量瓦片">
+    <meta name="content-type" content="text/html; charset=UTF-8">
+    <meta name="viewport" content="width=device-width,target-densitydpi=high-dpi,initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+    <link rel="stylesheet" href="../sdk_web/leafletSDK/css/leaflet.css" />
+
+</head>
+
+<body onload="init()"  style="margin : 0; ">
+
+    <div id="map" class="map" style ="position:absolute;bottom:0px;top:0px;width:100%"></div>
+
+
+    <script src="../sdk_web/leafletSDK/js/uuid.js"></script>
+    <script src="../sdk_web/leafletSDK/js/leaflet.js"></script>
+    <script src="../sdk_web/leafletSDK/js/CustomWebSDK.min.js"></script>
+    <script>
+        function init(){
+            var map = L.map('map',{crs:L.CRS.CustomEPSG4326,center: {lon:121.24, lat:29.268},maxZoom: 20,zoom:7,inertiaDeceleration:15000,inertiaThreshold:2000});
+
+            //添加底图
+            var layer = new L.GXYZ('http://ditu.zjzwfw.gov.cn/mapserver/vmap/zjvmap/getMAP?x={x}&y={y}&l={z}&styleId=tdt_biaozhunyangshi_2017',{tileSize:256,maxZoom: 20,keepBuffer:0,updateWhenZooming:false});
+            map.addLayer(layer);
+
+            //叠加wms图层
+            var wmsLayer = L.tileLayer.wms('http://183.129.171.243:8899/geoserver/zjplatform/RTIC_POLYLINE/ows', {
+                layers: 'RTIC_POLYLINE',tileSize:256,maxZoom: 20
+            });
+            wmsLayer.wmsParams.transparent = true;
+            wmsLayer.wmsParams.format = 'image/png';
+            map.addLayer(wmsLayer);
+
+            //添加注记图层
+            var labelLayer = new L.GWVTAnno({tileSize:512});
+            var dataSource = new Custom.URLDataSource();
+            dataSource.url = 'http://ditu.zjzwfw.gov.cn/mapserver/label/zjvmap/getDatas?x=${x}&y=${y}&l=${z}&styleId=tdt_biaozhunyangshi_2017';
+            labelLayer.addDataSource(dataSource);
+            map.addLayer(labelLayer);
+        }
+    </script>
+</body>
+</html>

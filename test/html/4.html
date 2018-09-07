@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html  style="overflow : hidden; ">
+<head>
+    <title>要素过滤</title>
+    <meta name="keywords" content="矢量瓦片,矢量索引">
+    <meta name="description" content="矢量瓦片">
+    <meta name="content-type" content="text/html; charset=UTF-8">
+    <meta name="viewport" content="width=device-width,target-densitydpi=high-dpi,initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+    <link rel="stylesheet" href="../sdk_web/leafletSDK/css/leaflet.css" />
+
+ 
+    <script src="../sdk_web/leafletSDK/js/uuid.js"></script>
+    <script src="../sdk_web/leafletSDK/js/leaflet.js"></script>
+    <script src="../sdk_web/leafletSDK/js/CustomWebSDK.min.js"></script>
+    <script src="../sdk_web/leafletSDK/js/filter/Filter.js"></script>
+    <script src="../sdk_web/leafletSDK/js/filter/FilterLayer.js"></script>
+
+</head>
+
+<body onload="init()"  style="margin : 0; ">
+<div id="map" class="map" style ="position:absolute;bottom:0px;top:0px;width:100%"></div>
+
+
+<script>
+    function init(){
+        var map = L.map('map',{crs:L.CRS.CustomEPSG4326,center: {lon:120.15, lat:30.268},zoom: 8,inertiaDeceleration:15000});
+        //添加底图
+        var layer = new L.GXYZ('https://ditu.zjzwfw.gov.cn/mapserver/vmap/zjvmap/getMAP?x={x}&y={y}&l={z}&styleId=tdt_biaozhunyangshi_2017',{tileSize:512});
+        //过滤条件
+        var filter = new Custom.Filter();
+        filter.otherDisplay=false;                            //是否显示过滤以外的字段
+        var filterLayer = new Custom.FilterLayer();
+        console.log(filterLayer);
+        filterLayer.id = '水系_水系_面状水系';                //过滤图层id
+        filterLayer.addFilterField('Q_fname_S_EQ','钱塘江');  //过滤字段   具体字段信息可参考2.5 获取服务图层及字段信息 fname为过滤字段名称
+        filter.addFilterLayer(filterLayer);
+        layer.setFilter(filter);
+        map.addLayer(layer);
+    }
+
+</script>
+
+</body>
+</html>

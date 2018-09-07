@@ -1,0 +1,106 @@
+﻿<!DOCTYPE html>
+<html  style="overflow : hidden; ">
+<head>
+    <title>天地图矢量瓦片</title>
+    <meta name="keywords" content="矢量瓦片,矢量索引">
+    <meta name="description" content="矢量瓦片">
+    <meta name="content-type" content="text/html; charset=UTF-8">
+    <meta name="viewport" content="width=device-width,target-densitydpi=high-dpi,initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+    <link rel="stylesheet" href="css/leaflet.css" />
+
+    <script src="js/jquery-3.1.1.js"></script>
+    <script src="js/uuid.js"></script>
+    <script src="js/leaflet.js"></script>
+    <script src="js/CustomWebSDK.min.js"></script>
+
+</head>
+
+<body onload="init()"  style="margin : 0; ">
+<div id="map" class="map" style ="position:absolute;bottom:0px;top:0px;width:100%"></div>
+
+
+
+
+<script>
+    function init(){
+        var map = L.map('map',{crs:L.CRS.CustomEPSG4326,easeLinearity:0.6,center: {lon:120.15, lat:30.268},zoom: 8});
+
+
+        var layer = new L.GFRONT('http://sdi.zjzwfw.gov.cn/mapserver/data/zjvmap/getData?x={x}&y={y}&l={z}&styleId=tdt_biaozhunyangshi_2017');
+        var dataSource1 = new Custom.MapStyle();
+        layer.setDatasource(dataSource1);
+        /*//过滤条件
+        var filter1 = new Custom.Filter();
+        filter1.cmdAll = true;
+        var filterLayer1 = new Custom.FilterLayer();
+        filterLayer1.id = '一级水系面';
+        //filterLayer1.display = false;
+        //filterLayer1.addFilterField('Q_name_S_EQ','长江');
+        filter1.addFilterLayer(filterLayer1);
+        layer.setFilter(filter1);*/
+        map.addLayer(layer);
+//
+        var labelLayer = new L.GWVTAnno("GWVTAnno");
+        var dataSource = new Custom.URLDataSource();
+        dataSource.url = 'http://sdi.zjzwfw.gov.cn/mapserver/label/zjvmap/getDatas?x=${x}&y=${y}&l=${z}&styleId=tdt_biaozhunyangshi_2017';
+
+        //过滤条件
+        var filter = new Custom.Filter();
+        var filterLayer = new Custom.FilterLayer();
+        filterLayer.id = '首都和省级行政区中心';
+        filterLayer.addFilterField('Q_name_S_EQ','上海');
+        filter.addFilterLayer(filterLayer);
+        dataSource.setFilter(filter);
+
+//        var circle = L.circle([30.268,120.15], 500, {
+//            color: '#ff00ff',
+//            fillColor: '#ff00ff',
+//            fillOpacity: 0.5
+//        }).addTo(map);
+
+/*        var canvas = L.canvas();
+        var circle = L.circle([30.268,120.15], 500, {
+            color: 'red',
+            fillColor: '#f03',
+            renderer: canvas,
+            fillOpacity: 0.5
+        }).addTo(map);*/
+        labelLayer.addDataSource(dataSource);
+/*        var dataSource1 = new Custom.URLDataSource();
+        dataSource1.url = 'http://localhost:8080/mapserver/label/china/getDatas?x=${x}&y=${y}&l=${z}';
+        dataSource1.styleUrl ='http://localhost:8080/mapserver/server/style';
+        dataSource1.styleId = 'styleLabel1';*/
+//        labelLayer.addDataSource(dataSource1);
+        map.addLayer(labelLayer);
+
+
+
+
+
+
+
+
+
+//        var LeafIcon = L.Icon.extend({
+//            options: {
+//                iconSize:     [20, 20],
+//                shadowSize:   [50, 64],
+//                iconAnchor:   [22, 94],
+//                shadowAnchor: [4, 62],
+//                renderer: canvas,
+//                popupAnchor:  [-3, -76]
+//            }
+//        });
+//        var greenIcon = new LeafIcon({iconUrl: 'images/170102.png'});
+//            L.marker([30.268,120.15], {icon: greenIcon}).addTo(map);
+//        var marker = L.marker([30.268,120.15])
+//            .addTo(map)
+//            .bindPopup("<b>中国</b><br>安徽黄山.")
+//            .openPopup();
+
+    }
+
+</script>
+
+</body>
+</html>
