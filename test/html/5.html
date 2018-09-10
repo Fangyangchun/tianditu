@@ -7,10 +7,31 @@
     <meta name="content-type" content="text/html; charset=UTF-8">
     <meta name="viewport" content="width=device-width,target-densitydpi=high-dpi,initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
     <link rel="stylesheet" href="../sdk_web/leafletSDK/css/leaflet.css" />
+    <style>
+        .resetBtn {
+            position: absolute;
+            left: 10px;
+            bottom: 30%;
+            z-index: 100000;
+        }
+        .modifyBtn {
+            position: absolute;
+            left: 10px;
+            bottom: 20px;
+            width: calc(100% - 20px);
+            z-index: 100000;
+            background: white;
+            border: none;
+            line-height: 40px;
+            box-shadow: 0px 0px 14px -1px #c8c8c8; 
+        }
+    </style>
 </head>
 
 <body onload="init()"  style="margin : 0; ">
     <div id="map" class="map" style ="position:absolute;bottom:0px;top:0px;width:100%"></div>
+    <button class="resetBtn">重置</button>
+    <button class="modifyBtn">标注</button>
 
     <script src="../sdk_web/leafletSDK/js/uuid.js"></script>
     <script src="../sdk_web/leafletSDK/js/leaflet-src.js"></script>
@@ -19,8 +40,45 @@
     <!-- <script src="../libs/jquery-1.12.3.min.js"></script> -->
     <script src="//code.jquery.com/jquery-3.2.1.min.js"></script>
     <script>
-        var map = L.map('map');
-        map.locate({setView: true, maxZoom: 16});
+        function init(initLatlng) {
+            var initLatlng = initLatlng || {lon:120.14989, lat:30.27751};  // 默认经纬度为蓝天商务中心
+            var map = L.map('map',{crs:L.CRS.CustomEPSG4326,center: initLatlng, minZoom: 5, zoom: 17, inertiaDeceleration:15000, zoomControl: false});
+            var tileAddress = 'http://ditu.zjzwfw.gov.cn/mapserver/vmap/zjvmap/getMAP?x={x}&y={y}&l={z}&styleId=tdt_biaozhunyangshi_2017';
+
+            var layer = new L.GXYZ(tileAddress, {tileSize:512,attribution: '&copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors',minZoom: 5});
+            map.attributionControl.setPrefix('汇信科技');
+            map.addLayer(layer);
+
+            // 添加注记图层
+            var labelLayer = new L.GWVTAnno({tileSize:512});
+            var dataSource = new Custom.URLDataSource();
+            dataSource.url = 'http://ditu.zjzwfw.gov.cn/mapserver/label/zjvmap/getDatas?x=${x}&y=${y}&l=${z}&styleId=tdt_biaozhunyangshi_2017';
+            labelLayer.addDataSource(dataSource);
+            map.addLayer(labelLayer);
+            var customIcon = L.icon({ 
+                iconUrl: '../sdk_web/leafletSDK/js/theme/default/img/add_point_on.png',
+                iconSize: [20, 20],
+                iconAnchor:   [10, 10],
+            }); 
+            var marker = L.marker( 
+                [map.getCenter().lat, map.getCenter().lng], 
+                { 
+                draggable: false,// 使图标可拖拽
+                title: '义乌市',// 添加一个标题
+                opacity: 1,
+                icon: customIcon//添加自定义的图标
+                }
+            ).addTo(map).bindPopup("您当前所在位置");
+            // marker.bindTooltip("my tooltip text").openTooltip();
+            L.circle([map.getCenter().lat, map.getCenter().lng], {radius: 30}).addTo(map);
+
+            map.on('click', function(e) {
+                marker.setLatLng(e.latlng);
+                marker.bindTooltip("my tooltip text").openTooltip();
+            });
+
+        }
+        
 
     </script>
 
