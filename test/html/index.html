@@ -111,7 +111,7 @@
                 icon: customIcon//添加自定义的图标
                 }
             ).addTo(map).bindPopup("你就在这个圈内").openPopup();
-            // marker.bindTooltip("my tooltip text").openTooltip();
+            // marker.unbindTooltip().bindTooltip("my tooltip text", {offset: [0, 10], direction : "bottom"}).openTooltip();
             L.circle([map.getCenter().lat, map.getCenter().lng], {radius: 200}).addTo(map);
             //创建标注对象
             // var marker = L.marker([map.getCenter().lat, map.getCenter().lng], {title: '义乌市'}).addTo(map);

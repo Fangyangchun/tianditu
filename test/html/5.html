@@ -8,28 +8,38 @@
     <meta name="viewport" content="width=device-width,target-densitydpi=high-dpi,initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
     <link rel="stylesheet" href="../sdk_web/leafletSDK/css/leaflet.css" />
     <style>
-        .resetBtn {
+        button, input {
             position: absolute;
             left: 10px;
-            bottom: 30%;
             z-index: 100000;
+            outline: none;
+            border: none;
+            background: white;
+            font-size: 14px;
+        }
+        .resetBtn {
+            bottom: 30%;
+            border: 1px solid rgb(51, 136, 255);
         }
         .modifyBtn {
-            position: absolute;
-            left: 10px;
             bottom: 20px;
             width: calc(100% - 20px);
-            z-index: 100000;
-            background: white;
-            border: none;
-            line-height: 40px;
-            box-shadow: 0px 0px 14px -1px #c8c8c8; 
+            line-height: 36px;
+            box-shadow: 0px 0px 14px -1px #c8c8c8;
+        }
+        .iptSearch {
+            width: calc(100% - 40px);
+            padding: 0 10px;
+            top: 10px;
+            line-height: 36px;
+            box-shadow: 0px 0px 14px -1px #c8c8c8;
         }
     </style>
 </head>
 
 <body onload="init()"  style="margin : 0; ">
     <div id="map" class="map" style ="position:absolute;bottom:0px;top:0px;width:100%"></div>
+    <input type="text" placeholder="请输入地址" class="iptSearch" />
     <button class="resetBtn">重置</button>
     <button class="modifyBtn">标注</button>
 
@@ -40,9 +50,11 @@
     <!-- <script src="../libs/jquery-1.12.3.min.js"></script> -->
     <script src="//code.jquery.com/jquery-3.2.1.min.js"></script>
     <script>
-        function init(initLatlng) {
+        function init(initLatlng, cityName) {
             var initLatlng = initLatlng || {lon:120.14989, lat:30.27751};  // 默认经纬度为蓝天商务中心
-            var map = L.map('map',{crs:L.CRS.CustomEPSG4326,center: initLatlng, minZoom: 5, zoom: 17, inertiaDeceleration:15000, zoomControl: false});
+            var initZoom = 17;
+            var cityName = cityName || "慈溪市";
+            var map = L.map('map',{crs:L.CRS.CustomEPSG4326,center: initLatlng, minZoom: 5, zoom: initZoom, inertiaDeceleration:15000, zoomControl: false});
             var tileAddress = 'http://ditu.zjzwfw.gov.cn/mapserver/vmap/zjvmap/getMAP?x={x}&y={y}&l={z}&styleId=tdt_biaozhunyangshi_2017';
 
             var layer = new L.GXYZ(tileAddress, {tileSize:512,attribution: '&copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors',minZoom: 5});
@@ -73,8 +85,54 @@
             L.circle([map.getCenter().lat, map.getCenter().lng], {radius: 30}).addTo(map);
 
             map.on('click', function(e) {
-                marker.setLatLng(e.latlng);
-                marker.bindTooltip("my tooltip text").openTooltip();
+                var reverseResolutionUrl = encodeURI("http://dh.ditu.zj.cn:18005/inverse/getInverseGeocoding.jsonp?&detail=1&zoom=11&latlon=" + e.latlng.lng + "," + e.latlng.lat + "&lat=&lon=&customer=2");
+                $.ajax({
+                    url: reverseResolutionUrl,
+                    dataType: "jsonp",
+                    // jsonp: "callback",
+                    success: function(res) {
+                        console.log(res);
+                        marker.setLatLng(e.latlng);
+                        marker.unbindTooltip().bindTooltip(res.city.value + res.dist.value + res.town.value + res.poi, {offset: [0, 10], direction : "bottom"}).openTooltip();
+                    },
+                    error: function (err) {
+                        console.log("地址解析出错");
+                    }
+                });
+            });
+
+            $('.iptSearch').on('keydown',function(e){
+                // e.preventDefault();
+                if(e.keyCode == 13){
+                    var keyWord = e.target.value;
+                    var resolutionUrl = encodeURI("http://dh.ditu.zj.cn:18006/geocoding/getLatLonByAddress.jsonp?&city=" + cityName + "&keyword=" + keyWord + "&width=500&height=430&pn=1&customer=2&encode=UTF-8");
+                    $.ajax({
+                        url: resolutionUrl,
+                        dataType: "jsonp",
+                        // jsonp: "callback",
+                        success: function(res) {
+                            var newAdress = res.strlatlon;
+                            if (newAdress == "0.0,0.0") {
+                                console.log("未查询到相关信息");
+                            } else {
+                                var newCenterLatlon = {lon: parseFloat(newAdress.split(",")[0]), lat: parseFloat(newAdress.split(",")[1])}
+                                marker.setLatLng(newCenterLatlon);
+                                marker.unbindTooltip().bindTooltip(keyWord, {offset: [0, 10], direction : "bottom"}).openTooltip();
+                                map.panTo(newCenterLatlon)
+                            }
+                        },
+                        error: function (err) {
+                            console.log("地址解析出错");
+                        }
+                    });
+                }
+            });
+            $('.resetBtn').on('click',function(e){
+                var a = map.panTo(initLatlng);
+                setTimeout(function () {
+                    map.setZoom(initZoom);
+                }, 300);
+                marker.unbindTooltip().setLatLng(initLatlng);
             });
 
         }
