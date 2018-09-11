@@ -6,8 +6,7 @@
     <meta name="description" content="矢量瓦片">
     <meta name="content-type" content="text/html; charset=UTF-8">
     <meta name="viewport" content="width=device-width,target-densitydpi=high-dpi,initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
-    <link rel="stylesheet" href="../sdk_web/leafletSDK/css/leaflet.css" />
-    
+    <link rel="stylesheet" href="../sdk_web/leafletSDK/css/leaflet.css" />   
     <style>
         button, input {
             position: absolute;
@@ -58,35 +57,37 @@
     <script src="../sdk_web/leafletSDK/js/CustomWebSDK.min.js"></script> 
     <script src="../libs/jquery-1.12.3.min.js"></script>
     <!-- <script src="//code.jquery.com/jquery-3.2.1.min.js"></script> -->
-    <script src="https://appx/web-view.min.js"></script>
+    <!-- <script src="https://appx/web-view.min.js"></script> -->
     <script>
-        if (navigator.userAgent.indexOf('AlipayClient') > -1) {
-          document.writeln('<script src="https://appx/web-view.min.js"' + '>' + '<' + '/' + 'script>');
-        }
-        my.getEnv(function(res) {
-            if (!res.miniProgram) {
-                my.alert({
-                    content:JSON.stringify('运行出错')
-                });
-            }
-        });
+        // if (navigator.userAgent.indexOf('AlipayClient') > -1) {
+        //   document.writeln('<script src="https://appx/web-view.min.js"' + '>' + '<' + '/' + 'script>');
+        // }
+        // my.getEnv(function(res) {
+        //     if (!res.miniProgram) {
+        //         my.alert({
+        //             content:JSON.stringify('运行出错')
+        //         });
+        //     }
+        // });
         var initLatlng, initZoom = 17, cityName, newCenterData;
         
-        my.postMessage('init');
+        // my.postMessage('init');
         // 来自小程序的消息。
-        my.onMessage = function(e) {
-            initLatlng = {lon: e.lon, lat: e.lat} || {lon: 120.14989, lat: 30.27751};  // 默认经纬度为蓝天商务中心
-            cityName = e.cityName || "杭州市";
+        // my.onMessage = function(e) {
+            // initLatlng = {lon: e.lon, lat: e.lat} || {lon: 120.14989, lat: 30.27751};  // 默认经纬度为蓝天商务中心
+            // cityName = e.cityName || "杭州市";
+            initLatlng = {lon: 120.14989, lat: 30.27751};  // 默认经纬度为蓝天商务中心
+            cityName = "杭州市";
             // my.alert({
             //     content: JSON.stringify(cityName)
             // }); // 测试是否接收到小程序中传来的数据
             init()
-        }
+        // }
         function init() {
             var map = L.map('map',{crs:L.CRS.CustomEPSG4326,center: initLatlng, minZoom: 5, zoom: initZoom, inertiaDeceleration:15000, zoomControl: false});
             var tileAddress = 'http://ditu.zjzwfw.gov.cn/mapserver/vmap/zjvmap/getMAP?x={x}&y={y}&l={z}&styleId=tdt_biaozhunyangshi_2017';
 
-            var layer = new L.GXYZ(tileAddress, {tileSize:512,attribution: '&copy; <a href="http://www.icinfo.cn/">http://www.icinfo.cn</a> contributors',minZoom: 5});
+            var layer = new L.GXYZ(tileAddress, {tileSize:512,attribution: '&copy; <a href="http://www.icinfo.cn">http://www.icinfo.cn</a> contributors',minZoom: 5});
             map.attributionControl.setPrefix('汇信科技');
             map.addLayer(layer);
 
@@ -111,63 +112,6 @@
             ).addTo(map);
             // marker.bindTooltip("my tooltip text").openTooltip();
             L.circle([map.getCenter().lat, map.getCenter().lng], {radius: 30}).addTo(map);
-
-            map.on('click', function(e) {
-                var reverseResolutionUrl = encodeURI("http://dh.ditu.zj.cn:18005/inverse/getInverseGeocoding.jsonp?&detail=1&zoom=11&latlon=" + e.latlng.lng + "," + e.latlng.lat + "&lat=&lon=&customer=2");
-                $.ajax({
-                    url: reverseResolutionUrl,
-                    dataType: "jsonp",
-                    // jsonp: "callback",
-                    success: function(res) {
-                        newCenterData = res;
-                        marker.setLatLng(e.latlng);
-                        marker.unbindTooltip().bindTooltip(res.city.value + res.dist.value + res.town.value + res.poi, {offset: [0, 10], direction : "bottom"}).openTooltip();
-                    },
-                    error: function (err) {
-                        my.alert({
-                            content: "地址解析出错"
-                        });
-                    }
-                });
-            });
-
-            $('.iptSearch').on('keydown',function(e){
-                // e.preventDefault();
-                if(e.keyCode == 13){
-                    var keyWord = e.target.value;
-                    var resolutionUrl = encodeURI("http://dh.ditu.zj.cn:18006/geocoding/getLatLonByAddress.jsonp?&city=" + cityName + "&keyword=" + keyWord + "&width=500&height=430&pn=1&customer=2&encode=UTF-8");
-                    $.ajax({
-                        url: resolutionUrl,
-                        dataType: "jsonp",
-                        // jsonp: "callback",
-                        success: function(res) {
-                            var newAdress = res.strlatlon;
-                            if (newAdress == "0.0,0.0") {
-                                my.alert({
-                                    content: "未查询到相关信息"
-                                });
-                            } else {
-                                var newCenterLatlon = {lon: parseFloat(newAdress.split(",")[0]), lat: parseFloat(newAdress.split(",")[1])}
-                                marker.setLatLng(newCenterLatlon);
-                                marker.unbindTooltip().bindTooltip(keyWord, {offset: [0, 10], direction : "bottom"}).openTooltip();
-                                map.panTo(newCenterLatlon)
-                            }
-                        },
-                        error: function (err) {
-                            my.alert({
-                                content: "地址解析出错"
-                            });
-                        }
-                    });
-                }
-            });
-            $('.resetBtn').on('click',function(e){
-                map.setView([Number(initLatlng.lat), Number(initLatlng.lon)], initZoom);
-                marker.unbindTooltip().setLatLng(initLatlng);
-            });
-            $(".modifyBtn").on('click', function () {
-                my.postMessage(newCenterData);
-            })
 
         }
         
