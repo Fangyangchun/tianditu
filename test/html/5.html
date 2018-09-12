@@ -72,7 +72,7 @@
                 });
             }
         });
-        var initLatlng, initZoom = 17, cityName, newCenterData;
+        var initLatlng, initZoom = 17, cityName, newCenterData = {};
         
         my.postMessage('init');
         // 来自小程序的消息。
@@ -82,6 +82,21 @@
             // my.alert({
             //     content: JSON.stringify(cityName)
             // }); // 测试是否接收到小程序中传来的数据
+            $.ajax({
+                url: encodeURI("http://dh.ditu.zj.cn:18005/inverse/getInverseGeocoding.jsonp?&detail=1&zoom=11&latlon=" + initLatlng.lon + "," + initLatlng.lat + "&lat=&lon=&customer=2"),
+                dataType: "jsonp",
+                // jsonp: "callback",
+                success: function(res) {
+                    newCenterData.latitude = parseFloat(res.latlon.split(',')[1])
+                    newCenterData.longitude = parseFloat(res.latlon.split(',')[0])
+                    newCenterData.location = res.city.value + res.dist.value + res.town.value + res.poi;
+                },
+                error: function (err) {
+                    my.alert({
+                        content: "地址解析出错"
+                    });
+                }
+            });
             init()
         }
         function init() {
@@ -121,7 +136,9 @@
                     dataType: "jsonp",
                     // jsonp: "callback",
                     success: function(res) {
-                        newCenterData = res;
+                        newCenterData.latitude = parseFloat(res.latlon.split(',')[1])
+                        newCenterData.longitude = parseFloat(res.latlon.split(',')[0])
+                        newCenterData.location = res.city.value + res.dist.value + res.town.value + res.poi;
                         marker.setLatLng(e.latlng);
                         marker.unbindTooltip().bindTooltip(res.city.value + res.dist.value + res.town.value + res.poi, {offset: [0, 10], direction : "bottom"}).openTooltip();
                     },
@@ -136,20 +153,22 @@
             $('.iptSearch').on('keydown',function(e){
                 // e.preventDefault();
                 if(e.keyCode == 13){
-                    var keyWord = e.target.value;
+                    var keyWord = cityName + e.target.value;
                     var resolutionUrl = encodeURI("http://dh.ditu.zj.cn:18006/geocoding/getLatLonByAddress.jsonp?&city=" + cityName + "&keyword=" + keyWord + "&width=500&height=430&pn=1&customer=2&encode=UTF-8");
                     $.ajax({
                         url: resolutionUrl,
                         dataType: "jsonp",
                         // jsonp: "callback",
                         success: function(res) {
-                            var newAdress = res.strlatlon;
-                            if (newAdress == "0.0,0.0") {
+                            if (res.strlatlon == "0.0,0.0") {
                                 my.alert({
                                     content: "未查询到相关信息"
                                 });
                             } else {
-                                var newCenterLatlon = {lon: parseFloat(newAdress.split(",")[0]), lat: parseFloat(newAdress.split(",")[1])}
+                                newCenterData.latitude = parseFloat(res.strlatlon.split(',')[1]);
+                                newCenterData.longitude = parseFloat(res.strlatlon.split(',')[0]);
+                                newCenterData.location = res.city + res.keyword;
+                                var newCenterLatlon = {lon: newCenterData.longitude, lat: newCenterData.latitude}
                                 marker.setLatLng(newCenterLatlon);
                                 marker.unbindTooltip().bindTooltip(keyWord, {offset: [0, 10], direction : "bottom"}).openTooltip();
                                 map.panTo(newCenterLatlon)
