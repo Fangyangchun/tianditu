@@ -25,15 +25,44 @@
             background: white;
             font-size: 14px;
         }
-        .resetBtn {
-            bottom: 30%;
-            border: 1px solid rgb(51, 136, 255);
+        .btn_handler_box {
+            position: absolute;
+            bottom: 20%;
+            left: 10px;
+            z-index: 100000;
+        }
+        .btn_handler_box li {
             width: 32px;
             height: 32px;
             border-radius: 2px;
-            background: rgba(255, 255, 255, 0.9);
-            padding: 0;
-            margin: 0;
+            background: white;
+            box-sizing: border-box;
+            overflow: hidden;
+            text-align: center;
+            margin-bottom: 10px;
+            line-height: 32px;
+            font-size: 20px;
+            font-weight: bold;
+            color: #704214;
+        }
+        .btn_handler_box li:last-child {
+            border: 1px solid rgb(51, 136, 255);
+            margin-bottom: 0;
+        }
+        .btn_handler_box li i {
+            width: 16px;
+            height: 16px;
+            display: inline-block;
+            border-radius: 50%;
+        }
+        .greenBtn i {
+            background: green;
+        }
+        .blueBtn i {
+            background: rgb(51, 136, 255);
+        }
+        .redBtn i {
+            background: red;
         }
         .iptSearch {
             width: calc(100% - 130px);
@@ -74,7 +103,7 @@
             top: 8px;
         }
         .custom-mask {
-            background: rgba(0,0,0,.5);
+            background: rgba(0,0,0,.3);
             position: fixed;
             z-index: 100001;
             top: 0;
@@ -103,15 +132,20 @@
             font-size: 14px;
             right: 0;
             top: 46px;
-            height: 0;
+            height: auto;
             overflow: hidden;
-            -webkit-transition: -webkit-transform 1s;
-            transition: -webkit-transform 1s;
-            transition: transform 1s;
-            transition: transform 1s,-webkit-transform 1s;
+            transform: translateY(-100%);
+            -ms-transform: translateY(-100%);
+            -webkit-transform: translateY(-100%);
+            -webkit-transition: -webkit-transform .3s;
+            transition: -webkit-transform .3s;
+            transition: transform .3s;
+            transition: transform .3s,-webkit-transform .3s;
         }
         .custom-container.custom-container--visible {
-            height: 128px;
+            transform: translateY(0);
+            -ms-transform: translateY(0);
+            -webkit-transform: translateY(0);
         }
 
         .custom-container li {
@@ -119,6 +153,11 @@
             width: 100%;
             border-bottom: 1px solid #ccc;
             box-sizing: border-box;
+            display: none;
+        }
+
+        .custom-container li.active {
+            display: block;
         }
 
         .custom-container li:last-child {
@@ -133,12 +172,16 @@
     <input type="text" placeholder="请输入地址" class="iptSearch" />
     <div class="filterBtn">
         <span>附近<i class="icon-arrow"></i></span></div>
-    <button class="resetBtn">
-        <img src="../img/location.png" style="height: 30px;" alt="">
-    </button>
+    
+    <ul class="btn_handler_box">
+        <li class="whiteBtn" data-filter="all">A</li><li class="greenBtn" data-filter="green"><i data-filter="green"></i></li>
+        <li class="blueBtn" data-filter="blue"><i data-filter="blue"></i></li><li class="redBtn" data-filter="red"><i data-filter="red"></i></li>
+        <li data-filter="reset"><img src="../img/location.png" style="height: 30px;" data-filter="reset"></li>
+    </ul>
+    
     <div class="custom-mask"></div>
     <ul class="custom-container">
-        <li>不限</li><li>500m</li><li>1000m</li><li>3000m</li>
+        <li data-metter="all">不限</li><li data-metter=500>500m</li><li data-metter=1000>1000m</li><li data-metter=3000>3000m</li>
     </ul>
 
 
@@ -148,11 +191,11 @@
     <script src="../sdk_web/leafletSDK/js/CustomWebSDK.min.js"></script> 
     <script src="../libs/jquery-1.12.3.min.js"></script>
     <!-- <script src="//code.jquery.com/jquery-3.2.1.min.js"></script> -->
-    <!-- <script src="https://appx/web-view.min.js"></script> -->
+    <script src="https://appx/web-view.min.js"></script>
     <script>
-        // if (navigator.userAgent.indexOf('AlipayClient') > -1) {
-        //   document.writeln('<script src="https://appx/web-view.min.js"' + '>' + '<' + '/' + 'script>');
-        // }
+        if (navigator.userAgent.indexOf('AlipayClient') > -1) {
+          document.writeln('<script src="https://appx/web-view.min.js"' + '>' + '<' + '/' + 'script>');
+        }
         // my.getEnv(function(res) {
         //     if (!res.miniProgram) {
         //         my.alert({
@@ -203,13 +246,60 @@
             ).addTo(map);
             // marker.bindTooltip("my tooltip text").openTooltip();
             L.circle([map.getCenter().lat, map.getCenter().lng], {radius: 30}).addTo(map);
+            
+            $('.filterBtn').on('click', function () {
+                changeSatus();
+            });
+
+            $('.custom-mask').on('click', function () {
+                changeSatus('remove');
+            });
+
+            $('.custom-container').on('click', function (ev) {
+                changeSatus('remove');
+                var metter = $(ev.target).data('metter');
+            });
+
+            $('.btn_handler_box').on('click', function (ev) {
+                var filter = $(ev.target).data('filter');
+                switch(filter){
+                    case "all":
+                        cosole.log('all');
+                        break;
+                    case "green":
+                        cosole.log('green');
+                        break;
+                    case "blue":
+                        cosole.log('blue');
+                        break;
+                    case "red":
+                        cosole.log('red');
+                        break;
+                    case "reset":
+                        map.setView([Number(initLatlng.lat), Number(initLatlng.lon)], initZoom);
+                        marker.unbindTooltip().setLatLng(initLatlng);
+                        break;
+                    default:
+                        return;
+                }
+            });
 
         }
 
-        $('.filterBtn').on('click', function () {
-            $('.custom-mask').addClass('custom-mask--visible');
-            $('.custom-container').addClass('custom-container--visible');
-        });
+        function changeSatus (handler) {
+            if (handler == 'remove') {
+                $('.custom-mask').removeClass('custom-mask--visible');
+                $('.custom-container').removeClass('custom-container--visible');
+                $('.custom-container li').removeClass('active');
+            } else {
+                $('.custom-mask').addClass('custom-mask--visible');
+                $('.custom-container').addClass('custom-container--visible');
+                $('.custom-container li').addClass('active');
+            }
+            
+        }
+
+        
         
 
     </script>
