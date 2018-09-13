@@ -169,7 +169,7 @@
 
 <body style="margin : 0; ">
     <div id="map" class="map" style ="position:absolute;bottom:0px;top:0px;width:100%"></div>
-    <input type="text" placeholder="请输入地址" class="iptSearch" />
+    <!-- <input type="text" placeholder="请输入地址" class="iptSearch" />
     <div class="filterBtn">
         <span>附近<i class="icon-arrow"></i></span></div>
     
@@ -182,7 +182,7 @@
     <div class="custom-mask"></div>
     <ul class="custom-container">
         <li data-metter="all">不限</li><li data-metter=500>500m</li><li data-metter=1000>1000m</li><li data-metter=3000>3000m</li>
-    </ul>
+    </ul> -->
 
 
     <script src="../sdk_web/leafletSDK/js/uuid.js"></script>
@@ -196,27 +196,31 @@
         if (navigator.userAgent.indexOf('AlipayClient') > -1) {
           document.writeln('<script src="https://appx/web-view.min.js"' + '>' + '<' + '/' + 'script>');
         }
-        // my.getEnv(function(res) {
-        //     if (!res.miniProgram) {
-        //         my.alert({
-        //             content:JSON.stringify('运行出错')
-        //         });
-        //     }
-        // });
-        var initLatlng, initZoom = 17, cityName, newCenterData;
+        my.getEnv(function(res) {
+            if (!res.miniProgram) {
+                my.alert({
+                    content:JSON.stringify('运行出错')
+                });
+            }
+        });
+        var initLatlng, initZoom = 17, cityName, newCenterData, reqData, markDatas = [], baseUrl;
         
-        // my.postMessage('init');
+        my.postMessage('init');
         // 来自小程序的消息。
-        // my.onMessage = function(e) {
-            // initLatlng = {lon: e.lon, lat: e.lat} || {lon: 120.14989, lat: 30.27751};  // 默认经纬度为蓝天商务中心
-            // cityName = e.cityName || "杭州市";
-            initLatlng = {lon: 120.14989, lat: 30.27751};  // 默认经纬度为蓝天商务中心
-            cityName = "杭州市";
-            // my.alert({
-            //     content: JSON.stringify(cityName)
-            // }); // 测试是否接收到小程序中传来的数据
+        my.onMessage = function(e) {
+            initLatlng = {lon: e.lon, lat: e.lat} || {lon: 120.14989, lat: 30.27751};  // 默认经纬度为蓝天商务中心
+            cityName = e.cityName || "杭州市";
+            baseUrl = e.baseUrl;
+            reqData = {
+                start: e.start,
+                length: e.pageSize,
+                params: e.params
+            };
+            my.alert({
+                content: JSON.stringify(e)
+            }); // 测试是否接收到小程序中传来的数据
             init()
-        // }
+        }
         function init() {
             var map = L.map('map',{crs:L.CRS.CustomEPSG4326,center: initLatlng, minZoom: 5, zoom: initZoom, inertiaDeceleration:15000, zoomControl: false});
             var tileAddress = 'http://ditu.zjzwfw.gov.cn/mapserver/vmap/zjvmap/getMAP?x={x}&y={y}&l={z}&styleId=tdt_biaozhunyangshi_2017';
