@@ -127,6 +127,20 @@
             my.postMessage({type: 'distance', val: metter});
         });
 
+        $('.iptSearch').on('keydown',function(e){
+            // e.preventDefault();
+            if(e.keyCode == 13){
+                var keyWord = cityName + e.target.value;
+                if (e.target.value) {
+                    my.postMessage({type: 'keyword', val: e.target.value});
+                } else {
+                    my.alert({
+                        content: "请输入查询关键字"
+                    });
+                }
+            }
+        });
+
         $('.btn_handler_box').on('click', function (ev) {
             var filter = $(ev.target).data('filter');
             if (filter == "" || filter == "1" || filter == "2" || filter == "3") {

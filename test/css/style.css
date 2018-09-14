@@ -96,7 +96,7 @@ button, input {
     line-height: 36px;
     box-shadow: 0px 0px 14px -1px #c8c8c8;
     background: url("../img/search.png") no-repeat 5px center #ffffff;
-    font-size: 14px;
+    font-size: 12px;
 }
 .filterBtn {
     position: absolute;
