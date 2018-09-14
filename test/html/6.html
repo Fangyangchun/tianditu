@@ -43,7 +43,7 @@
         </div>
         <ul class="menu_box clearfix">
             <li><p><i class="menu_icon menu_icon_4"></i>去检查</p></li><li><p><i class="menu_icon menu_icon_5"></i>查无下落</p></li>
-            <li><p><i class="menu_icon menu_icon_6"></i>详情</p></li><li><p><i class="menu_icon menu_icon_7"></i>打电话</p></li>
+            <li><p><i class="menu_icon menu_icon_6"></i>详情</p></li><li class="call_tel"><p><i class="menu_icon menu_icon_7"></i>打电话</p></li>
         </ul>
     </div>
 
@@ -67,7 +67,7 @@
                 });
             }
         });
-        var initLatlng, initZoom = 10, cityName, newCenterData,  markDatas = [], map, markers;
+        var initLatlng, initZoom = 10, cityName, newCenterData,  markDatas = [], map, markers, mapParams;
         
         my.postMessage('init');
         // 来自小程序的消息。
@@ -152,6 +152,15 @@
                 return
             }
         });
+        $(".call_tel").on("click", function () {
+            var phoneNum = $(".call_tel").data("tel");
+            my.postMessage({type: 'callPhone', val: phoneNum});
+        });
+
+        $(".menu_icon_3").on("click", function () {
+            my.postMessage({type: 'openMap', val: mapParams});
+        });
+        
 
         function drawMarekers() {
             markDatas.forEach(function (val, index) {
@@ -196,6 +205,14 @@
                     $(".legalRep_tel").text(e.tel)
                     $(".address_info").text(location)
                     $(".distance_info").text((parseInt(e.distance) / 1000).toFixed(2));
+                    $(".call_tel").data("tel", e.tel);
+                    my.postMessage({type: 'openMap', val: res});
+                    mapParams = {
+                        longitude: e.lon,
+                        latitude: e.lat,
+                        name: res.poi,
+                        address: res.poi,
+                    };
                     $(".detail_info").addClass('active');
                 },
                 error: function (err) {
