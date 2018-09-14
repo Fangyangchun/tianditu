@@ -6,7 +6,9 @@
     <meta name="description" content="矢量瓦片">
     <meta name="content-type" content="text/html; charset=UTF-8">
     <meta name="viewport" content="width=device-width,target-densitydpi=high-dpi,initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
-    <link rel="stylesheet" href="../sdk_web/leafletSDK/css/leaflet.css" />   
+    <link rel="stylesheet" href="../sdk_web/leafletSDK/css/leaflet.css" />
+    <link rel="stylesheet" href="../sdk_web/leafletSDK/css/MarkerCluster.css" />
+    <link rel="stylesheet" href="../sdk_web/leafletSDK/css/MarkerCluster.Default.css" />
     <style>
         html, body {
             height: 100%;
@@ -169,26 +171,27 @@
 
 <body style="margin : 0; ">
     <div id="map" class="map" style ="position:absolute;bottom:0px;top:0px;width:100%"></div>
-    <!-- <input type="text" placeholder="请输入地址" class="iptSearch" />
+    <input type="text" placeholder="请输入地址" class="iptSearch" />
     <div class="filterBtn">
         <span>附近<i class="icon-arrow"></i></span></div>
     
     <ul class="btn_handler_box">
-        <li class="whiteBtn" data-filter="all">A</li><li class="greenBtn" data-filter="green"><i data-filter="green"></i></li>
-        <li class="blueBtn" data-filter="blue"><i data-filter="blue"></i></li><li class="redBtn" data-filter="red"><i data-filter="red"></i></li>
+        <li class="whiteBtn" data-filter="">A</li><li class="greenBtn" data-filter=1><i data-filter=1></i></li>
+        <li class="blueBtn" data-filter=2><i data-filter=2></i></li><li class="redBtn" data-filter=3><i data-filter=3></i></li>
         <li data-filter="reset"><img src="../img/location.png" style="height: 30px;" data-filter="reset"></li>
     </ul>
     
     <div class="custom-mask"></div>
     <ul class="custom-container">
-        <li data-metter="all">不限</li><li data-metter=500>500m</li><li data-metter=1000>1000m</li><li data-metter=3000>3000m</li>
-    </ul> -->
+        <li data-metter="">不限</li><li data-metter=500>500m</li><li data-metter=1000>1000m</li><li data-metter=3000>3000m</li>
+    </ul>
 
 
     <script src="../sdk_web/leafletSDK/js/uuid.js"></script>
     <script src="../sdk_web/leafletSDK/js/leaflet-src.js"></script>
     <script src="../sdk_web/leafletSDK/js/leaflet.js"></script>
     <script src="../sdk_web/leafletSDK/js/CustomWebSDK.min.js"></script> 
+    <script src="../sdk_web/leafletSDK/js/leaflet.markercluster.js"></script>
     <script src="../libs/jquery-1.12.3.min.js"></script>
     <!-- <script src="//code.jquery.com/jquery-3.2.1.min.js"></script> -->
     <script src="https://appx/web-view.min.js"></script>
@@ -203,22 +206,17 @@
                 });
             }
         });
-        var initLatlng, initZoom = 17, cityName, newCenterData, reqData, markDatas = [], baseUrl;
+        var initLatlng, initZoom = 10, cityName, newCenterData,  markDatas = [];
         
         my.postMessage('init');
         // 来自小程序的消息。
         my.onMessage = function(e) {
             initLatlng = {lon: e.lon, lat: e.lat} || {lon: 120.14989, lat: 30.27751};  // 默认经纬度为蓝天商务中心
             cityName = e.cityName || "杭州市";
-            baseUrl = e.baseUrl;
-            reqData = {
-                start: e.start,
-                length: e.pageSize,
-                params: e.params
-            };
-            my.alert({
-                content: JSON.stringify(e)
-            }); // 测试是否接收到小程序中传来的数据
+            markDatas = e.markDatas;
+            // my.alert({
+            //     content: JSON.stringify(e)
+            // }); // 测试是否接收到小程序中传来的数据
             init()
         }
         function init() {
@@ -235,21 +233,32 @@
             dataSource.url = 'http://ditu.zjzwfw.gov.cn/mapserver/label/zjvmap/getDatas?x=${x}&y=${y}&l=${z}&styleId=tdt_biaozhunyangshi_2017';
             labelLayer.addDataSource(dataSource);
             map.addLayer(labelLayer);
-            var customIcon = L.icon({ 
-                iconUrl: '../img/indoor_pub_poi_pressed.png',
-                iconSize: [21, 30],
-                iconAnchor:   [10, 20],
-            }); 
-            var marker = L.marker( 
-                [map.getCenter().lat, map.getCenter().lng], 
-                { 
-                    draggable: false,// 使图标可拖拽
-                    opacity: 1,
-                    icon: customIcon//添加自定义的图标
-                }
-            ).addTo(map);
-            // marker.bindTooltip("my tooltip text").openTooltip();
-            L.circle([map.getCenter().lat, map.getCenter().lng], {radius: 30}).addTo(map);
+            // var customIcon = L.icon({ 
+            //     iconUrl: '../img/indoor_pub_poi_pressed.png',
+            //     iconSize: [21, 30],
+            //     iconAnchor:   [10, 20],
+            // }); 
+            // var marker = L.marker([map.getCenter().lat, map.getCenter().lng], 
+            //     {draggable: false, opacity: 1, icon: customIcon}).addTo(map);
+            // L.circle([map.getCenter().lat, map.getCenter().lng], {radius: 30}).addTo(map);
+            // markDatas.forEach(function (val, index) {
+            //     var marker = L.marker([val.lat, val.lon], 
+            //     {draggable: false, opacity: 1, icon: customIcon}).addTo(map);
+            // });
+            var customIcon = L.divIcon({className: 'leaflet-div-icon', html: '<span>1</span>'});
+            // 生成点聚合对象
+            var markers = L.markerClusterGroup();
+
+            // markDatas 数据结构可根据实际情况组织，主要是为了方便生成标记
+            // 生成 marker 对象并添加到标记群组对象里面
+            markDatas.forEach(function (val, index) {
+                var marker = L.marker([val.lat, val.lon], {draggable: false, opacity: 1, icon: customIcon});
+                markers.addLayer(marker);
+            });
+
+            // markers 添加到地图上
+            map.addLayer(markers);
+
             
             $('.filterBtn').on('click', function () {
                 changeSatus();
@@ -262,22 +271,23 @@
             $('.custom-container').on('click', function (ev) {
                 changeSatus('remove');
                 var metter = $(ev.target).data('metter');
+                my.postMessage({type: 'distance', val: metter});
             });
 
             $('.btn_handler_box').on('click', function (ev) {
                 var filter = $(ev.target).data('filter');
                 switch(filter){
-                    case "all":
-                        cosole.log('all');
+                    case "":
+                        my.postMessage({type: 'checkState', val: ''});
                         break;
-                    case "green":
-                        cosole.log('green');
+                    case 1:
+                        my.postMessage({type: 'checkState', val: 2});
                         break;
-                    case "blue":
-                        cosole.log('blue');
+                    case 2:
+                        my.postMessage({type: 'checkState', val: 2});
                         break;
-                    case "red":
-                        cosole.log('red');
+                    case 3:
+                        my.postMessage({type: 'checkState', val: 3});
                         break;
                     case "reset":
                         map.setView([Number(initLatlng.lat), Number(initLatlng.lon)], initZoom);
