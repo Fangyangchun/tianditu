@@ -206,7 +206,6 @@
                     $(".address_info").text(location)
                     $(".distance_info").text((parseInt(e.distance) / 1000).toFixed(2));
                     $(".call_tel").data("tel", e.tel);
-                    my.postMessage({type: 'openMap', val: res});
                     mapParams = {
                         longitude: e.lon,
                         latitude: e.lat,
