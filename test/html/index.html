@@ -141,6 +141,9 @@
                         break;
                 }
                 markers.addLayer(marker);
+                marker.on('click', function (e) {
+                    console.log(e.originalEvent.target.textContent);
+                });
             });
 
             // markers 添加到地图上

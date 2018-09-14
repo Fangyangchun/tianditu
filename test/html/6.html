@@ -14,7 +14,7 @@
 
 <body style="margin : 0; ">
     <div id="map" class="map" style ="position:absolute;bottom:0px;top:0px;width:100%"></div>
-    <input type="text" placeholder="请输入地址" class="iptSearch" />
+    <input type="text" placeholder="输入企业名、统一信用代码、地址等查询" class="iptSearch" />
     <div class="filterBtn">
         <span>附近<i class="icon-arrow"></i></span></div>
     
@@ -28,6 +28,24 @@
     <ul class="custom-container">
         <li data-metter="">不限</li><li data-metter=500>500m</li><li data-metter=1000>1000m</li><li data-metter=3000>3000m</li>
     </ul>
+
+    <div class="detail_info">
+        <div class="info_tip clearfix">
+            <div class="info_box">
+                <p class="legalEntity_info"><span class="legalEntity_name"></span><span class="regState"><i>存续</i></span></p>
+                <p class="mt15 ellips"><i class="menu_icon menu_icon_1"></i>工商联络员：<span class="legalRep_name"></span>&nbsp;<span class="legalRep_tel"></span></p>
+                <p class="mt15 ellips"><i class="menu_icon menu_icon_2"></i>地址：<span class="address_info"></span></p>
+            </div>
+            <div class="location_box">
+                <p><span class="distance_info"></span>km</p>
+                <i class="menu_icon menu_icon_3"></i>
+            </div>
+        </div>
+        <ul class="menu_box clearfix">
+            <li><p><i class="menu_icon menu_icon_4"></i>去检查</p></li><li><p><i class="menu_icon menu_icon_5"></i>查无下落</p></li>
+            <li><p><i class="menu_icon menu_icon_6"></i>详情</p></li><li><p><i class="menu_icon menu_icon_7"></i>打电话</p></li>
+        </ul>
+    </div>
 
 
     <script src="../sdk_web/leafletSDK/js/uuid.js"></script>
@@ -86,6 +104,13 @@
             markers = L.markerClusterGroup();
             drawMarekers();
             map.addLayer(markers);
+
+            map.on('click', function (e) {
+                if($(".detail_info").hasClass('active')) { 
+                    $(".detail_info").removeClass('active');
+                }
+            });
+
         }
 
         $('.filterBtn').on('click', function () {
@@ -129,12 +154,42 @@
                         break;
                 }
                 markers.addLayer(marker);
+                marker.on('click', function (e) {
+                    if($(".detail_info").hasClass('active')) { 
+                        $(".detail_info").removeClass('active');
+                    }
+                    var idx = parseInt(e.originalEvent.target.textContent) - 1;
+                    getAdressInfo(markDatas[idx]);
+                });
             });
         }
 
         function reductionMap() {
             markers.clearLayers();
             map.setView([Number(initLatlng.lat), Number(initLatlng.lon)], initZoom);
+        }
+
+        function getAdressInfo (e) {
+            var reverseResolutionUrl = encodeURI("http://dh.ditu.zj.cn:18005/inverse/getInverseGeocoding.jsonp?&detail=1&zoom=11&latlon=" + e.lon + "," + e.lat + "&lat=&lon=&customer=2");
+            $.ajax({
+                url: reverseResolutionUrl,
+                dataType: "jsonp",
+                // jsonp: "callback",
+                success: function(res) {
+                    var location = res.city.value + res.dist.value + res.town.value + res.poi;
+                    $(".legalEntity_name").text(e.legalEntityName)
+                    $(".legalRep_name").text(e.legalRep)
+                    $(".legalRep_tel").text(e.tel)
+                    $(".address_info").text(location)
+                    $(".distance_info").text((parseInt(e.distance) / 1000).toFixed(2));
+                    $(".detail_info").addClass('active');
+                },
+                error: function (err) {
+                    my.alert({
+                        content: "地址解析出错"
+                    });
+                }
+            });
         }
 
         function changeSatus (handler) {
