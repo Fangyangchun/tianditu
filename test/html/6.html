@@ -9,164 +9,7 @@
     <link rel="stylesheet" href="../sdk_web/leafletSDK/css/leaflet.css" />
     <link rel="stylesheet" href="../sdk_web/leafletSDK/css/MarkerCluster.css" />
     <link rel="stylesheet" href="../sdk_web/leafletSDK/css/MarkerCluster.Default.css" />
-    <style>
-        html, body {
-            height: 100%;
-        }
-        ul, li, div, p {
-            list-style: none;
-            padding: 0;
-            margin: 0;
-        }
-        button, input {
-            position: absolute;
-            left: 10px;
-            z-index: 100000;
-            outline: none;
-            border: none;
-            background: white;
-            font-size: 14px;
-        }
-        .btn_handler_box {
-            position: absolute;
-            bottom: 20%;
-            left: 10px;
-            z-index: 100000;
-        }
-        .btn_handler_box li {
-            width: 32px;
-            height: 32px;
-            border-radius: 2px;
-            background: white;
-            box-sizing: border-box;
-            overflow: hidden;
-            text-align: center;
-            margin-bottom: 10px;
-            line-height: 32px;
-            font-size: 20px;
-            font-weight: bold;
-            color: #704214;
-        }
-        .btn_handler_box li:last-child {
-            border: 1px solid rgb(51, 136, 255);
-            margin-bottom: 0;
-        }
-        .btn_handler_box li i {
-            width: 16px;
-            height: 16px;
-            display: inline-block;
-            border-radius: 50%;
-        }
-        .greenBtn i {
-            background: green;
-        }
-        .blueBtn i {
-            background: rgb(51, 136, 255);
-        }
-        .redBtn i {
-            background: red;
-        }
-        .iptSearch {
-            width: calc(100% - 130px);
-            padding-left: 25px;
-            padding-right: 10px;
-            top: 10px;
-            line-height: 36px;
-            box-shadow: 0px 0px 14px -1px #c8c8c8;
-            background: url("../img/search.png") no-repeat 5px center #ffffff;
-        }
-        .filterBtn {
-            position: absolute;
-            width: 55px;
-            right: 10px;
-            top: 10px;
-            height: 36px;
-            box-shadow: 0px 0px 14px -1px #c8c8c8;
-            padding-left: 10px;
-            padding-right: 5px;
-            line-height: 36px;
-            z-index: 100000;
-            font-size: 14px;
-            text-align: center;
-            background: url("../img/map_near_left.png") no-repeat 5px center #ffffff;
-            background-size: 14px; 
-        }
-        .filterBtn span {
-            position: relative;
-        }
-        .icon-arrow {
-            position: absolute;
-            right: -13px;
-            width: 0px;
-            height: 0px;
-            border-top: 5px solid grey;
-            border-left: 5px solid transparent;
-            border-right: 5px solid transparent;
-            top: 8px;
-        }
-        .custom-mask {
-            background: rgba(0,0,0,.3);
-            position: fixed;
-            z-index: 100001;
-            top: 0;
-            right: 0;
-            left: 0;
-            bottom: 0;
-            opacity: 0;
-            -webkit-transition-duration: .3s;
-            transition-duration: .3s;
-            visibility: hidden;
-        }
-
-        .custom-mask.custom-mask--visible {
-            opacity: 1;
-            visibility: visible;
-        }
-
-        .custom-container {
-            width: 100px;
-            text-align: center;
-            color: #333333;
-            line-height: 32px;
-            background: transparent;
-            z-index: 100001;
-            position: absolute;
-            font-size: 14px;
-            right: 0;
-            top: 46px;
-            height: auto;
-            overflow: hidden;
-            transform: translateY(-100%);
-            -ms-transform: translateY(-100%);
-            -webkit-transform: translateY(-100%);
-            -webkit-transition: -webkit-transform .3s;
-            transition: -webkit-transform .3s;
-            transition: transform .3s;
-            transition: transform .3s,-webkit-transform .3s;
-        }
-        .custom-container.custom-container--visible {
-            transform: translateY(0);
-            -ms-transform: translateY(0);
-            -webkit-transform: translateY(0);
-        }
-
-        .custom-container li {
-            background: #ffffff;
-            width: 100%;
-            border-bottom: 1px solid #ccc;
-            box-sizing: border-box;
-            display: none;
-        }
-
-        .custom-container li.active {
-            display: block;
-        }
-
-        .custom-container li:last-child {
-            border-bottom: none;
-        }
-
-    </style>
+    <link rel="stylesheet" href="../css/style.css">
 </head>
 
 <body style="margin : 0; ">
@@ -176,8 +19,8 @@
         <span>附近<i class="icon-arrow"></i></span></div>
     
     <ul class="btn_handler_box">
-        <li class="whiteBtn" data-filter="">A</li><li class="greenBtn" data-filter=1><i data-filter=1></i></li>
-        <li class="blueBtn" data-filter=2><i data-filter=2></i></li><li class="redBtn" data-filter=3><i data-filter=3></i></li>
+        <li class="whiteBtn" data-filter=""></li><li class="greenBtn" data-filter="1"></li>
+        <li class="blueBtn" data-filter="2"></li><li class="redBtn" data-filter="3"></li>
         <li data-filter="reset"><img src="../img/location.png" style="height: 30px;" data-filter="reset"></li>
     </ul>
     
@@ -223,8 +66,7 @@
             var map = L.map('map',{crs:L.CRS.CustomEPSG4326,center: initLatlng, minZoom: 5, zoom: initZoom, inertiaDeceleration:15000, zoomControl: false});
             var tileAddress = 'http://ditu.zjzwfw.gov.cn/mapserver/vmap/zjvmap/getMAP?x={x}&y={y}&l={z}&styleId=tdt_biaozhunyangshi_2017';
 
-            var layer = new L.GXYZ(tileAddress, {tileSize:512,attribution: '&copy; <a href="http://www.icinfo.cn">http://www.icinfo.cn</a> contributors',minZoom: 5});
-            map.attributionControl.setPrefix('汇信科技');
+            var layer = new L.GXYZ(tileAddress, {tileSize:512, minZoom: 5});
             map.addLayer(layer);
 
             // 添加注记图层
@@ -233,26 +75,25 @@
             dataSource.url = 'http://ditu.zjzwfw.gov.cn/mapserver/label/zjvmap/getDatas?x=${x}&y=${y}&l=${z}&styleId=tdt_biaozhunyangshi_2017';
             labelLayer.addDataSource(dataSource);
             map.addLayer(labelLayer);
-            // var customIcon = L.icon({ 
-            //     iconUrl: '../img/indoor_pub_poi_pressed.png',
-            //     iconSize: [21, 30],
-            //     iconAnchor:   [10, 20],
-            // }); 
-            // var marker = L.marker([map.getCenter().lat, map.getCenter().lng], 
-            //     {draggable: false, opacity: 1, icon: customIcon}).addTo(map);
-            // L.circle([map.getCenter().lat, map.getCenter().lng], {radius: 30}).addTo(map);
-            // markDatas.forEach(function (val, index) {
-            //     var marker = L.marker([val.lat, val.lon], 
-            //     {draggable: false, opacity: 1, icon: customIcon}).addTo(map);
-            // });
-            var customIcon = L.divIcon({className: 'leaflet-div-icon', html: '<span>1</span>'});
+            // var customIcon = L.divIcon({className: 'red-marker', html: '<p>20</p>'});
             // 生成点聚合对象
             var markers = L.markerClusterGroup();
 
             // markDatas 数据结构可根据实际情况组织，主要是为了方便生成标记
             // 生成 marker 对象并添加到标记群组对象里面
             markDatas.forEach(function (val, index) {
-                var marker = L.marker([val.lat, val.lon], {draggable: false, opacity: 1, icon: customIcon});
+                var preState = val.checkState, marker, customIcon;
+                switch(preState){
+                    case "1":
+                        marker = L.marker([val.lat, val.lon], {draggable: false, opacity: 1, icon: L.divIcon({className: 'green-marker', html: '<p>' + (index + 1) + '</p>'})});
+                        break;
+                    case "2":
+                        marker = L.marker([val.lat, val.lon], {draggable: false, opacity: 1, icon: L.divIcon({className: 'blue-marker', html: '<p>' + (index + 1) + '</p>'})});
+                        break;
+                    case "3":
+                        marker = L.marker([val.lat, val.lon], {draggable: false, opacity: 1, icon: L.divIcon({className: 'red-marker', html: '<p>' + (index + 1) + '</p>'})});
+                        break;
+                }
                 markers.addLayer(marker);
             });
 
@@ -280,14 +121,14 @@
                     case "":
                         my.postMessage({type: 'checkState', val: ''});
                         break;
-                    case 1:
-                        my.postMessage({type: 'checkState', val: 2});
+                    case "1":
+                        my.postMessage({type: 'checkState', val: "1"});
                         break;
-                    case 2:
-                        my.postMessage({type: 'checkState', val: 2});
+                    case "2":
+                        my.postMessage({type: 'checkState', val: "2"});
                         break;
-                    case 3:
-                        my.postMessage({type: 'checkState', val: 3});
+                    case "3":
+                        my.postMessage({type: 'checkState', val: "3"});
                         break;
                     case "reset":
                         map.setView([Number(initLatlng.lat), Number(initLatlng.lon)], initZoom);

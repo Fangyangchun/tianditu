@@ -7,6 +7,9 @@
     <meta name="content-type" content="text/html; charset=UTF-8">
     <meta name="viewport" content="width=device-width,target-densitydpi=high-dpi,initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
     <link rel="stylesheet" href="../sdk_web/leafletSDK/css/leaflet.css" />
+    <link rel="stylesheet" href="../sdk_web/leafletSDK/css/MarkerCluster.css" />
+    <link rel="stylesheet" href="../sdk_web/leafletSDK/css/MarkerCluster.Default.css" />
+    <link rel="stylesheet" href="../css/style.css">
     <!-- <script src="https://appx/web-view.min.js"></script> -->
     <script>
     //     if (navigator.userAgent.indexOf('AlipayClient') > -1) {
@@ -48,11 +51,12 @@
     <script src="../sdk_web/leafletSDK/js/leaflet-src.js"></script>
     <script src="../sdk_web/leafletSDK/js/leaflet.js"></script>
     <script src="../sdk_web/leafletSDK/js/CustomWebSDK.min.js"></script> 
+    <script src="../sdk_web/leafletSDK/js/leaflet.markercluster.js"></script>
     <!-- <script src="../libs/jquery-1.12.3.min.js"></script> -->
     <script src="//code.jquery.com/jquery-3.2.1.min.js"></script>
     <script>
         function init(){
-            var map = L.map('map',{crs:L.CRS.CustomEPSG4326,center: {lon:120.07, lat:29.30},minZoom: 5, zoom: 15,inertiaDeceleration:15000, zoomControl: false});
+            var map = L.map('map',{crs:L.CRS.CustomEPSG4326,center: {lon: 120.14989, lat: 30.27751},minZoom: 5, zoom: 10,inertiaDeceleration:15000, zoomControl: false});
             //添加底图
             var layer = new L.GXYZ('http://ditu.zjzwfw.gov.cn/mapserver/vmap/zjvmap/getMAP?x={x}&y={y}&l={z}&styleId=tdt_biaozhunyangshi_2017',{tileSize:512,attribution: '&copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors',});
             map.addLayer(layer);
@@ -96,23 +100,52 @@
 
 
             // 自定义标注
-            var customIcon = L.icon({ 
-                iconUrl: '../sdk_web/leafletSDK/js/theme/default/img/add_point_on.png', 
-                //以下都是可选参数 
-                // iconSize: [38, 95], // 自定义图标size 
-                // iconAnchor:   [22, 94], // 自定义锚点去适应icon的位置
-            }); 
-            var marker = L.marker( 
-                [map.getCenter().lat, map.getCenter().lng], 
-                { 
-                draggable: false,// 使图标可拖拽
-                title: '义乌市',// 添加一个标题
-                opacity: 1,
-                icon: customIcon//添加自定义的图标
-                }
-            ).addTo(map).bindPopup("你就在这个圈内").openPopup();
+            // var customIcon = L.icon({ 
+            //     iconUrl: '../sdk_web/leafletSDK/js/theme/default/img/add_point_on.png', 
+            //     //以下都是可选参数 
+            //     // iconSize: [38, 95], // 自定义图标size 
+            //     // iconAnchor:   [22, 94], // 自定义锚点去适应icon的位置
+            // }); 
+            // var customIcon = L.divIcon({className: 'red-marker', html: '<p>1</p>'})
+            // var marker = L.marker( 
+            //     [map.getCenter().lat, map.getCenter().lng], 
+            //     { 
+            //     draggable: false,// 使图标可拖拽
+            //     title: '义乌市',// 添加一个标题
+            //     opacity: 1,
+            //     icon: customIcon//添加自定义的图标
+            //     }
+            // ).addTo(map).bindPopup("你就在这个圈内").openPopup();
             // marker.unbindTooltip().bindTooltip("my tooltip text", {offset: [0, 10], direction : "bottom"}).openTooltip();
-            L.circle([map.getCenter().lat, map.getCenter().lng], {radius: 200}).addTo(map);
+            // L.circle([map.getCenter().lat, map.getCenter().lng], {radius: 200}).addTo(map);
+
+            var markDatas = [{checkState: "2", lat: 30.2732, lon: 120.12843}, {checkState: "1", lat: 30.27594, lon: 120.12674},
+            {checkState: "1", lat: 30.27174, lon: 120.12672}, {checkState: "3", lat: 30.27622, lon: 120.12714}, 
+            {checkState: "2", lat: 30.27634, lon: 120.12767}, {checkState: "3", lat: 30.281576, lon: 120.16021}]
+            // 生成点聚合对象
+            var markers = L.markerClusterGroup();
+
+            // markDatas 数据结构可根据实际情况组织，主要是为了方便生成标记
+            // 生成 marker 对象并添加到标记群组对象里面
+            markDatas.forEach(function (val, index) {
+                var preState = val.checkState, marker, customIcon;
+                switch(preState){
+                    case "1":
+                        marker = L.marker([val.lat, val.lon], {draggable: false, opacity: 1, icon: L.divIcon({className: 'green-marker', html: '<p>' + (index + 1) + '</p>'})});
+                        break;
+                    case "2":
+                        marker = L.marker([val.lat, val.lon], {draggable: false, opacity: 1, icon: L.divIcon({className: 'blue-marker', html: '<p>' + (index + 1) + '</p>'})});
+                        break;
+                    case "3":
+                        marker = L.marker([val.lat, val.lon], {draggable: false, opacity: 1, icon: L.divIcon({className: 'red-marker', html: '<p>' + (index + 1) + '</p>'})});
+                        break;
+                }
+                markers.addLayer(marker);
+            });
+
+            // markers 添加到地图上
+            map.addLayer(markers);
+
             //创建标注对象
             // var marker = L.marker([map.getCenter().lat, map.getCenter().lng], {title: '义乌市'}).addTo(map);
 
