@@ -49,7 +49,7 @@
                 });
             }
         });
-        var initLatlng, initZoom = 10, cityName, newCenterData,  markDatas = [];
+        var initLatlng, initZoom = 10, cityName, newCenterData,  markDatas = [], map, markers;
         
         my.postMessage('init');
         // 来自小程序的消息。
@@ -58,12 +58,18 @@
             cityName = e.cityName || "杭州市";
             markDatas = e.markDatas;
             // my.alert({
-            //     content: JSON.stringify(e)
+            //     content: JSON.stringify(init)
             // }); // 测试是否接收到小程序中传来的数据
-            init()
+            drawMap(e.init)
         }
+        function drawMap(e) {
+            if (e) { init(); return; }
+            reductionMap()
+            drawMarekers()
+        }
+
         function init() {
-            var map = L.map('map',{crs:L.CRS.CustomEPSG4326,center: initLatlng, minZoom: 5, zoom: initZoom, inertiaDeceleration:15000, zoomControl: false});
+            map = L.map('map',{crs:L.CRS.CustomEPSG4326,center: initLatlng, minZoom: 5, zoom: initZoom, inertiaDeceleration:15000, zoomControl: false});
             var tileAddress = 'http://ditu.zjzwfw.gov.cn/mapserver/vmap/zjvmap/getMAP?x={x}&y={y}&l={z}&styleId=tdt_biaozhunyangshi_2017';
 
             var layer = new L.GXYZ(tileAddress, {tileSize:512, minZoom: 5});
@@ -75,12 +81,40 @@
             dataSource.url = 'http://ditu.zjzwfw.gov.cn/mapserver/label/zjvmap/getDatas?x=${x}&y=${y}&l=${z}&styleId=tdt_biaozhunyangshi_2017';
             labelLayer.addDataSource(dataSource);
             map.addLayer(labelLayer);
-            // var customIcon = L.divIcon({className: 'red-marker', html: '<p>20</p>'});
-            // 生成点聚合对象
-            var markers = L.markerClusterGroup();
 
-            // markDatas 数据结构可根据实际情况组织，主要是为了方便生成标记
-            // 生成 marker 对象并添加到标记群组对象里面
+            // 添加标记点
+            markers = L.markerClusterGroup();
+            drawMarekers();
+            map.addLayer(markers);
+        }
+
+        $('.filterBtn').on('click', function () {
+            changeSatus();
+        });
+
+        $('.custom-mask').on('click', function () {
+            changeSatus('remove');
+        });
+
+        $('.custom-container').on('click', function (ev) {
+            changeSatus('remove');
+            var metter = $(ev.target).data('metter');
+            my.postMessage({type: 'distance', val: metter});
+        });
+
+        $('.btn_handler_box').on('click', function (ev) {
+            var filter = $(ev.target).data('filter');
+            if (filter == "" || filter == "1" || filter == "2" || filter == "3") {
+                my.postMessage({type: 'checkState', val: filter});
+                return
+            }
+            if (filter == "reset") {
+                map.setView([Number(initLatlng.lat), Number(initLatlng.lon)], initZoom);
+                return
+            }
+        });
+
+        function drawMarekers() {
             markDatas.forEach(function (val, index) {
                 var preState = val.checkState, marker, customIcon;
                 switch(preState){
@@ -96,49 +130,11 @@
                 }
                 markers.addLayer(marker);
             });
+        }
 
-            // markers 添加到地图上
-            map.addLayer(markers);
-
-            
-            $('.filterBtn').on('click', function () {
-                changeSatus();
-            });
-
-            $('.custom-mask').on('click', function () {
-                changeSatus('remove');
-            });
-
-            $('.custom-container').on('click', function (ev) {
-                changeSatus('remove');
-                var metter = $(ev.target).data('metter');
-                my.postMessage({type: 'distance', val: metter});
-            });
-
-            $('.btn_handler_box').on('click', function (ev) {
-                var filter = $(ev.target).data('filter');
-                switch(filter){
-                    case "":
-                        my.postMessage({type: 'checkState', val: ''});
-                        break;
-                    case "1":
-                        my.postMessage({type: 'checkState', val: "1"});
-                        break;
-                    case "2":
-                        my.postMessage({type: 'checkState', val: "2"});
-                        break;
-                    case "3":
-                        my.postMessage({type: 'checkState', val: "3"});
-                        break;
-                    case "reset":
-                        map.setView([Number(initLatlng.lat), Number(initLatlng.lon)], initZoom);
-                        marker.unbindTooltip().setLatLng(initLatlng);
-                        break;
-                    default:
-                        return;
-                }
-            });
-
+        function reductionMap() {
+            markers.clearLayers();
+            map.setView([Number(initLatlng.lat), Number(initLatlng.lon)], initZoom);
         }
 
         function changeSatus (handler) {

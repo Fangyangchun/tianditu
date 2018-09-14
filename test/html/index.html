@@ -145,6 +145,8 @@
 
             // markers 添加到地图上
             map.addLayer(markers);
+            // map.removeLayer(markers) // 在地图上移除标记点，但是标记点人存在
+            // markers.clearLayers(); // 清空所有标记点，引起地图上的标记点也消失
 
             //创建标注对象
             // var marker = L.marker([map.getCenter().lat, map.getCenter().lng], {title: '义乌市'}).addTo(map);
