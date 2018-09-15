@@ -10,6 +10,7 @@
     <link rel="stylesheet" href="../libs/leafletSDK/css/MarkerCluster.css" />
     <link rel="stylesheet" href="../libs/leafletSDK/css/MarkerCluster.Default.css" />
     <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="../css/checkMap.css">
 </head>
 
 <body style="margin : 0; ">
@@ -45,6 +46,25 @@
             <li class="gocheck"><p><i class="menu_icon menu_icon_4"></i>去检查</p></li><li class="unfind"><p><i class="menu_icon menu_icon_5"></i>查无下落</p></li>
             <li class="detail"><p><i class="menu_icon menu_icon_6"></i>详情</p></li><li class="call_tel"><p><i class="menu_icon menu_icon_7"></i>打电话</p></li>
         </ul>
+    </div>
+
+    <p class="floating_box">筛选</p>
+    <div class="filter_list_box">
+        <dl>
+            <dt>主体类型</dt>
+            <dd>市场主体</dd><dd>非市场主体</dd>
+            <dt>检查类型</dt>
+            <dd>日常检查</dd><dd>随机检查</dd>
+            <dt>检查状态</dt>
+            <dd>待查</dd><dd>检查中</dd><dd>未完结</dd><dd>已完结</dd>
+            <dt>片区/商圈</dt>
+            <dd>市</dd><dd>区县</dd>
+            <dd>管辖单位</dd><dd>片区</dd>
+            <dt>监管类型</dt>
+            <dd>一般</dd><dd>分类</dd>
+        </dl>
+        <button class="reset_btn"><i></i>完成</button>
+        <button class="confirm_btn"><i></i>重置</button>
     </div>
 
     <script src="../libs/leafletSDK/js/uuid.js"></script>

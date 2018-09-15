@@ -50,17 +50,34 @@ if (navigator.userAgent.indexOf('AlipayClient') > -1) {
   }
 
   $('.filterBtn').on('click', function () {
-      changeSatus();
+    $('.custom-mask').addClass('custom-mask--visible');
+    $('.custom-container').addClass('custom-container--visible');
+    $('.custom-container li').addClass('active');
   });
 
   $('.custom-mask').on('click', function () {
-      changeSatus('remove');
+    $('.custom-mask').removeClass('custom-mask--visible');
+    if ($(".floating_box").hasClass('active')) {
+        $(".floating_box").removeClass('active');
+        $('.filter_list_box').removeClass('active');
+    } else {
+        $('.custom-container').removeClass('custom-container--visible');
+        $('.custom-container li').removeClass('active');
+    }
   });
 
   $('.custom-container').on('click', function (ev) {
-      changeSatus('remove');
-      var metter = $(ev.target).data('metter');
-      my.postMessage({type: 'distance', val: metter});
+    $('.custom-mask').removeClass('custom-mask--visible');
+    $('.custom-container').removeClass('custom-container--visible');
+    $('.custom-container li').removeClass('active');
+    var metter = $(ev.target).data('metter');
+    my.postMessage({type: 'distance', val: metter});
+  });
+
+  $(".floating_box").on("click", function (e) {
+        $(this).addClass('active');
+        $('.custom-mask').addClass('custom-mask--visible');
+        $('.filter_list_box').addClass('active');
   });
 
   $('.iptSearch').on('keydown',function(e){
@@ -168,17 +185,4 @@ if (navigator.userAgent.indexOf('AlipayClient') > -1) {
               });
           }
       });
-  }
-
-  function changeSatus (handler) {
-      if (handler == 'remove') {
-          $('.custom-mask').removeClass('custom-mask--visible');
-          $('.custom-container').removeClass('custom-container--visible');
-          $('.custom-container li').removeClass('active');
-      } else {
-          $('.custom-mask').addClass('custom-mask--visible');
-          $('.custom-container').addClass('custom-container--visible');
-          $('.custom-container li').addClass('active');
-      }
-      
   }

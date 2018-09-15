@@ -1,0 +1,22 @@
+
+.iptSearch {
+    width: calc(100% - 55px);
+}
+
+.resetBtn {
+    bottom: 30%;
+    border: 1px solid rgb(51, 136, 255);
+    width: 32px;
+    height: 32px;
+    border-radius: 2px;
+    background: rgba(255, 255, 255, 0.9);
+    padding: 0;
+    margin: 0;
+}
+
+.modifyBtn {
+    bottom: 20px;
+    width: calc(100% - 20px);
+    line-height: 36px;
+    box-shadow: 0px 0px 14px -1px #c8c8c8;
+}
