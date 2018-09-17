@@ -1,17 +1,17 @@
-if (navigator.userAgent.indexOf('AlipayClient') > -1) {
+if (navigator.userAgent.toLowerCase().indexOf('dingtalk') > -1) {
     document.writeln('<script src="https://appx/web-view.min.js"' + '>' + '<' + '/' + 'script>');
   }
-  my.getEnv(function(res) {
+  dd.getEnv(function(res) {
       if (!res.miniProgram) {
-          my.alert({
+          dd.alert({
               content:JSON.stringify('运行出错')
           });
       }
   });
   var initLatlng, initZoom = 17, cityName, newCenterData = {};
   
-  my.postMessage('init');
-  my.onMessage = function(e) {
+  dd.postMessage('init');
+  dd.onMessage = function(e) {
       initLatlng = {lon: e.lon, lat: e.lat} || {lon: 120.14989, lat: 30.27751};  // 默认经纬度为蓝天商务中心
       cityName = e.cityName || "杭州市";
       $.ajax({
@@ -24,7 +24,7 @@ if (navigator.userAgent.indexOf('AlipayClient') > -1) {
               newCenterData.location = res.city.value + res.dist.value + res.town.value + res.poi;
           },
           error: function (err) {
-              my.alert({
+              dd.alert({
                   content: "地址解析出错"
               });
           }
@@ -73,7 +73,7 @@ if (navigator.userAgent.indexOf('AlipayClient') > -1) {
                   marker.unbindTooltip().bindTooltip(res.city.value + res.dist.value + res.town.value + res.poi, {offset: [0, 10], direction : "bottom"}).openTooltip();
               },
               error: function (err) {
-                  my.alert({
+                  dd.alert({
                       content: "地址解析出错"
                   });
               }
@@ -92,7 +92,7 @@ if (navigator.userAgent.indexOf('AlipayClient') > -1) {
                       // jsonp: "callback",
                       success: function(res) {
                           if (res.strlatlon == "0.0,0.0") {
-                              my.alert({
+                              dd.alert({
                                   content: "未查询到相关信息"
                               });
                           } else {
@@ -106,13 +106,13 @@ if (navigator.userAgent.indexOf('AlipayClient') > -1) {
                           }
                       },
                       error: function (err) {
-                          my.alert({
+                          dd.alert({
                               content: "地址解析出错"
                           });
                       }
                   });
               } else {
-                  my.alert({
+                  dd.alert({
                       content: "请输入查询关键字"
                   });
               }
@@ -124,7 +124,7 @@ if (navigator.userAgent.indexOf('AlipayClient') > -1) {
           marker.unbindTooltip().setLatLng(initLatlng);
       });
       $(".modifyBtn").on('click', function () {
-          my.postMessage(newCenterData);
+          dd.postMessage(newCenterData);
       })
 
   }

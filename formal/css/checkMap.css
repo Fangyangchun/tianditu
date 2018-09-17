@@ -328,3 +328,87 @@
     -ms-transform: translateX(0%);
     -webkit-transform: translateX(0%);
 }
+
+.handler_box {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    height: 40px;
+    box-sizing: border-box;
+    border-top: 1px solid #ccc;
+    width: 100%;
+    text-align: center;
+    line-height: 38px;
+}
+
+.handler_box li {
+    float: left;
+    box-sizing: border-box;
+    width: 50%;
+    height: 100%;
+}
+
+.handler_box li:first-child {
+    border-right: 1px solid #ccc;    
+}
+
+.handler_box li i {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    vertical-align: -4px;
+    margin-right: 3px;
+}
+
+.handler_box .reset_btn i {
+    background: url("../img/icon-button-reset.png") no-repeat center;
+}
+
+.handler_box .confirm_btn i {
+    background: url("../img/icon-button-complete.png") no-repeat center;
+}
+
+.filter_type {
+    padding-top: 5px;
+}
+
+.filter_type dt {
+    font-size: 16px;
+    margin-bottom: 5px;
+    color: #000000;
+}
+
+.filter_type dt i {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    background: url("../img/icon-half-tit.png") no-repeat center;
+    vertical-align: -4px;
+    margin-right: 5px;
+}
+
+.filter_type .border_box {
+    padding: 10px 0;
+    margin: 0 10px;
+    border-bottom: 1px solid #ccc;
+}
+
+.filter_type dd {
+    display: inline-block;
+    padding: 2px 5px;
+    border: 1px solid #ccc;
+    min-width: 25%;
+    margin-right: 5px;
+    margin-bottom: 5px;
+    text-align: center;
+    font-size: 12px;
+    color: #555;
+}
+
+.filter_type dd.active {
+    color: rgb(51, 136, 255);
+}
+
+.pickerView-wrap {
+    z-index: 100001;
+}

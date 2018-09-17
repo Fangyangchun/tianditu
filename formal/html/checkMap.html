@@ -9,11 +9,12 @@
     <link rel="stylesheet" href="../libs/leafletSDK/css/leaflet.css" />
     <link rel="stylesheet" href="../libs/leafletSDK/css/MarkerCluster.css" />
     <link rel="stylesheet" href="../libs/leafletSDK/css/MarkerCluster.Default.css" />
+    <link rel="stylesheet" href="../libs/my-picker/my-picker.css">
     <link rel="stylesheet" href="../css/style.css">
     <link rel="stylesheet" href="../css/checkMap.css">
 </head>
 
-<body style="margin : 0; ">
+<body style="margin : 0;">
     <div id="map" class="map" style ="position:absolute;bottom:0px;top:0px;width:100%"></div>
     <input type="text" placeholder="输入企业名、统一信用代码、地址等查询" class="iptSearch" />
     <div class="filterBtn">
@@ -50,29 +51,50 @@
 
     <p class="floating_box">筛选</p>
     <div class="filter_list_box">
-        <dl>
-            <dt>主体类型</dt>
-            <dd>市场主体</dd><dd>非市场主体</dd>
-            <dt>检查类型</dt>
-            <dd>日常检查</dd><dd>随机检查</dd>
-            <dt>检查状态</dt>
-            <dd>待查</dd><dd>检查中</dd><dd>未完结</dd><dd>已完结</dd>
-            <dt>片区/商圈</dt>
-            <dd>市</dd><dd>区县</dd>
-            <dd>管辖单位</dd><dd>片区</dd>
-            <dt>监管类型</dt>
-            <dd>一般</dd><dd>分类</dd>
+        <dl class="filter_type">
+            <div class="border_box">
+                <dt><i></i>主体类型</dt>
+                <div id="MARKET_TYPE">
+                    <dd>市场主体</dd><dd>非市场主体</dd>
+                </div>
+            </div>
+            <div class="border_box">
+                <dt><i></i>检查类型</dt>
+                <div id="TASK_TYPE">
+                    <dd>日常检查</dd><dd>随机检查</dd>
+                </div>
+            </div>
+            <div class="border_box">
+                <dt><i></i>检查状态</dt>
+                <div class="TASK_STATUS">
+                    <dd>待查</dd><dd>检查中</dd><dd>未完结</dd><dd>已完结</dd>
+                </div>
+            </div>
+            <div class="border_box">
+                <dt><i></i>片区/商圈</dt>
+                <div>
+                    <dd id="picker-btn">管辖单位|片区</dd>
+                </div> 
+            </div>
+            <div class="border_box">
+                <dt><i></i>监管类型</dt>
+                <div id="SUPERVISE_TAG">
+                    <dd>一般</dd><dd>分类</dd>
+                </div>
+            </div>
         </dl>
-        <button class="reset_btn"><i></i>完成</button>
-        <button class="confirm_btn"><i></i>重置</button>
+        <ul class="handler_box">
+            <li class="reset_btn"><i></i>完成</li>
+            <li class="confirm_btn"><i></i>重置</li>
+        </ul>
     </div>
-
     <script src="../libs/leafletSDK/js/uuid.js"></script>
     <script src="../libs/leafletSDK/js/leaflet-src.js"></script>
     <script src="../libs/leafletSDK/js/leaflet.js"></script>
     <script src="../libs/leafletSDK/js/CustomWebSDK.min.js"></script> 
     <script src="../libs/leafletSDK/js/leaflet.markercluster.js"></script>
     <script src="../libs/jquery-1.12.3.min.js"></script>
+    <script src="../libs/my-picker/my-picker.js"></script>
     <script src="https://appx/web-view.min.js"></script>
     <script src="../js/checkMap.js"></script>
 

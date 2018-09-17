@@ -1,21 +1,25 @@
-if (navigator.userAgent.indexOf('AlipayClient') > -1) {
+if (navigator.userAgent.toLowerCase().indexOf('dingtalk') > -1) {
     document.writeln('<script src="https://appx/web-view.min.js"' + '>' + '<' + '/' + 'script>');
   }
-  my.getEnv(function(res) {
+  dd.getEnv(function(res) {
       if (!res.miniProgram) {
-          my.alert({
+          dd.alert({
               content:JSON.stringify('运行出错')
           });
       }
   });
-  var initLatlng, initZoom = 10, cityName, newCenterData,  markDatas = [], map, markers, mapParams, idx;
+  var initLatlng, initZoom = 10, cityName, newCenterData,  markDatas = [],
+   map, markers, mapParams, idx, filterDatas, pickerOpt;
+  var currentTaskStatus, legalEntityCata, checkType, legalEntityTag, areaName, areaCode; 
+  var btn = document.getElementById("picker-btn");
   
-  my.postMessage('init');
-  my.onMessage = function(e) {
+  dd.postMessage('init');
+  dd.onMessage = function(e) {
       initLatlng = {lon: e.lon, lat: e.lat} || {lon: 120.14989, lat: 30.27751};  // 默认经纬度为蓝天商务中心
       cityName = e.cityName || "杭州市";
       markDatas = e.markDatas;
-      drawMap(e.init)
+      filterDatas = e.filterDatas;
+      drawMap(e.init);
   }
   function drawMap(e) {
       if (e) { init(); return; }
@@ -46,7 +50,37 @@ if (navigator.userAgent.indexOf('AlipayClient') > -1) {
               $(".detail_info").removeClass('active');
           }
       });
+      getPickerOpt();
 
+  }
+
+  function getPickerOpt() {
+    pickerOpt = {};
+    filterDatas.SlicenoLDNameJson.forEach(val => {
+        pickerOpt[val.addressName] = [];
+        if (!val.codeAddress) {
+            pickerOpt[val.addressName] = val.codeAddress.map(codeval => {
+                return codeval.addressName;
+            });
+        }
+    });
+    var marketHtml = '', typeHtml = '', statusHtml = '', tagHtml = '';
+    filterDatas.SlicenoLDNameJson.marketType.forEach(val => {
+        marketHtml += '<dd data-paramCode="' + val.paramCode + '" data-paramCodeType="' + val.paramCodeType + '">' + val.paramName + '</dd>';
+    });
+    filterDatas.SlicenoLDNameJson.checkType.forEach(val => {
+        typeHtml += '<dd data-paramCode="' + val.paramCode + '" data-paramCodeType="' + val.paramCodeType + '">' + val.paramName + '</dd>';
+    });
+    filterDatas.SlicenoLDNameJson.taskStatus.forEach(val => {
+        statusHtml += '<dd data-paramCode="' + val.paramCode + '" data-paramCodeType="' + val.paramCodeType + '">' + val.paramName + '</dd>';
+    });
+    filterDatas.SlicenoLDNameJson.superviseTag.forEach(val => {
+        tagHtml += '<dd data-paramCode="' + val.paramCode + '" data-paramCodeType="' + val.paramCodeType + '">' + val.paramName + '</dd>';
+    });
+    $('#MARKET_TYPE').innerHtml = marketHtml;
+    $('#TASK_TYPE').innerHtml = typeHtml;
+    $('#TASK_STATUS').innerHtml = statusHtml;
+    $('#SUPERVISE_TAG').innerHtml = tagHtml;
   }
 
   $('.filterBtn').on('click', function () {
@@ -71,7 +105,7 @@ if (navigator.userAgent.indexOf('AlipayClient') > -1) {
     $('.custom-container').removeClass('custom-container--visible');
     $('.custom-container li').removeClass('active');
     var metter = $(ev.target).data('metter');
-    my.postMessage({type: 'distance', val: metter});
+    dd.postMessage({type: 'distance', val: metter});
   });
 
   $(".floating_box").on("click", function (e) {
@@ -85,9 +119,9 @@ if (navigator.userAgent.indexOf('AlipayClient') > -1) {
       if(e.keyCode == 13){
           var keyWord = cityName + e.target.value;
           if (e.target.value) {
-              my.postMessage({type: 'keyword', val: e.target.value});
+              dd.postMessage({type: 'keyword', val: e.target.value});
           } else {
-              my.alert({
+              dd.alert({
                   content: "请输入查询关键字"
               });
           }
@@ -97,7 +131,7 @@ if (navigator.userAgent.indexOf('AlipayClient') > -1) {
   $('.btn_handler_box').on('click', function (ev) {
       var filter = $(ev.target).data('filter');
       if (filter == "" || filter == "1" || filter == "2" || filter == "3") {
-          my.postMessage({type: 'checkState', val: filter});
+          dd.postMessage({type: 'checkState', val: filter});
           return
       }
       if (filter == "reset") {
@@ -107,24 +141,96 @@ if (navigator.userAgent.indexOf('AlipayClient') > -1) {
   });
   $(".call_tel").on("click", function () {
       var phoneNum = $(".call_tel").data("tel");
-      my.postMessage({type: 'callPhone', val: phoneNum});
+      dd.postMessage({type: 'callPhone', val: phoneNum});
   });
 
   $(".menu_icon_3").on("click", function () {
-      my.postMessage({type: 'openMap', val: mapParams});
+      dd.postMessage({type: 'openMap', val: mapParams});
   });
 
   $(".detail").on("click", function () {
-      my.postMessage({type: 'detail', val: idx});
+      dd.postMessage({type: 'detail', val: idx});
   });
 
   $(".gocheck").on("click", function () {
-      my.postMessage({type: 'gocheck', val: idx});
+      dd.postMessage({type: 'gocheck', val: idx});
   });
 
   $(".unfind").on("click", function () {
-      my.postMessage({type: 'unfind', val: idx});
+      dd.postMessage({type: 'unfind', val: idx});
   });
+
+  $(".border_box").on('click', 'dd', function () {
+      $(this).siblings().removeClass('active')
+      $(this).addClass('active');
+      var type = $(ev.target).data('paramCodeType');
+      switch(type){
+        case "MARKET_TYPE":
+            legalEntityCata = $(ev.target).data('paramCode');
+            break;
+        case "TASK_TYPE":
+            checkType = $(ev.target).data('paramCode');
+            break;
+        case "TASK_STATUS":
+            taskStatus = $(ev.target).data('paramCode');
+            break;
+        case "SUPERVISE_TAG":
+            legalEntityTag = $(ev.target).data('paramCode');
+            break;
+      }
+  });
+
+  $(".reset_btn").on("click", function () {
+    areaName = [];
+    areaCode = [];
+    btn.innerText = '管辖单位|片区';
+    $(".filter_type dd").removeClass('active');
+    $('.custom-mask').removeClass('custom-mask--visible');
+    $(".floating_box").removeClass('active');
+    $('.filter_list_box').removeClass('active');
+    // dd.postMessage({type: 'businessDistrict', val: idx});
+  });
+
+  $(".confirm_btn").on("click", function () {
+      var preFilterData = {
+            taskStatus: currentTaskStatus,
+            businessDistrict: areaCode.join(','), //片区
+            legalEntityCata: currentMarketType,
+            checkType: currentCheckType,
+            legalEntityTag: currentSuperviseTag
+      }
+    // dd.postMessage({type: 'businessDistrict', val: preFilterData});
+  });
+
+  btn.onclick = function(){
+    // data = {"小明家":[], "小红家":["小红爸爸", "小红妈妈"]}
+    var pickerView = new PickerView({
+        bindElem: btn,
+        data: pickerOpt,
+        // data: data,
+        title: '片区/商圈',
+        leftText: '取消',
+        rightText: '确定',
+        rightFn: function( selectArr ){
+            // var indexArry = btn.getAttribute("selectcache");
+            areaName = [];
+            areaCode = [];
+            let subSlicenoLDNameJson;
+            var firstIdx = filterDatas.SlicenoLDNameJson.findIndex(function(obj){return obj.addressName == selectArr[0]});
+            areaCode.push(filterDatas.SlicenoLDNameJson[firstIdx].code);
+            if (selectArr[1]) {
+                areaName = selectArr;
+                subSlicenoLDNameJson = filterDatas.SlicenoLDNameJson[firstIdx].codeAddress;
+                var subIdx = subSlicenoLDNameJson.findIndex(function(val){return val.addressName == selectArr[1]});
+                areaCode.push(subSlicenoLDNameJson[subIdx].code);
+            } else {
+                areaName = selectArr[0];
+            }
+            btn.innerText = areaName.join('-');
+            btn.setAttribute("class", 'active');
+        }
+    });
+  }
   
 
   function drawMarekers() {
@@ -180,7 +286,7 @@ if (navigator.userAgent.indexOf('AlipayClient') > -1) {
               $(".detail_info").addClass('active');
           },
           error: function (err) {
-              my.alert({
+              dd.alert({
                   content: "地址解析出错"
               });
           }
