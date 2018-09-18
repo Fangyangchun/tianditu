@@ -10,7 +10,7 @@ if (navigator.userAgent.toLowerCase().indexOf('dingtalk') > -1) {
   });
   var initLatlng, initZoom = 10, cityName, newCenterData,  markDatas = [],
    map, markers, mapParams, idx, filterDatas, pickerOpt;
-  var currentTaskStatus, legalEntityCata, checkType, legalEntityTag, areaName, areaCode; 
+  var taskStatus, legalEntityCata, checkType, legalEntityTag, areaName, areaCode; 
   var btn = document.getElementById("picker-btn");
   
   dd.postMessage('init');
@@ -91,6 +91,26 @@ if (navigator.userAgent.toLowerCase().indexOf('dingtalk') > -1) {
     $('#TASK_TYPE').html(typeHtml);
     $('#TASK_STATUS').html(statusHtml);
     $('#SUPERVISE_TAG').html(tagHtml);
+    
+    $(".filter_list").on('click', 'dd', function (ev) {
+        $(this).siblings().removeClass('active')
+        $(this).addClass('active');
+        var type = $(ev.target)[0].dataset.paramcodetype;
+        switch(type){
+            case "MARKET_TYPE":
+                legalEntityCata = $(ev.target)[0].dataset.paramcode;
+                break;
+            case "TASK_TYPE":
+                checkType = $(ev.target)[0].dataset.paramcode;
+                break;
+            case "TASK_STATUS":
+                taskStatus = $(ev.target)[0].dataset.paramcode;
+                break;
+            case "SUPERVISE_TAG":
+                legalEntityTag = $(ev.target)[0].dataset.paramcode;
+                break;
+        }
+    });
   }
 
   $('.filterBtn').on('click', function () {
@@ -170,26 +190,6 @@ if (navigator.userAgent.toLowerCase().indexOf('dingtalk') > -1) {
       dd.postMessage({type: 'unfind', val: idx});
   });
 
-  $(".border_box").on('click', 'dd', function (ev) {
-      $(this).siblings().removeClass('active')
-      $(this).addClass('active');
-      var type = $(ev.target).data('paramCodeType');
-      switch(type){
-        case "MARKET_TYPE":
-            legalEntityCata = $(ev.target).data('paramCode');
-            break;
-        case "TASK_TYPE":
-            checkType = $(ev.target).data('paramCode');
-            break;
-        case "TASK_STATUS":
-            taskStatus = $(ev.target).data('paramCode');
-            break;
-        case "SUPERVISE_TAG":
-            legalEntityTag = $(ev.target).data('paramCode');
-            break;
-      }
-  });
-
   $(".reset_btn").on("click", function () {
     areaName = [];
     areaCode = [];
@@ -209,13 +209,20 @@ if (navigator.userAgent.toLowerCase().indexOf('dingtalk') > -1) {
   });
 
   $(".confirm_btn").on("click", function () {
+      var currentAreaCode = '';
+      if (areaCode) {
+        currentAreaCode = areaCode.join(',');
+      } 
       var preFilterData = {
-            taskStatus: currentTaskStatus || '',
-            businessDistrict: areaCode.join(',') || '', //片区
-            legalEntityCata: currentMarketType || '',
-            checkType: currentCheckType || '',
-            legalEntityTag: currentSuperviseTag || ''
+            taskStatus: taskStatus || '',
+            businessDistrict: currentAreaCode, //片区
+            legalEntityCata: legalEntityCata || '',
+            checkType: checkType || '',
+            legalEntityTag: legalEntityTag || ''
       }
+      $('.custom-mask').removeClass('custom-mask--visible');
+      $(".floating_box").removeClass('active');
+      $('.filter_list_box').removeClass('active');
       dd.postMessage({type: 'businessDistrict', val: preFilterData});
   });
 
