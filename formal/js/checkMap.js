@@ -22,7 +22,10 @@ if (navigator.userAgent.toLowerCase().indexOf('dingtalk') > -1) {
       drawMap(e.init);
   }
   function drawMap(e) {
-      if (e) { init(); return; }
+      if (e) {
+        init();
+        return; 
+      }
       reductionMap()
       drawMarekers()
   }
@@ -45,42 +48,49 @@ if (navigator.userAgent.toLowerCase().indexOf('dingtalk') > -1) {
       drawMarekers();
       map.addLayer(markers);
 
+      initFilterHtml();
+      getPickerOpt(); 
+
       map.on('click', function (e) {
           if($(".detail_info").hasClass('active')) { 
               $(".detail_info").removeClass('active');
           }
       });
-      getPickerOpt();
+      
 
   }
 
   function getPickerOpt() {
     pickerOpt = {};
-    filterDatas.SlicenoLDNameJson.forEach(val => {
-        pickerOpt[val.addressName] = [];
-        if (!val.codeAddress) {
-            pickerOpt[val.addressName] = val.codeAddress.map(codeval => {
-                return codeval.addressName;
+    $.each(filterDatas.SlicenoLDNameJson, function (index, val) {
+        var idxKey = val.addressName;
+        pickerOpt[idxKey] = [];
+        if (val.codeAddress) {
+            val.codeAddress.forEach(codeval => {
+                pickerOpt[idxKey].push(codeval.addressName);
             });
         }
-    });
+    })
+  }
+
+  function initFilterHtml () {
     var marketHtml = '', typeHtml = '', statusHtml = '', tagHtml = '';
-    filterDatas.SlicenoLDNameJson.marketType.forEach(val => {
+    filterDatas.marketType.forEach(val => {
         marketHtml += '<dd data-paramCode="' + val.paramCode + '" data-paramCodeType="' + val.paramCodeType + '">' + val.paramName + '</dd>';
     });
-    filterDatas.SlicenoLDNameJson.checkType.forEach(val => {
+    filterDatas.checkType.forEach(val => {
         typeHtml += '<dd data-paramCode="' + val.paramCode + '" data-paramCodeType="' + val.paramCodeType + '">' + val.paramName + '</dd>';
     });
-    filterDatas.SlicenoLDNameJson.taskStatus.forEach(val => {
+    filterDatas.taskStatus.forEach(val => {
         statusHtml += '<dd data-paramCode="' + val.paramCode + '" data-paramCodeType="' + val.paramCodeType + '">' + val.paramName + '</dd>';
     });
-    filterDatas.SlicenoLDNameJson.superviseTag.forEach(val => {
+    filterDatas.superviseTag.forEach(val => {
         tagHtml += '<dd data-paramCode="' + val.paramCode + '" data-paramCodeType="' + val.paramCodeType + '">' + val.paramName + '</dd>';
     });
-    $('#MARKET_TYPE').innerHtml = marketHtml;
-    $('#TASK_TYPE').innerHtml = typeHtml;
-    $('#TASK_STATUS').innerHtml = statusHtml;
-    $('#SUPERVISE_TAG').innerHtml = tagHtml;
+    $('#MARKET_TYPE').html(marketHtml);
+    $('#TASK_TYPE').html(typeHtml);
+    $('#TASK_STATUS').html(statusHtml);
+    $('#SUPERVISE_TAG').html(tagHtml);
   }
 
   $('.filterBtn').on('click', function () {
@@ -188,18 +198,25 @@ if (navigator.userAgent.toLowerCase().indexOf('dingtalk') > -1) {
     $('.custom-mask').removeClass('custom-mask--visible');
     $(".floating_box").removeClass('active');
     $('.filter_list_box').removeClass('active');
-    // dd.postMessage({type: 'businessDistrict', val: idx});
+    var preFilterData = {
+        taskStatus: '',
+        businessDistrict: '', //片区
+        legalEntityCata: '',
+        checkType: '',
+        legalEntityTag: ''
+    }
+    dd.postMessage({type: 'businessDistrict', val: preFilterData});
   });
 
   $(".confirm_btn").on("click", function () {
       var preFilterData = {
-            taskStatus: currentTaskStatus,
-            businessDistrict: areaCode.join(','), //片区
-            legalEntityCata: currentMarketType,
-            checkType: currentCheckType,
-            legalEntityTag: currentSuperviseTag
+            taskStatus: currentTaskStatus || '',
+            businessDistrict: areaCode.join(',') || '', //片区
+            legalEntityCata: currentMarketType || '',
+            checkType: currentCheckType || '',
+            legalEntityTag: currentSuperviseTag || ''
       }
-    // dd.postMessage({type: 'businessDistrict', val: preFilterData});
+      dd.postMessage({type: 'businessDistrict', val: preFilterData});
   });
 
   btn.onclick = function(){
