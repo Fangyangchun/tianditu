@@ -170,7 +170,7 @@ if (navigator.userAgent.toLowerCase().indexOf('dingtalk') > -1) {
       dd.postMessage({type: 'unfind', val: idx});
   });
 
-  $(".border_box").on('click', 'dd', function () {
+  $(".border_box").on('click', 'dd', function (ev) {
       $(this).siblings().removeClass('active')
       $(this).addClass('active');
       var type = $(ev.target).data('paramCodeType');
@@ -241,7 +241,7 @@ if (navigator.userAgent.toLowerCase().indexOf('dingtalk') > -1) {
                 var subIdx = subSlicenoLDNameJson.findIndex(function(val){return val.addressName == selectArr[1]});
                 areaCode.push(subSlicenoLDNameJson[subIdx].code);
             } else {
-                areaName = selectArr[0];
+                areaName.push(selectArr[0]);
             }
             btn.innerText = areaName.join('-');
             btn.setAttribute("class", 'active');

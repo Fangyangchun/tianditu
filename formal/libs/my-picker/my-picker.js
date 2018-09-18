@@ -189,6 +189,20 @@
                 _this.touchend(e);
                 e.stopPropagation();
             }, false);
+            this.elem_contents.addEventListener("dragstart", function(e) {
+                _this.moveObj = util.parents(e.target, "pickerView-box-content").children[2];
+                _this.dragstart(e);
+                e.stopPropagation();
+            }, false);
+            this.elem_contents.addEventListener("drag", function(e) {
+                _this.drag(e);
+                e.stopPropagation();
+                e.preventDefault();
+            }, false);
+            this.elem_contents.addEventListener("dragend", function(e) {
+                _this.dragend(e);
+                e.stopPropagation();
+            }, false);
             this.elem_mask.addEventListener("touchend", function(e) {
                 _this.closeComponent();
                 e.stopPropagation();
@@ -199,7 +213,27 @@
                 e.stopPropagation();
                 e.preventDefault()
             }, false);
+            this.elem_leftBtn.addEventListener("click", function(e) {
+                _this.closeComponent();
+                e.stopPropagation();
+                e.preventDefault()
+            }, false);
             this.elem_rightBtn.addEventListener("touchend", function(e) {
+                var selectArr = [];
+                for (var i = 0; i < _this.elem_contents.children.length; i++) {
+                    var items = _this.elem_contents.children[i].children[2],
+                        field = items.children.length > 0 ? items.children[_this.selectArr[i]].innerText : "";
+
+                    selectArr.push(field);
+                }
+                _this.Opt.rightFn(selectArr);
+                _this.closeComponent();
+                // 绑定元素
+                _this.Opt.bindElem.setAttribute("selectcache",_this.selectArr);
+                e.stopPropagation();
+                e.preventDefault()
+            }, false);
+            this.elem_rightBtn.addEventListener("click", function(e) {
                 var selectArr = [];
                 for (var i = 0; i < _this.elem_contents.children.length; i++) {
                     var items = _this.elem_contents.children[i].children[2],
@@ -232,6 +266,56 @@
             this.top_end = len;
         },
         touchend: function(e) {
+            if (!this.isMove) return;
+            this.isMove = false;
+
+            var _this = this,
+                itemHeight = PickerView.defaultOpt.itemHeight,
+                sign = this.top_end >= 0 ? 1 : -1,
+                index = this.moveObj.parentNode.getAttribute("index"),
+                fieldIndex = Math.round(Math.abs(this.top_end) / itemHeight),
+                len = sign * (fieldIndex * itemHeight);
+
+            if (len > 0) {
+                len = 0;
+                fieldIndex = 0;
+            } else if (len < -(this.moveObj.children.length - 1) * itemHeight) {
+                len = -(this.moveObj.children.length - 1) * itemHeight;
+                fieldIndex = this.moveObj.children.length - 1;
+            };
+
+            this.selectArr[index] = fieldIndex;
+            this.moveObj.setAttribute("fieldIndex", fieldIndex);
+
+            this.moveObj.style.transition = "0.3s cubic-bezier(0,0,0.2,1.15)";
+            util.css(_this.moveObj, {
+                "transform": 'translate3d(0,' + len + 'px,0)'
+            });
+            _this.changeNext(index);
+            _this.moveObj.addEventListener("transitionend", function(event) {
+                _this.moveObj.style.transition = "";
+            }, false);
+            _this.moveObj.addEventListener("webkitTransitionEnd", function(event) {
+                _this.moveObj.style.transition = "";
+            }, false);
+
+        },
+        dragstart: function(e) {
+            this._y_start = e.pageY;
+            this.isMove = false;
+            this.top_start = parseInt(this.moveObj.style.transform.split(",")[1]);
+        },
+        drag: function(e) {
+            var _this = this;
+            this.isMove = true;
+            this._y_move = e.pageY;
+            var len = parseFloat(this._y_move) - parseFloat(this._y_start) + parseFloat(this.top_start);
+            util.css(_this.moveObj, {
+                "transform": 'translate3d(0,' + len + 'px,0)'
+            })
+            this.top_end = len;
+        },
+        dragend: function(e) {
             if (!this.isMove) return;
             this.isMove = false;
 
