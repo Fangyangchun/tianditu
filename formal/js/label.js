@@ -2,7 +2,7 @@ if (navigator.userAgent.toLowerCase().indexOf('dingtalk') > -1) {
     document.writeln('<script src="https://appx/web-view.min.js"' + '>' + '<' + '/' + 'script>');
   }
   dd.getEnv(function(res) {
-      if (!res.miniProgram) {
+      if (!res.miniprogram) {
           dd.alert({
               content:JSON.stringify('运行出错')
           });

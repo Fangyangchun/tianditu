@@ -2,7 +2,7 @@ if (navigator.userAgent.toLowerCase().indexOf('dingtalk') > -1) {
     document.writeln('<script src="https://appx/web-view.min.js"' + '>' + '<' + '/' + 'script>');
   }
   dd.getEnv(function(res) {
-      if (!res.miniProgram) {
+      if (!res.miniprogram) {
           dd.alert({
               content:JSON.stringify('运行出错')
           });
@@ -15,6 +15,9 @@ if (navigator.userAgent.toLowerCase().indexOf('dingtalk') > -1) {
   
   dd.postMessage('init');
   dd.onMessage = function(e) {
+    dd.alert({
+        content:JSON.stringify(e)
+    });
       initLatlng = {lon: e.lon, lat: e.lat} || {lon: 120.14989, lat: 30.27751};  // 默认经纬度为蓝天商务中心
       cityName = e.cityName || "杭州市";
       markDatas = e.markDatas;
