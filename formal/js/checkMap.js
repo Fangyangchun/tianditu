@@ -289,16 +289,16 @@
             } else {
                 currentAreaCode = '';
             }
-            curTaskStatus = ''
-            curLegalEntityCata = ''
-            curCheckType = ''
-            curLegalEntityTag = ''
+            curTaskStatus = taskStatus || ''
+            curLegalEntityCata = legalEntityCata || ''
+            curCheckType = checkType || ''
+            curLegalEntityTag = legalEntityTag || ''
             var preFilterData = {
-                    taskStatus: taskStatus || '',
+                    taskStatus: curTaskStatus,
                     businessDistrict: currentAreaCode, //片区
-                    legalEntityCata: legalEntityCata || '',
-                    checkType: checkType || '',
-                    legalEntityTag: legalEntityTag || ''
+                    legalEntityCata: curLegalEntityCata,
+                    checkType: curCheckType,
+                    legalEntityTag: curLegalEntityTag
             }
             $('.custom-mask').removeClass('custom-mask--visible');
             $(".floating_box").removeClass('active');
