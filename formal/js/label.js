@@ -10,7 +10,7 @@ if (navigator.userAgent.toLowerCase().indexOf('dingtalk') > -1) {
   });
   var initLatlng, initZoom = 17, cityName, newCenterData = {};
   
-  dd.postMessage('init');
+  dd.postMessage({});
   dd.onMessage = function(e) {
       initLatlng = {lon: e.lon, lat: e.lat} || {lon: 120.14989, lat: 30.27751};  // 默认经纬度为蓝天商务中心
       cityName = e.cityName || "杭州市";
@@ -44,6 +44,8 @@ if (navigator.userAgent.toLowerCase().indexOf('dingtalk') > -1) {
       dataSource.url = 'http://ditu.zjzwfw.gov.cn/mapserver/label/zjvmap/getDatas?x=${x}&y=${y}&l=${z}&styleId=tdt_biaozhunyangshi_2017';
       labelLayer.addDataSource(dataSource);
       map.addLayer(labelLayer);
+    //   var layer = new L.GXYZ('http://ditu.zjzwfw.gov.cn/mapserver/label/zjvmap/getImg?x={x}&y={y}&l={z}&styleId=tdt_biaozhunyangshi_2017',{tileSize:512,hitDetection:true,keepBuffer:0,updateWhenZooming:false});
+    //   map.addLayer(layer);
       var customIcon = L.icon({ 
           iconUrl: '../img/indoor_pub_poi_pressed.png',
           iconSize: [21, 30],
@@ -101,7 +103,7 @@ if (navigator.userAgent.toLowerCase().indexOf('dingtalk') > -1) {
                               newCenterData.location = res.city + res.keyword;
                               var newCenterLatlon = {lon: newCenterData.longitude, lat: newCenterData.latitude}
                               marker.setLatLng(newCenterLatlon);
-                              marker.unbindTooltip().bindTooltip(keyWord, {offset: [0, 10], direction : "bottom"}).openTooltip();
+                              marker.unbindTooltip().bindTooltip(e.target.value, {offset: [0, 10], direction : "bottom"}).openTooltip();
                               map.panTo(newCenterLatlon)
                           }
                       },

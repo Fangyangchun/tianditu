@@ -64,7 +64,7 @@
     border-top: 5px solid grey;
     border-left: 5px solid transparent;
     border-right: 5px solid transparent;
-    top: 8px;
+    top: 5px;
 }
 .custom-mask {
     background: rgba(0,0,0,.3);
@@ -78,6 +78,7 @@
     -webkit-transition-duration: .3s;
     transition-duration: .3s;
     visibility: hidden;
+    overflow: hidden;
 }
 
 .custom-mask.custom-mask--visible {
@@ -95,7 +96,7 @@
     position: absolute;
     font-size: 14px;
     right: 0;
-    top: 46px;
+    top: 48px;
     height: auto;
     overflow: hidden;
     transform: translateY(-100%);
@@ -143,12 +144,14 @@
     transition: -webkit-transform .3s;
     transition: transform .3s;
     transition: transform .3s,-webkit-transform .3s;
+    display: none;
 }
 
 .detail_info.active {
     transform: translateY(0);
     -ms-transform: translateY(0);
     -webkit-transform: translateY(0);
+    display: block;
 }
 
 .menu_box {
@@ -281,6 +284,7 @@
 }
 
 .floating_box {
+    display: block;
     position: absolute;
     z-index: 100000;
     right: 0;
@@ -304,6 +308,7 @@
     transform: translateX(100%);
     -ms-transform: translateX(100%);
     -webkit-transform: translateX(100%);
+    display: none;
 }
 
 .filter_list_box {
@@ -330,7 +335,7 @@
 }
 
 .handler_box {
-    position: absolute;
+    position: fixed;
     bottom: 0;
     left: 0;
     height: 40px;
@@ -346,6 +351,7 @@
     box-sizing: border-box;
     width: 50%;
     height: 100%;
+    background: #ffffff;
 }
 
 .handler_box li:first-child {
@@ -370,6 +376,7 @@
 
 .filter_type {
     padding-top: 5px;
+    padding-bottom: 45px;
 }
 
 .filter_type dt {
