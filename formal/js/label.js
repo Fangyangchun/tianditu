@@ -39,13 +39,13 @@ if (navigator.userAgent.toLowerCase().indexOf('dingtalk') > -1) {
       map.addLayer(layer);
 
       // 添加注记图层
-      var labelLayer = new L.GWVTAnno({tileSize:512});
-      var dataSource = new Custom.URLDataSource();
-      dataSource.url = 'http://ditu.zjzwfw.gov.cn/mapserver/label/zjvmap/getDatas?x=${x}&y=${y}&l=${z}&styleId=tdt_biaozhunyangshi_2017';
-      labelLayer.addDataSource(dataSource);
+    //   var labelLayer = new L.GWVTAnno({tileSize:512});
+    //   var dataSource = new Custom.URLDataSource();
+    //   dataSource.url = 'http://ditu.zjzwfw.gov.cn/mapserver/label/zjvmap/getDatas?x=${x}&y=${y}&l=${z}&styleId=tdt_biaozhunyangshi_2017';
+    //   labelLayer.addDataSource(dataSource);
+    //   map.addLayer(labelLayer);
+      var labelLayer = new L.GXYZ('http://ditu.zjzwfw.gov.cn/mapserver/label/zjvmap/getImg?x={x}&y={y}&l={z}&styleId=tdt_biaozhunyangshi_2017',{tileSize:512,hitDetection:true,keepBuffer:0,updateWhenZooming:false});
       map.addLayer(labelLayer);
-    //   var layer = new L.GXYZ('http://ditu.zjzwfw.gov.cn/mapserver/label/zjvmap/getImg?x={x}&y={y}&l={z}&styleId=tdt_biaozhunyangshi_2017',{tileSize:512,hitDetection:true,keepBuffer:0,updateWhenZooming:false});
-    //   map.addLayer(layer);
       var customIcon = L.icon({ 
           iconUrl: '../img/indoor_pub_poi_pressed.png',
           iconSize: [21, 30],
