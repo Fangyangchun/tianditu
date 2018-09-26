@@ -94,7 +94,7 @@
             $('#TASK_STATUS').html(statusHtml);
             $('#SUPERVISE_TAG').html(tagHtml);
             
-            $(".filter_list").on('click', 'dd', function (ev) {
+            $(".filter_list dd").on('click', function (ev) {
                 $(this).siblings().removeClass('active')
                 $(this).addClass('active');
                 var type = $(ev.target)[0].dataset.paramcodetype;
@@ -229,7 +229,7 @@
             }
         });
 
-        $('.btn_handler_box').on('click', function (ev) {
+        $('.btn_handler_box li').on('click', function (ev) {
             var filter = $(ev.target).data('filter');
             if (filter == "" || filter == "1" || filter == "2" || filter == "3") {
                 dd.postMessage({type: 'checkState', val: filter});
@@ -353,6 +353,8 @@
                 }
                 markers.addLayer(marker);
                 marker.on('click', function (e) {
+                    console.log('marker');
+                    console.log(e);
                     if($(".detail_info").hasClass('active')) { 
                         $(".detail_info").removeClass('active');
                     }
