@@ -100,7 +100,7 @@ if (navigator.userAgent.toLowerCase().indexOf('dingtalk') > -1) {
                           } else {
                               newCenterData.latitude = parseFloat(res.strlatlon.split(',')[1]);
                               newCenterData.longitude = parseFloat(res.strlatlon.split(',')[0]);
-                              newCenterData.location = res.city + res.keyword;
+                              newCenterData.location = res.city + e.target.value;
                               var newCenterLatlon = {lon: newCenterData.longitude, lat: newCenterData.latitude}
                               marker.setLatLng(newCenterLatlon);
                               marker.unbindTooltip().bindTooltip(e.target.value, {offset: [0, 10], direction : "bottom"}).openTooltip();
