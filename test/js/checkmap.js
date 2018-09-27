@@ -10,7 +10,8 @@
         //     }
         // });
         var initLatlng, initZoom = 10, cityName, newCenterData,  markDatas = [],
-        map, markers, mapParams, idx, filterDatas, pickerOpt;
+        map, markers, mapParams, idx, filterDatas, pickerOpt; 
+        var layers=[];  
         var taskStatus, curTaskStatus, legalEntityCata, curLegalEntityCata, checkType, curCheckType, legalEntityTag, curLegalEntityTag, areaName, areaCode, currentAreaCode; 
         var btn = document.getElementById("picker-btn");
         dd.postMessage({type: 'init'});
@@ -32,7 +33,7 @@
 
         function init() {
             map = L.map('map',{crs:L.CRS.CustomEPSG4326,center: initLatlng, minZoom: 5, zoom: initZoom, inertiaDeceleration:15000, zoomControl: false});
-            var tileAddress = 'https://ditu.zjzwfw.gov.cn/mapserver/vmap/zjvmap/getMAP?x={x}&y={y}&l={z}&styleId=tdt_biaozhunyangshi_2017';
+            var tileAddress = 'http://ditu.zjzwfw.gov.cn/mapserver/vmap/zjvmap/getMAP?x={x}&y={y}&l={z}&styleId=tdt_biaozhunyangshi_2017';
 
             var layer = new L.GXYZ(tileAddress, {tileSize:512, minZoom: 5});
             map.addLayer(layer);
@@ -40,15 +41,14 @@
             // 添加注记图层
             // var labelLayer = new L.GWVTAnno({tileSize:512});
             // var dataSource = new Custom.URLDataSource();
-            // dataSource.url = 'https://ditu.zjzwfw.gov.cn/mapserver/label/zjvmap/getDatas?x=${x}&y=${y}&l=${z}&styleId=tdt_biaozhunyangshi_2017';
+            // dataSource.url = 'http://ditu.zjzwfw.gov.cn/mapserver/label/zjvmap/getDatas?x=${x}&y=${y}&l=${z}&styleId=tdt_biaozhunyangshi_2017';
             // labelLayer.addDataSource(dataSource);
             // map.addLayer(labelLayer);
-            var labelLayer = new L.GXYZ('https://ditu.zjzwfw.gov.cn/mapserver/label/zjvmap/getImg?x={x}&y={y}&l={z}&styleId=tdt_biaozhunyangshi_2017',{tileSize:512,hitDetection:true,keepBuffer:0,updateWhenZooming:false});
+            var labelLayer = new L.GXYZ('http://ditu.zjzwfw.gov.cn/mapserver/label/zjvmap/getImg?x={x}&y={y}&l={z}&styleId=tdt_biaozhunyangshi_2017',{tileSize:512,hitDetection:true,keepBuffer:0,updateWhenZooming:false});
             map.addLayer(labelLayer);
 
-            markers = L.markerClusterGroup();
+            // markers = L.markerClusterGroup();
             drawMarekers();
-            map.addLayer(markers);
 
             initFilterHtml();
             getPickerOpt(); 
@@ -338,8 +338,9 @@
         
 
         function drawMarekers() {
+            layers=[];  
             markDatas.forEach(function (val, index) {
-                var preState = val.checkState, marker, customIcon;
+                var preState = val.checkState, marker;
                 switch(preState){
                     case "1":
                         marker = L.marker([val.lat, val.lon], {draggable: false, opacity: 1, icon: L.divIcon({className: 'green-marker', html: '<p>' + (index + 1) + '</p>'})});
@@ -351,7 +352,8 @@
                         marker = L.marker([val.lat, val.lon], {draggable: false, opacity: 1, icon: L.divIcon({className: 'red-marker', html: '<p>' + (index + 1) + '</p>'})});
                         break;
                 }
-                markers.addLayer(marker);
+                // markers.addLayer(marker);
+                layers.push(marker);
                 marker.on('click', function (e) {
                     if($(".detail_info").hasClass('active')) { 
                         $(".detail_info").removeClass('active');
@@ -360,6 +362,8 @@
                     getAdressInfo(markDatas[idx]);
                 });
             });
+            markers = L.layerGroup(layers);  
+            map.addLayer(markers);
         }
 
         function reductionMap() {
@@ -368,7 +372,7 @@
         }
 
         function getAdressInfo (e) {
-            var reverseResolutionUrl = encodeURI("https://dh.ditu.zj.cn:9443/inverse/getInverseGeocoding.jsonp?&detail=1&zoom=11&latlon=" + e.lon + "," + e.lat + "&lat=&lon=&customer=2");
+            var reverseResolutionUrl = encodeURI("http://dh.ditu.zj.cn:18005/inverse/getInverseGeocoding.jsonp?&detail=1&zoom=11&latlon=" + e.lon + "," + e.lat + "&lat=&lon=&customer=2");
             $.ajax({
                 url: reverseResolutionUrl,
                 dataType: "jsonp",

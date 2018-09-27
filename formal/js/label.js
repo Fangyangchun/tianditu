@@ -1,13 +1,13 @@
 if (navigator.userAgent.toLowerCase().indexOf('dingtalk') > -1) {
     document.writeln('<script src="https://appx/web-view.min.js"' + '>' + '<' + '/' + 'script>');
   }
-  dd.getEnv(function(res) {
-      if (!res.miniprogram) {
-          dd.alert({
-              content:JSON.stringify('运行出错')
-          });
-      }
-  });
+//   dd.getEnv(function(res) {
+//       if (!res.miniprogram) {
+//           dd.alert({
+//               content:JSON.stringify('运行出错')
+//           });
+//       }
+//   });
   var initLatlng, initZoom = 17, cityName, newCenterData = {};
   
   dd.postMessage({});
@@ -15,7 +15,7 @@ if (navigator.userAgent.toLowerCase().indexOf('dingtalk') > -1) {
       initLatlng = {lon: e.lon, lat: e.lat} || {lon: 120.14989, lat: 30.27751};  // 默认经纬度为蓝天商务中心
       cityName = e.cityName || "杭州市";
       $.ajax({
-          url: encodeURI("http://dh.ditu.zj.cn:18005/inverse/getInverseGeocoding.jsonp?&detail=1&zoom=11&latlon=" + initLatlng.lon + "," + initLatlng.lat + "&lat=&lon=&customer=2"),
+          url: encodeURI("https://dh.ditu.zj.cn:9443/inverse/getInverseGeocoding.jsonp?&detail=1&zoom=11&latlon=" + initLatlng.lon + "," + initLatlng.lat + "&lat=&lon=&customer=2"),
           dataType: "jsonp",
           // jsonp: "callback",
           success: function(res) {
@@ -33,7 +33,7 @@ if (navigator.userAgent.toLowerCase().indexOf('dingtalk') > -1) {
   }
   function init() {
       var map = L.map('map',{crs:L.CRS.CustomEPSG4326,center: initLatlng, minZoom: 5, zoom: initZoom, inertiaDeceleration:15000, zoomControl: false});
-      var tileAddress = 'http://ditu.zjzwfw.gov.cn/mapserver/vmap/zjvmap/getMAP?x={x}&y={y}&l={z}&styleId=tdt_biaozhunyangshi_2017';
+      var tileAddress = 'https://ditu.zjzwfw.gov.cn/mapserver/vmap/zjvmap/getMAP?x={x}&y={y}&l={z}&styleId=tdt_biaozhunyangshi_2017';
 
       var layer = new L.GXYZ(tileAddress, {tileSize:512, minZoom: 5});
       map.addLayer(layer);
@@ -41,10 +41,10 @@ if (navigator.userAgent.toLowerCase().indexOf('dingtalk') > -1) {
       // 添加注记图层
     //   var labelLayer = new L.GWVTAnno({tileSize:512});
     //   var dataSource = new Custom.URLDataSource();
-    //   dataSource.url = 'http://ditu.zjzwfw.gov.cn/mapserver/label/zjvmap/getDatas?x=${x}&y=${y}&l=${z}&styleId=tdt_biaozhunyangshi_2017';
+    //   dataSource.url = 'https://ditu.zjzwfw.gov.cn/mapserver/label/zjvmap/getDatas?x=${x}&y=${y}&l=${z}&styleId=tdt_biaozhunyangshi_2017';
     //   labelLayer.addDataSource(dataSource);
     //   map.addLayer(labelLayer);
-      var labelLayer = new L.GXYZ('http://ditu.zjzwfw.gov.cn/mapserver/label/zjvmap/getImg?x={x}&y={y}&l={z}&styleId=tdt_biaozhunyangshi_2017',{tileSize:512,hitDetection:true,keepBuffer:0,updateWhenZooming:false});
+      var labelLayer = new L.GXYZ('https://ditu.zjzwfw.gov.cn/mapserver/label/zjvmap/getImg?x={x}&y={y}&l={z}&styleId=tdt_biaozhunyangshi_2017',{tileSize:512,hitDetection:true,keepBuffer:0,updateWhenZooming:false});
       map.addLayer(labelLayer);
       var customIcon = L.icon({ 
           iconUrl: '../img/indoor_pub_poi_pressed.png',
@@ -62,7 +62,7 @@ if (navigator.userAgent.toLowerCase().indexOf('dingtalk') > -1) {
       L.circle([map.getCenter().lat, map.getCenter().lng], {radius: 30}).addTo(map);
 
       map.on('click', function(e) {
-          var reverseResolutionUrl = encodeURI("http://dh.ditu.zj.cn:18005/inverse/getInverseGeocoding.jsonp?&detail=1&zoom=11&latlon=" + e.latlng.lng + "," + e.latlng.lat + "&lat=&lon=&customer=2");
+          var reverseResolutionUrl = encodeURI("https://dh.ditu.zj.cn:9443/inverse/getInverseGeocoding.jsonp?&detail=1&zoom=11&latlon=" + e.latlng.lng + "," + e.latlng.lat + "&lat=&lon=&customer=2");
           $.ajax({
               url: reverseResolutionUrl,
               dataType: "jsonp",
@@ -87,7 +87,7 @@ if (navigator.userAgent.toLowerCase().indexOf('dingtalk') > -1) {
           if(e.keyCode == 13){
               if(e.target.value) {
                   var keyWord = cityName + e.target.value;
-                  var resolutionUrl = encodeURI("http://dh.ditu.zj.cn:18006/geocoding/getLatLonByAddress.jsonp?&city=" + cityName + "&keyword=" + keyWord + "&width=500&height=430&pn=1&customer=2&encode=UTF-8");
+                  var resolutionUrl = encodeURI("https://dh.ditu.zj.cn:9446/geocoding/getLatLonByAddress.jsonp?&city=" + cityName + "&keyword=" + keyWord + "&width=500&height=430&pn=1&customer=2&encode=UTF-8");
                   $.ajax({
                       url: resolutionUrl,
                       dataType: "jsonp",
