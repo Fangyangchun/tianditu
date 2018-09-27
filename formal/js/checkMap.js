@@ -218,14 +218,7 @@
         $('.iptSearch').on('keydown',function(e){
             // e.preventDefault();
             if(e.keyCode == 13){
-                var keyWord = cityName + e.target.value;
-                if (e.target.value) {
-                    dd.postMessage({type: 'keyword', val: e.target.value});
-                } else {
-                    dd.alert({
-                        content: "请输入查询关键字"
-                    });
-                }
+                dd.postMessage({type: 'keyword', val: e.target.value || ''});
             }
         });
 
