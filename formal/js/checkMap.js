@@ -2,13 +2,6 @@
         if (navigator.userAgent.toLowerCase().indexOf('dingtalk') > -1) {
             document.writeln('<script src="https://appx/web-view.min.js"' + '>' + '<' + '/' + 'script>');
         }
-        // dd.getEnv(function(res) {
-        //     if (!res.miniprogram) {
-        //         dd.alert({
-        //             content:JSON.stringify('运行出错')
-        //         });
-        //     }
-        // });
         var initLatlng, initZoom = 10, cityName, newCenterData,  markDatas = [],
         map, markers, mapParams, idx, filterDatas, pickerOpt;
         var taskStatus, curTaskStatus, legalEntityCata, curLegalEntityCata, checkType, curCheckType, legalEntityTag, curLegalEntityTag, areaName, areaCode, currentAreaCode; 

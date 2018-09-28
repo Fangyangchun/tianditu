@@ -1,13 +1,6 @@
 if (navigator.userAgent.toLowerCase().indexOf('dingtalk') > -1) {
     document.writeln('<script src="https://appx/web-view.min.js"' + '>' + '<' + '/' + 'script>');
   }
-//   dd.getEnv(function(res) {
-//       if (!res.miniprogram) {
-//           dd.alert({
-//               content:JSON.stringify('运行出错')
-//           });
-//       }
-//   });
   var initLatlng, initZoom = 17, cityName, newCenterData = {};
   
   dd.postMessage({});
@@ -29,7 +22,9 @@ if (navigator.userAgent.toLowerCase().indexOf('dingtalk') > -1) {
               });
           }
       });
-      init()
+    //   setTimeout(function () {
+        init()
+    //   }, 3000);
   }
   function init() {
       var map = L.map('map',{crs:L.CRS.CustomEPSG4326,center: initLatlng, minZoom: 5, zoom: initZoom, inertiaDeceleration:15000, zoomControl: false});
@@ -58,8 +53,12 @@ if (navigator.userAgent.toLowerCase().indexOf('dingtalk') > -1) {
               opacity: 1,
               icon: customIcon
           }
-      ).addTo(map);
-      L.circle([map.getCenter().lat, map.getCenter().lng], {radius: 30}).addTo(map);
+      );
+      map.addLayer(marker);
+      var circle = L.circle([map.getCenter().lat, map.getCenter().lng], {radius: 30});
+      map.addLayer(circle);
+
+      dd.postMessage({render: true}); // 结束loading
 
       map.on('click', function(e) {
           var reverseResolutionUrl = encodeURI("https://dh.ditu.zj.cn:9443/inverse/getInverseGeocoding.jsonp?&detail=1&zoom=11&latlon=" + e.latlng.lng + "," + e.latlng.lat + "&lat=&lon=&customer=2");
