@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html  style="overflow : hidden; ">
+<head>
+    <title>通知详情</title>
+    <meta name="keywords" content="通知详情">
+    <meta name="description" content="通知详情">
+    <meta name="content-type" content="text/html; charset=UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+    <link rel="stylesheet" href="../css/style.css">
+</head>
+<style>
+    html, body {
+        height: 100%;
+        overflow: hidden;
+    }
+    html, body, div, p, {
+        padding: 0;
+        margin: 0;
+    }
+    .clearfix {
+        *zoom: 1;
+    }
+    .clearfix:before,.clearfix:after {
+        display: table;
+        content: "";
+        line-height: 0;
+    }
+    .clearfix:after {
+        clear: both;
+    }
+    .list {
+        padding: 0 12px;
+        height: 100%;
+        overflow-y: auto;
+    }
+    .c-666 {
+        color: #666666;
+    }
+    .c-999 {
+        color: #999999;
+    }
+    .mr10 {
+        margin-right: 10px;
+    }
+    .mb10 {
+        margin-bottom: 10px;
+    }
+    .mt12 {
+        margin-top: 12px;
+    }
+    .mt30 {
+        margin-top: 30px;
+    }
+    .fr {
+        float: right;
+    }
+    .text-center {
+        text-align: center;
+    }
+    .title {
+        font-size: 16px;
+        line-height: 24px;
+    }
+    .content_list {
+        line-height: 20px;
+    }
+</style>
+
+<body>
+    <div class="list">
+        <p class="text-center mb10 mt12 title"></p>
+        <p class="text-center">
+            <span class="setTime c-666 mr10"></span>
+            <span class="setName c-666"></span>
+        </p>
+        <div class="content c-999"></div>
+    </div>
+
+    <script src="../libs/jquery-1.12.3.min.js"></script>
+    <script src="https://appx/web-view.min.js"></script>
+    <script>
+        if (navigator.userAgent.toLowerCase().indexOf('dingtalk') > -1) {
+            document.writeln('<script src="https://appx/web-view.min.js"' + '>' + '<' + '/' + 'script>');
+        }
+        var noticeInfo = {};
+        dd.postMessage({type: 'init'});
+        dd.onMessage = function(e) {
+            noticeInfo = e;
+            initNoticeInfo();
+        }
+        function initNoticeInfo () {
+            $('.title').text(noticeInfo.title);
+            $('.setTime').text(noticeInfo.setTime);
+            $('.setName').text(noticeInfo.setName);
+            $('.content').html(noticeInfo.contents);
+        }
+    </script>
+
+</body>
+</html>
