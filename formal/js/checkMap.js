@@ -3,15 +3,25 @@
             document.writeln('<script src="https://appx/web-view.min.js"' + '>' + '<' + '/' + 'script>');
         }
         var initLatlng, initZoom = 10, cityName, newCenterData,  markDatas = [],
-        map, markers, mapParams, idx, filterDatas, pickerOpt;
-        var taskStatus, curTaskStatus, legalEntityCata, curLegalEntityCata, checkType, curCheckType, legalEntityTag, curLegalEntityTag, areaName, areaCode, currentAreaCode; 
+        map, markers, mapParams, idx, filterDatas, userLevel, showDistrict, pickerOpt, distPickerOpt;
+        var taskStatus, curTaskStatus, legalEntityCata, curLegalEntityCata, checkType, curCheckType, legalEntityTag, curLegalEntityTag, 
+        cityName = [], cityCode = [], distName = [], distCode = [], areaName = [], areaCode = [], currentAreaCode; 
         var btn = document.getElementById("picker-btn");
+        var distBtn = document.getElementById("district-btn");
         dd.postMessage({type: 'init'});
         dd.onMessage = function(e) {
             initLatlng = {lon: e.lon, lat: e.lat} || {lon: 120.14989, lat: 30.27751};  // 默认经纬度为蓝天商务中心
             cityName = e.cityName || "杭州市";
             markDatas = e.markDatas;
             filterDatas = e.filterDatas;
+            userLevel = e.userLevel;
+            showDistrict = e.showDistrict;
+            if (!e.init) {
+                if (userLevel && showDistrict) {
+                    distBtn.style.display =  'inline-block';
+                    getDistPickerOpt()
+                }
+            }
             drawMap(e.init);
         }
         function drawMap(e) {
@@ -44,7 +54,14 @@
             map.addLayer(markers);
 
             initFilterHtml();
-            getPickerOpt(); 
+            
+            if (userLevel) {
+                btn.style.display = 'inline-block';
+                getPickerOpt();
+            } else {
+                distBtn.style.display = 'inline-block';
+                getDistPickerOpt();
+            }
 
             map.on('click', function (e) {
                 if($(".detail_info").hasClass('active')) { 
@@ -58,11 +75,24 @@
         function getPickerOpt() {
             pickerOpt = {};
             $.each(filterDatas.SlicenoLDNameJson, function (index, val) {
-                var idxKey = val.addressName;
+                var idxKey = val.name;
                 pickerOpt[idxKey] = [];
-                if (val.codeAddress) {
-                    $.each(val.codeAddress, function (idx, value) {
-                        pickerOpt[idxKey].push(value.addressName);
+                if (val.children) {
+                    $.each(val.children, function (idx, value) {
+                        pickerOpt[idxKey].push(value.name);
+                    })
+                }
+            })
+        }
+
+        function getDistPickerOpt() {
+            distPickerOpt = {};
+            $.each(filterDatas.DistrictJson, function (index, val) {
+                var idxKey = val.name;
+                distPickerOpt[idxKey] = [];
+                if (val.children) {
+                    $.each(val.children, function (idx, value) {
+                        distPickerOpt[idxKey].push(value.name);
                     })
                 }
             })
@@ -79,13 +109,13 @@
             $.each(filterDatas.taskStatus, function (index, val) {
                 statusHtml += '<dd data-paramCode="' + val.paramCode + '" data-paramCodeType="' + val.paramCodeType + '">' + val.paramName + '</dd>';
             });
-            $.each(filterDatas.superviseTag, function (index, val) {
-                tagHtml += '<dd data-paramCode="' + val.paramCode + '" data-paramCodeType="' + val.paramCodeType + '">' + val.paramName + '</dd>';
-            });
+            // $.each(filterDatas.superviseTag, function (index, val) {
+            //     tagHtml += '<dd data-paramCode="' + val.paramCode + '" data-paramCodeType="' + val.paramCodeType + '">' + val.paramName + '</dd>';
+            // });
             $('#MARKET_TYPE').html(marketHtml);
             $('#TASK_TYPE').html(typeHtml);
             $('#TASK_STATUS').html(statusHtml);
-            $('#SUPERVISE_TAG').html(tagHtml);
+            // $('#SUPERVISE_TAG').html(tagHtml);
             
             $(".filter_list dd").on('click', function (ev) {
                 $(this).siblings().removeClass('active')
@@ -101,9 +131,9 @@
                     case "TASK_STATUS":
                         taskStatus = $(ev.target)[0].dataset.paramcode;
                         break;
-                    case "SUPERVISE_TAG":
-                        legalEntityTag = $(ev.target)[0].dataset.paramcode;
-                        break;
+                    // case "SUPERVISE_TAG":
+                    //     legalEntityTag = $(ev.target)[0].dataset.paramcode;
+                    //     break;
                 }
             });
         }
@@ -155,11 +185,28 @@
                 $('#TASK_STATUS dd').removeClass('active');
             }
             if (currentAreaCode) {
-                $('#picker-btn').text(areaName.join('-'));
-                $('#picker-btn').addClass('active');
+                if (userLevel) {
+                    $('#picker-btn').text(cityName.join('-'));
+                    $('#picker-btn').addClass('active');
+                    if (distName) {
+                        $('#district-btn').text(distName.join('-'));
+                        $('#district-btn').addClass('active');
+                    }
+                } else {
+                    $('#district-btn').text(distName.join('-'));
+                    $('#district-btn').addClass('active');
+                }
             } else {
-                $('#picker-btn').text('管辖单位|片区');
-                $('#picker-btn').removeClass('active');
+                if (userLevel) {
+                    $('#picker-btn').text('市|区|县');
+                    $('#picker-btn').removeClass('active');
+                    $('#district-btn').text('商圈/片区');
+                    $('#district-btn').removeClass('active');
+                    $('#district-btn').css('display', 'none');
+                } else {
+                    $('#district-btn').text('商圈/片区');
+                    $('#district-btn').removeClass('active');
+                }
             }
             if (curLegalEntityCata) {
                 $('#MARKET_TYPE dd').removeClass('active');
@@ -185,18 +232,18 @@
             } else {
                 $('#TASK_TYPE dd').removeClass('active');
             }
-            if (curLegalEntityTag) {
-                $('#SUPERVISE_TAG dd').removeClass('active');
-                var arr = jQuery.makeArray($('#SUPERVISE_TAG dd'));
-                $.each(arr, function (index, val) {
-                    if (val.dataset.paramcode == legalEntityTag) {
-                        $(val).addClass('active');
-                        return true
-                    }
-                })
-            } else {
-                $('#SUPERVISE_TAG dd').removeClass('active');
-            }
+            // if (curLegalEntityTag) {
+            //     $('#SUPERVISE_TAG dd').removeClass('active');
+            //     var arr = jQuery.makeArray($('#SUPERVISE_TAG dd'));
+            //     $.each(arr, function (index, val) {
+            //         if (val.dataset.paramcode == legalEntityTag) {
+            //             $(val).addClass('active');
+            //             return true
+            //         }
+            //     })
+            // } else {
+            //     $('#SUPERVISE_TAG dd').removeClass('active');
+            // }
         });
 
         $('.custom-mask').on('touchmove', function (ev) {
@@ -248,9 +295,10 @@
         });
 
         $(".reset_btn").on("click", function () {
-            areaName = [];
-            areaCode = [];
-            btn.innerText = '管辖单位|片区';
+            areaCode = []; distName = []; distCode = [];
+            cityName = []; cityCode = [];
+            btn.innerText = '市|区|县';
+            distBtn.innerText = '商圈/片区';
             $(".filter_type dd").removeClass('active');
             $('.custom-mask').removeClass('custom-mask--visible');
             $(".floating_box").removeClass('active');
@@ -259,6 +307,7 @@
             curLegalEntityCata = ''
             curCheckType = ''
             curLegalEntityTag = ''
+            currentAreaCode = ''
             var preFilterData = {
                 taskStatus: '',
                 businessDistrict: '', //片区
@@ -270,6 +319,7 @@
         });
 
         $(".confirm_btn").on("click", function () {
+            areaCode = cityCode.concat(distCode);
             if (areaCode) {
                 currentAreaCode = areaCode.join(',');
             } else {
@@ -298,26 +348,59 @@
                 bindElem: btn,
                 data: pickerOpt,
                 // data: data,
-                title: '片区/商圈',
+                title: '市|区|县',
                 leftText: '取消',
                 rightText: '确定',
                 rightFn: function( selectArr ){
                     // var indexArry = btn.getAttribute("selectcache");
-                    areaName = [];
-                    areaCode = [];
+                    cityName = [];
+                    cityCode = [];
                     var subSlicenoLDNameJson;
-                    var firstIdx = filterDatas.SlicenoLDNameJson.findIndex(function(obj){return obj.addressName == selectArr[0]});
-                    areaCode.push(filterDatas.SlicenoLDNameJson[firstIdx].code);
+                    var firstIdx = filterDatas.SlicenoLDNameJson.findIndex(function(obj){return obj.name == selectArr[0]});
+                    cityCode.push(filterDatas.SlicenoLDNameJson[firstIdx].code);
                     if (selectArr[1]) {
-                        areaName = selectArr;
-                        subSlicenoLDNameJson = filterDatas.SlicenoLDNameJson[firstIdx].codeAddress;
-                        var subIdx = subSlicenoLDNameJson.findIndex(function(val){return val.addressName == selectArr[1]});
-                        areaCode.push(subSlicenoLDNameJson[subIdx].code);
+                        cityName = selectArr;
+                        subSlicenoLDNameJson = filterDatas.SlicenoLDNameJson[firstIdx].children;
+                        var subIdx = subSlicenoLDNameJson.findIndex(function(val){return val.name == selectArr[1]});
+                        cityCode.push(subSlicenoLDNameJson[subIdx].code);
                     } else {
-                        areaName.push(selectArr[0]);
+                        cityName.push(selectArr[0]);
                     }
-                    btn.innerText = areaName.join('-');
+                    btn.innerText = cityName.join('-');
                     btn.setAttribute("class", 'active');
+                    distBtn.innerText = '商圈/片区';
+                    distBtn.style.display = 'none';
+                    distBtn.setAttribute("class", '');
+                    distName = [];
+                    distCode = [];
+                    dd.postMessage({type: 'showDistrict', val: cityCode[cityCode.length - 1]});
+                }
+            });
+        }
+
+        distBtn.onclick = function(){
+            var pickerView = new PickerView({
+                bindElem: distBtn,
+                data: distPickerOpt,
+                title: '商圈/片区',
+                leftText: '取消',
+                rightText: '确定',
+                rightFn: function( selectArr ){
+                    distName = [];
+                    distCode = [];
+                    var subSlicenoLDNameJson;
+                    var firstIdx = filterDatas.DistrictJson.findIndex(function(obj){return obj.name == selectArr[0]});
+                    distCode.push(filterDatas.DistrictJson[firstIdx].code);
+                    if (selectArr[1]) {
+                        distName = selectArr;
+                        subSlicenoLDNameJson = filterDatas.DistrictJson[firstIdx].children;
+                        var subIdx = subSlicenoLDNameJson.findIndex(function(val){return val.name == selectArr[1]});
+                        distCode.push(subSlicenoLDNameJson[subIdx].code);
+                    } else {
+                        distName.push(selectArr[0]);
+                    }
+                    distBtn.innerText = distName.join('-');
+                    distBtn.setAttribute("class", 'active');
                 }
             });
         }
