@@ -9,7 +9,8 @@
     width: 32px;
     height: 32px;
     border-radius: 2px;
-    background: rgba(255, 255, 255, 0.9);
+    background: url("../img/location.png") no-repeat center #ffffff;
+    background-size: 20px 20px;
     padding: 0;
     margin: 0;
 }

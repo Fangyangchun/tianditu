@@ -17,13 +17,14 @@
 <body style="margin : 0;">
     <div id="map" class="map" style ="position:absolute;bottom:0px;top:0px;width:100%"></div>
     <input type="text" placeholder="输入企业名、统一信用代码、地址等查询" class="iptSearch" />
+    <p class="check_title"></p>
     <div class="filterBtn">
         <span>附近<i class="icon-arrow"></i></span></div>
     
     <ul class="btn_handler_box">
-        <li class="whiteBtn" data-filter=""></li><li class="greenBtn" data-filter="1"></li>
-        <li class="blueBtn" data-filter="2"></li><li class="redBtn" data-filter="3"></li>
-        <li data-filter="reset"><img src="../img/location.png" style="height: 30px;" data-filter="reset"></li>
+        <li class="whiteBtn" data-filter="" data-title="全部检查企业"></li><li class="greenBtn" data-filter="1" data-title="已查完的企业"></li>
+        <li class="blueBtn" data-filter="2" data-title="待查任务不紧急的企业"></li><li class="redBtn" data-filter="3" data-title="有紧急检查任务的企业"></li>
+        <li class="positioning" data-filter="reset"></li>
     </ul>
     
     <div class="custom-mask"></div>

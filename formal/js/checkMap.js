@@ -3,7 +3,7 @@
             document.writeln('<script src="https://appx/web-view.min.js"' + '>' + '<' + '/' + 'script>');
         }
         var initLatlng, initZoom = 10, cityName, newCenterData,  markDatas = [],
-        map, markers, mapParams, idx, filterDatas, userLevel, showDistrict, pickerOpt, distPickerOpt;
+        map, curMarker, circle, markers, mapParams, idx, filterDatas, userLevel, showDistrict, pickerOpt, distPickerOpt;
         var taskStatus, curTaskStatus, legalEntityCata, curLegalEntityCata, checkType, curCheckType, legalEntityTag, curLegalEntityTag, 
         cityName = [], cityCode = [], distName = [], distCode = [], areaName = [], areaCode = [], currentAreaCode; 
         var btn = document.getElementById("picker-btn");
@@ -48,11 +48,27 @@
             // map.addLayer(labelLayer);
             var labelLayer = new L.GXYZ('https://ditu.zjzwfw.gov.cn/mapserver/label/zjvmap/getImg?x={x}&y={y}&l={z}&styleId=tdt_biaozhunyangshi_2017',{tileSize:512,hitDetection:true,keepBuffer:0,updateWhenZooming:false});
             map.addLayer(labelLayer);
+            var customIcon = L.icon({ 
+                iconUrl: '../img/indoor_pub_poi_pressed.png',
+                iconSize: [21, 30],
+                iconAnchor:   [10, 20],
+            }); 
+            var curMarker = L.marker( 
+                [map.getCenter().lat, map.getCenter().lng], 
+                { 
+                    draggable: false,
+                    opacity: 1,
+                    icon: customIcon
+                }
+            );
+            map.addLayer(curMarker);
 
             markers = L.markerClusterGroup();
             drawMarekers();
             map.addLayer(markers);
 
+            $('.whiteBtn').addClass('active');
+            $('.check_title').text($('.whiteBtn').data('title')).fadeIn();
             initFilterHtml();
             
             if (userLevel) {
@@ -264,12 +280,19 @@
 
         $('.btn_handler_box li').on('click', function (ev) {
             var filter = $(ev.target).data('filter');
+            var title = $(ev.target).data('title');
+            $(this).closest("li").addClass('active').siblings().removeClass('active')
             if (filter == "" || filter == "1" || filter == "2" || filter == "3") {
+                $('.check_title').text(title).fadeIn();
                 dd.postMessage({type: 'checkState', val: filter});
                 return
             }
             if (filter == "reset") {
+                $('.check_title').fadeOut();
+                markers.clearLayers();
                 map.setView([Number(initLatlng.lat), Number(initLatlng.lon)], initZoom);
+                circle = L.circle([map.getCenter().lat, map.getCenter().lng], {radius: 30});
+                map.addLayer(circle);
                 return
             }
         });
@@ -408,7 +431,7 @@
 
         function drawMarekers() {
             markDatas.forEach(function (val, index) {
-                var preState = val.checkState, marker, customIcon;
+                var preState = val.checkState, marker;
                 switch(preState){
                     case "1":
                         marker = L.marker([val.lat, val.lon], {draggable: false, opacity: 1, icon: L.divIcon({className: 'green-marker', html: '<p>' + (index + 1) + '</p>'})});

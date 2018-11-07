@@ -1,4 +1,14 @@
-
+.check_title {
+    position: absolute;
+    bottom: 20px;
+    left: 0px;
+    z-index: 100000;
+    width: 100%;
+    text-align: center;
+    color: rgb(78, 33, 0);
+    font-size: 14px;
+    display: none;
+}
 .btn_handler_box {
     position: absolute;
     bottom: 25%;
@@ -18,8 +28,18 @@
     font-weight: bold;
     color: #704214;
 }
-.btn_handler_box li:last-child {
-    border: 1px solid rgb(51, 136, 255);
+.positioning.active, .whiteBtn.active, .blueBtn.active {
+    border: 2px solid rgb(51, 136, 255);
+}
+.greenBtn.active {
+    border: 2px solid rgb(0, 158, 1);
+}
+.redBtn.active {
+    border: 2px solid rgb(255, 84, 47);
+}
+.positioning {
+    background: url("../img/location.png") no-repeat center #ffffff;
+    background-size: 20px 20px;
 }
 .whiteBtn {
     background: url("../img/icon-1.png") no-repeat center #ffffff;
