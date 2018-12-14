@@ -92,7 +92,7 @@
             pickerOpt = {};
             $.each(filterDatas.SlicenoLDNameJson, function (index, val) {
                 var idxKey = val.name;
-                pickerOpt[idxKey] = [];
+                pickerOpt[idxKey] = ['全部'];
                 if (val.children) {
                     $.each(val.children, function (idx, value) {
                         pickerOpt[idxKey].push(value.name);
@@ -105,7 +105,7 @@
             distPickerOpt = {};
             $.each(filterDatas.DistrictJson, function (index, val) {
                 var idxKey = val.name;
-                distPickerOpt[idxKey] = [];
+                distPickerOpt[idxKey] = ['全部'];
                 if (val.children) {
                     $.each(val.children, function (idx, value) {
                         distPickerOpt[idxKey].push(value.name);
@@ -200,7 +200,7 @@
             } else {
                 $('#TASK_STATUS dd').removeClass('active');
             }
-            if (currentAreaCode) {
+            if (cityCode.length > 0 || distCode.length > 0) {
                 if (userLevel) {
                     $('#picker-btn').text(cityName.join('-'));
                     $('#picker-btn').addClass('active');
@@ -320,8 +320,15 @@
         $(".reset_btn").on("click", function () {
             areaCode = []; distName = []; distCode = [];
             cityName = []; cityCode = [];
-            btn.innerText = '市|区|县';
-            distBtn.innerText = '商圈/片区';
+            $('#picker-btn').text('市|区|县');
+            $('#district-btn').text('商圈/片区');
+            if (userLevel) {
+                $('#picker-btn').removeClass('active');
+                $('#district-btn').removeClass('active');
+                $('#district-btn').css('display', 'none');
+            } else {
+                $('#district-btn').removeClass('active');
+            }
             $(".filter_type dd").removeClass('active');
             $('.custom-mask').removeClass('custom-mask--visible');
             $(".floating_box").removeClass('active');
@@ -336,28 +343,41 @@
                 businessDistrict: '', //片区
                 legalEntityCata: '',
                 checkType: '',
-                legalEntityTag: ''
+                legalEntityTag: '',
+                localAdm: ''
             }
             dd.postMessage({type: 'businessDistrict', val: preFilterData});
         });
 
         $(".confirm_btn").on("click", function () {
-            areaCode = cityCode.concat(distCode);
-            if (areaCode) {
-                currentAreaCode = areaCode.join(',');
-            } else {
-                currentAreaCode = '';
-            }
+            // areaCode = cityCode.concat(distCode);
+            // if (areaCode) {
+            //     currentAreaCode = areaCode.join(',');
+            // } else {    
+            //     currentAreaCode = '';
+            // }
             curTaskStatus = taskStatus || ''
             curLegalEntityCata = legalEntityCata || ''
             curCheckType = checkType || ''
             curLegalEntityTag = legalEntityTag || ''
             var preFilterData = {
                     taskStatus: curTaskStatus,
-                    businessDistrict: currentAreaCode, //片区
+                    // businessDistrict: currentAreaCode, //片区
                     legalEntityCata: curLegalEntityCata,
                     checkType: curCheckType,
                     legalEntityTag: curLegalEntityTag
+            }
+            if (cityCode.length == 1) {
+                preFilterData['localAdm'] = cityCode[0];
+                preFilterData['businessDistrict'] = '';
+            } else {
+                if (distCode.length == 0) {
+                    preFilterData['localAdm'] = cityCode[0];
+                    preFilterData['businessDistrict'] = '';
+                } else {
+                    preFilterData['localAdm'] = distCode[0];
+                    preFilterData['businessDistrict'] = distCode[1] || '';
+                }
             }
             $('.custom-mask').removeClass('custom-mask--visible');
             $(".floating_box").removeClass('active');
@@ -378,15 +398,18 @@
                     // var indexArry = btn.getAttribute("selectcache");
                     cityName = [];
                     cityCode = [];
+                    var selAll;
                     var subSlicenoLDNameJson;
                     var firstIdx = filterDatas.SlicenoLDNameJson.findIndex(function(obj){return obj.name == selectArr[0]});
                     cityCode.push(filterDatas.SlicenoLDNameJson[firstIdx].code);
-                    if (selectArr[1]) {
+                    if (selectArr[1] != '全部') {
                         cityName = selectArr;
+                        selAll = false;
                         subSlicenoLDNameJson = filterDatas.SlicenoLDNameJson[firstIdx].children;
                         var subIdx = subSlicenoLDNameJson.findIndex(function(val){return val.name == selectArr[1]});
                         cityCode.push(subSlicenoLDNameJson[subIdx].code);
                     } else {
+                        selAll = true;
                         cityName.push(selectArr[0]);
                     }
                     btn.innerText = cityName.join('-');
@@ -396,7 +419,7 @@
                     distBtn.setAttribute("class", '');
                     distName = [];
                     distCode = [];
-                    dd.postMessage({type: 'showDistrict', val: cityCode[cityCode.length - 1]});
+                    dd.postMessage({type: 'showDistrict', val: {localAdm: cityCode[cityCode.length - 1], selAll: selAll}});
                 }
             });
         }
@@ -414,7 +437,7 @@
                     var subSlicenoLDNameJson;
                     var firstIdx = filterDatas.DistrictJson.findIndex(function(obj){return obj.name == selectArr[0]});
                     distCode.push(filterDatas.DistrictJson[firstIdx].code);
-                    if (selectArr[1]) {
+                    if (selectArr[1] != '全部') {
                         distName = selectArr;
                         subSlicenoLDNameJson = filterDatas.DistrictJson[firstIdx].children;
                         var subIdx = subSlicenoLDNameJson.findIndex(function(val){return val.name == selectArr[1]});
