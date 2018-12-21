@@ -4,7 +4,8 @@
         }
         var initLatlng, initZoom = 10, cityName, newCenterData,  markDatas = [],
         map, curMarker, circle, markers, mapParams, idx, filterDatas, userLevel, showDistrict, pickerOpt, distPickerOpt;
-        var taskStatus, curTaskStatus, legalEntityCata, curLegalEntityCata, checkType, curCheckType, legalEntityTag, curLegalEntityTag, 
+        var taskStatus, curTaskStatus, legalEntityCata, curLegalEntityCata, checkType, curCheckType, 
+        legalEntityTag, legalEntityTag1, legalEntityTag2, curLegalEntityTag, curLegalEntityTag1, curLegalEntityTag2,
         cityName = [], cityCode = [], distName = [], distCode = [], areaName = [], areaCode = [], currentAreaCode; 
         var btn = document.getElementById("picker-btn");
         var distBtn = document.getElementById("district-btn");
@@ -92,7 +93,8 @@
             pickerOpt = {};
             $.each(filterDatas.SlicenoLDNameJson, function (index, val) {
                 var idxKey = val.name;
-                pickerOpt[idxKey] = ['全部'];
+                // pickerOpt[idxKey] = ['全部'];
+                pickerOpt[idxKey] = [];
                 if (val.children) {
                     $.each(val.children, function (idx, value) {
                         pickerOpt[idxKey].push(value.name);
@@ -105,7 +107,8 @@
             distPickerOpt = {};
             $.each(filterDatas.DistrictJson, function (index, val) {
                 var idxKey = val.name;
-                distPickerOpt[idxKey] = ['全部'];
+                // distPickerOpt[idxKey] = ['全部'];
+                distPickerOpt[idxKey] = [];
                 if (val.children) {
                     $.each(val.children, function (idx, value) {
                         distPickerOpt[idxKey].push(value.name);
@@ -125,13 +128,14 @@
             $.each(filterDatas.taskStatus, function (index, val) {
                 statusHtml += '<dd data-paramCode="' + val.paramCode + '" data-paramCodeType="' + val.paramCodeType + '">' + val.paramName + '</dd>';
             });
-            // $.each(filterDatas.superviseTag, function (index, val) {
-            //     tagHtml += '<dd data-paramCode="' + val.paramCode + '" data-paramCodeType="' + val.paramCodeType + '">' + val.paramName + '</dd>';
-            // });
+            $.each(filterDatas.superviseTag, function (index, val) {
+                tagHtml += '<dd data-paramCode="' + val.paramCode + '" data-paramCode1="' + val.paramCode1 
+                + '" data-paramCode2="' + val.paramCode2 + '" data-paramCodeType="' + val.paramCodeType + '">' + val.paramName + '</dd>';
+            });
             $('#MARKET_TYPE').html(marketHtml);
             $('#TASK_TYPE').html(typeHtml);
             $('#TASK_STATUS').html(statusHtml);
-            // $('#SUPERVISE_TAG').html(tagHtml);
+            $('#SUPERVISE_TAG').html(tagHtml);
             
             $(".filter_list dd").on('click', function (ev) {
                 $(this).siblings().removeClass('active')
@@ -147,9 +151,11 @@
                     case "TASK_STATUS":
                         taskStatus = $(ev.target)[0].dataset.paramcode;
                         break;
-                    // case "SUPERVISE_TAG":
-                    //     legalEntityTag = $(ev.target)[0].dataset.paramcode;
-                    //     break;
+                    case "SUPERVISE_TAG_LARGECLASS":
+                        legalEntityTag = $(ev.target)[0].dataset.paramcode;
+                        legalEntityTag1 = $(ev.target)[0].dataset.paramcode1;
+                        legalEntityTag2 = $(ev.target)[0].dataset.paramcode2;
+                        break;
                 }
             });
         }
@@ -248,18 +254,18 @@
             } else {
                 $('#TASK_TYPE dd').removeClass('active');
             }
-            // if (curLegalEntityTag) {
-            //     $('#SUPERVISE_TAG dd').removeClass('active');
-            //     var arr = jQuery.makeArray($('#SUPERVISE_TAG dd'));
-            //     $.each(arr, function (index, val) {
-            //         if (val.dataset.paramcode == legalEntityTag) {
-            //             $(val).addClass('active');
-            //             return true
-            //         }
-            //     })
-            // } else {
-            //     $('#SUPERVISE_TAG dd').removeClass('active');
-            // }
+            if (curLegalEntityTag) {
+                $('#SUPERVISE_TAG dd').removeClass('active');
+                var arr = jQuery.makeArray($('#SUPERVISE_TAG dd'));
+                $.each(arr, function (index, val) {
+                    if (val.dataset.paramcode == legalEntityTag) {
+                        $(val).addClass('active');
+                        return true
+                    }
+                })
+            } else {
+                $('#SUPERVISE_TAG dd').removeClass('active');
+            }
         });
 
         $('.custom-mask').on('touchmove', function (ev) {
@@ -337,6 +343,8 @@
             curLegalEntityCata = ''
             curCheckType = ''
             curLegalEntityTag = ''
+            curLegalEntityTag1 = ''
+            curLegalEntityTag2 = ''
             currentAreaCode = ''
             var preFilterData = {
                 taskStatus: '',
@@ -344,6 +352,8 @@
                 legalEntityCata: '',
                 checkType: '',
                 legalEntityTag: '',
+                legalEntityTag1: '',
+                legalEntityTag2: '',
                 localAdm: ''
             }
             dd.postMessage({type: 'businessDistrict', val: preFilterData});
@@ -360,12 +370,16 @@
             curLegalEntityCata = legalEntityCata || ''
             curCheckType = checkType || ''
             curLegalEntityTag = legalEntityTag || ''
+            curLegalEntityTag1 = legalEntityTag1 || ''
+            curLegalEntityTag2 = legalEntityTag2 || ''
             var preFilterData = {
                     taskStatus: curTaskStatus,
                     // businessDistrict: currentAreaCode, //片区
                     legalEntityCata: curLegalEntityCata,
                     checkType: curCheckType,
-                    legalEntityTag: curLegalEntityTag
+                    legalEntityTag: curLegalEntityTag,
+                    legalEntityTag1: curLegalEntityTag1,
+                    legalEntityTag2: curLegalEntityTag2
             }
             if (cityCode.length == 1) {
                 preFilterData['localAdm'] = cityCode[0];
@@ -402,16 +416,22 @@
                     var subSlicenoLDNameJson;
                     var firstIdx = filterDatas.SlicenoLDNameJson.findIndex(function(obj){return obj.name == selectArr[0]});
                     cityCode.push(filterDatas.SlicenoLDNameJson[firstIdx].code);
-                    if (selectArr[1] != '全部') {
-                        cityName = selectArr;
-                        selAll = false;
-                        subSlicenoLDNameJson = filterDatas.SlicenoLDNameJson[firstIdx].children;
-                        var subIdx = subSlicenoLDNameJson.findIndex(function(val){return val.name == selectArr[1]});
-                        cityCode.push(subSlicenoLDNameJson[subIdx].code);
-                    } else {
-                        selAll = true;
-                        cityName.push(selectArr[0]);
-                    }
+                    // if (selectArr[1] != '全部') {
+                    //     cityName = selectArr;
+                    //     selAll = false;
+                    //     subSlicenoLDNameJson = filterDatas.SlicenoLDNameJson[firstIdx].children;
+                    //     var subIdx = subSlicenoLDNameJson.findIndex(function(val){return val.name == selectArr[1]});
+                    //     cityCode.push(subSlicenoLDNameJson[subIdx].code);
+                    // } else {
+                    //     selAll = true;
+                    //     cityName.push(selectArr[0]);
+                    // }
+                    cityName = selectArr;
+                    selAll = false;
+                    subSlicenoLDNameJson = filterDatas.SlicenoLDNameJson[firstIdx].children;
+                    var subIdx = subSlicenoLDNameJson.findIndex(function(val){return val.name == selectArr[1]});
+                    cityCode.push(subSlicenoLDNameJson[subIdx].code);
+
                     btn.innerText = cityName.join('-');
                     btn.setAttribute("class", 'active');
                     distBtn.innerText = '商圈/片区';
@@ -437,14 +457,19 @@
                     var subSlicenoLDNameJson;
                     var firstIdx = filterDatas.DistrictJson.findIndex(function(obj){return obj.name == selectArr[0]});
                     distCode.push(filterDatas.DistrictJson[firstIdx].code);
-                    if (selectArr[1] != '全部') {
-                        distName = selectArr;
-                        subSlicenoLDNameJson = filterDatas.DistrictJson[firstIdx].children;
-                        var subIdx = subSlicenoLDNameJson.findIndex(function(val){return val.name == selectArr[1]});
-                        distCode.push(subSlicenoLDNameJson[subIdx].code);
-                    } else {
-                        distName.push(selectArr[0]);
-                    }
+                    // if (selectArr[1] != '全部') {
+                    //     distName = selectArr;
+                    //     subSlicenoLDNameJson = filterDatas.DistrictJson[firstIdx].children;
+                    //     var subIdx = subSlicenoLDNameJson.findIndex(function(val){return val.name == selectArr[1]});
+                    //     distCode.push(subSlicenoLDNameJson[subIdx].code);
+                    // } else {
+                    //     distName.push(selectArr[0]);
+                    // }
+                    distName = selectArr;
+                    subSlicenoLDNameJson = filterDatas.DistrictJson[firstIdx].children;
+                    var subIdx = subSlicenoLDNameJson.findIndex(function(val){return val.name == selectArr[1]});
+                    distCode.push(subSlicenoLDNameJson[subIdx].code);
+
                     distBtn.innerText = distName.join('-');
                     distBtn.setAttribute("class", 'active');
                 }
