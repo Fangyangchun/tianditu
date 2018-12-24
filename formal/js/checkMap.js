@@ -107,8 +107,8 @@
             distPickerOpt = {};
             $.each(filterDatas.DistrictJson, function (index, val) {
                 var idxKey = val.name;
-                // distPickerOpt[idxKey] = ['全部'];
-                distPickerOpt[idxKey] = [];
+                distPickerOpt[idxKey] = ['全部'];
+                // distPickerOpt[idxKey] = [];
                 if (val.children) {
                     $.each(val.children, function (idx, value) {
                         distPickerOpt[idxKey].push(value.name);
@@ -457,18 +457,18 @@
                     var subSlicenoLDNameJson;
                     var firstIdx = filterDatas.DistrictJson.findIndex(function(obj){return obj.name == selectArr[0]});
                     distCode.push(filterDatas.DistrictJson[firstIdx].code);
-                    // if (selectArr[1] != '全部') {
-                    //     distName = selectArr;
-                    //     subSlicenoLDNameJson = filterDatas.DistrictJson[firstIdx].children;
-                    //     var subIdx = subSlicenoLDNameJson.findIndex(function(val){return val.name == selectArr[1]});
-                    //     distCode.push(subSlicenoLDNameJson[subIdx].code);
-                    // } else {
-                    //     distName.push(selectArr[0]);
-                    // }
-                    distName = selectArr;
-                    subSlicenoLDNameJson = filterDatas.DistrictJson[firstIdx].children;
-                    var subIdx = subSlicenoLDNameJson.findIndex(function(val){return val.name == selectArr[1]});
-                    distCode.push(subSlicenoLDNameJson[subIdx].code);
+                    if (selectArr[1] != '全部') {
+                        distName = selectArr;
+                        subSlicenoLDNameJson = filterDatas.DistrictJson[firstIdx].children;
+                        var subIdx = subSlicenoLDNameJson.findIndex(function(val){return val.name == selectArr[1]});
+                        distCode.push(subSlicenoLDNameJson[subIdx].code);
+                    } else {
+                        distName.push(selectArr[0]);
+                    }
+                    // distName = selectArr;
+                    // subSlicenoLDNameJson = filterDatas.DistrictJson[firstIdx].children;
+                    // var subIdx = subSlicenoLDNameJson.findIndex(function(val){return val.name == selectArr[1]});
+                    // distCode.push(subSlicenoLDNameJson[subIdx].code);
 
                     distBtn.innerText = distName.join('-');
                     distBtn.setAttribute("class", 'active');
