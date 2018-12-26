@@ -408,6 +408,28 @@
                 title: '市|区|县',
                 leftText: '取消',
                 rightText: '确定',
+                getAjaxData: false,
+                ajaxFn: function(index) {
+                    $.ajax({
+                        url: encodeURI("http://192.168.5.107:8080//superviseTag/selectSuperviseTagListByTagLargeCode"),
+                        data: {
+                            token: '',
+                            userId: '',
+                            tagLargeCategory: ''
+                        },
+                        dataType: "json",
+                        success: function(res) {
+                            newCenterData.latitude = parseFloat(res.latlon.split(',')[1])
+                            newCenterData.longitude = parseFloat(res.latlon.split(',')[0])
+                            newCenterData.location = res.city.value + res.dist.value + res.town.value + res.poi;
+                        },
+                        error: function (err) {
+                            dd.alert({
+                                content: "地址解析出错"
+                            });
+                        }
+                    });
+                },
                 rightFn: function( selectArr ){
                     // var indexArry = btn.getAttribute("selectcache");
                     cityName = [];
@@ -451,6 +473,28 @@
                 title: '商圈/片区',
                 leftText: '取消',
                 rightText: '确定',
+                getAjaxData: false,
+                ajaxFn: function(index) {
+                    $.ajax({
+                        url: encodeURI("http://192.168.5.107:8080/superviseTag/selectSuperviseTagListByTagLargeCode"),
+                        data: {
+                            userId: '',
+                            token: '',
+                            tagLargeCategory: '',
+                        },
+                        dataType: "json",
+                        success: function(res) {
+                            newCenterData.latitude = parseFloat(res.latlon.split(',')[1])
+                            newCenterData.longitude = parseFloat(res.latlon.split(',')[0])
+                            newCenterData.location = res.city.value + res.dist.value + res.town.value + res.poi;
+                        },
+                        error: function (err) {
+                            dd.alert({
+                                content: "地址解析出错"
+                            });
+                        }
+                    });
+                },
                 rightFn: function( selectArr ){
                     distName = [];
                     distCode = [];

@@ -69,6 +69,10 @@
             title: '标题',
             leftText: '取消',
             rightText: '确定',
+            getAjaxData: false,
+            ajaxFn: function(idx) {
+                // 目前数据请求必须同步
+            },
             saveFn: function(selectArr) {
 
             }
@@ -291,6 +295,9 @@
             util.css(_this.moveObj, {
                 "transform": 'translate3d(0,' + len + 'px,0)'
             });
+            if (_this.Opt.getAjaxData) {
+                _this.Opt.ajaxFn(index)
+            }
             _this.changeNext(index);
             _this.moveObj.addEventListener("transitionend", function(event) {
                 _this.moveObj.style.transition = "";
@@ -341,6 +348,9 @@
             util.css(_this.moveObj, {
                 "transform": 'translate3d(0,' + len + 'px,0)'
             });
+            if (_this.Opt.getAjaxData) {
+                _this.Opt.ajaxFn(index);
+            }
             _this.changeNext(index);
             _this.moveObj.addEventListener("transitionend", function(event) {
                 _this.moveObj.style.transition = "";
@@ -351,6 +361,7 @@
 
         },
         changeNext: function(index) {
+            console.log('------------test------------------');
             var data = this.Opt.data,
                 arr = [];
 
