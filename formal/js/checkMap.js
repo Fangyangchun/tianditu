@@ -568,6 +568,10 @@
                     })
                 },
                 rightFn: function(selectArr){
+                    curMinTagName = '';
+                    curMaxTagName = '';
+                    maxTagCode = '';
+                    minTagCode = '';
                     $.each(filterDatas.superviseTag, function (idx, val) {
                         if (val.paramName == selectArr[0]) {
                             maxTagCode = val.paramCode;
@@ -582,7 +586,7 @@
                             return false;
                         }
                     })
-                    if (curMinTagName) {
+                    if (selectArr[1]) {
                         $('#tag-btn').text(curMinTagName);
                         $('#tag-btn').addClass('active');
                     } else {
