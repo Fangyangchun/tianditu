@@ -154,7 +154,7 @@
                 contentType: 'application/json',
                 // dataType: "jsonp",
                 success: function(res) {
-                    preTagMinOpt = JSON.parse(res).data;
+                    preTagMinOpt = JSON.parse(JSON.stringify(res)).data;
                     $.each(preTagMinOpt, function (idx, value) {
                         tagPickerOpt[name].push(value.tagName);
                     })
