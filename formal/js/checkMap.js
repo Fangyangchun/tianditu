@@ -2,15 +2,22 @@
         if (navigator.userAgent.toLowerCase().indexOf('dingtalk') > -1) {
             document.writeln('<script src="https://appx/web-view.min.js"' + '>' + '<' + '/' + 'script>');
         }
+        var userId, token, baseUrl, tagAction;
         var initLatlng, initZoom = 10, cityName, newCenterData,  markDatas = [],
         map, curMarker, circle, markers, mapParams, idx, filterDatas, userLevel, showDistrict, pickerOpt, distPickerOpt;
         var taskStatus, curTaskStatus, legalEntityCata, curLegalEntityCata, checkType, curCheckType, 
         legalEntityTag, legalEntityTag1, legalEntityTag2, curLegalEntityTag, curLegalEntityTag1, curLegalEntityTag2,
         cityName = [], cityCode = [], distName = [], distCode = [], areaName = [], areaCode = [], currentAreaCode; 
+        var tagPickerOpt, preTagMinOpt, minTagCode, curMinTagCode, curMinTagName;  // 监管标签-picker.data
         var btn = document.getElementById("picker-btn");
         var distBtn = document.getElementById("district-btn");
+        var tagBtn = document.getElementById("tag-btn");
         dd.postMessage({type: 'init'});
         dd.onMessage = function(e) {
+            userId = e.userId;
+            token = e.token;
+            baseUrl = e.baseUrl;
+            tagAction = e.tagAction,
             initLatlng = {lon: e.lon, lat: e.lat} || {lon: 120.14989, lat: 30.27751};  // 默认经纬度为蓝天商务中心
             cityName = e.cityName || "杭州市";
             markDatas = e.markDatas;
@@ -80,6 +87,8 @@
                 getDistPickerOpt();
             }
 
+            getTagPickerOpt();
+
             map.on('click', function (e) {
                 if($(".detail_info").hasClass('active')) { 
                     $(".detail_info").removeClass('active');
@@ -117,6 +126,50 @@
             })
         }
 
+        function getTagPickerOpt() {
+            tagPickerOpt = {};
+            $.each(filterDatas.superviseTag, function (index, val) {
+                var idxKey = val.paramName;
+                tagPickerOpt[idxKey] = [];
+                if (index == 0) {
+                    ajaxMinTagOpt(idxKey, val.paramCode);
+                }
+            })
+        }
+
+        function ajaxMinTagOpt(name, code) {
+            preTagMinOpt = [{tagName: '垃圾填埋场', tagCode: 'A01900000010000014'},
+            {tagName: '环保部门20181126', tagCode: 'A01900000010000003'},
+            {tagName: '垃圾填埋场20181126', tagCode: 'A01900000010000003'},
+            {tagName: '环保部门', tagCode: 'A01900000010000003'}];
+            $.each(preTagMinOpt, function (idx, value) {
+                tagPickerOpt[name].push(value.tagName);
+                
+            })
+            // $.ajax({
+            //     async: false,
+            //     type: "POST",
+            //     url: encodeURI(baseUrl + tagAction),
+            //     data: {
+            //         token: token,
+            //         userId: userId,
+            //         tagLargeCategory: code,
+            //     },
+            //     contentType: 'application/json',
+            //     dataType: "jsonp",
+            //     success: function(res) {
+            //         preTagMinOpt = res.data;
+            //         $.each(preTagMinOpt, function (idx, value) {
+            //             tagPickerOpt[name].push(value.tagName);
+                        
+            //         })
+            //     },
+            //     error: function (err) {
+            //         dd.alert({ content: err.msg });
+            //     }
+            // });
+        }
+
         function initFilterHtml () {
             var marketHtml = '', typeHtml = '', statusHtml = '', tagHtml = '';
             $.each(filterDatas.marketType, function (index, val) {
@@ -128,14 +181,14 @@
             $.each(filterDatas.taskStatus, function (index, val) {
                 statusHtml += '<dd data-paramCode="' + val.paramCode + '" data-paramCodeType="' + val.paramCodeType + '">' + val.paramName + '</dd>';
             });
-            $.each(filterDatas.superviseTag, function (index, val) {
-                tagHtml += '<dd data-paramCode="' + val.paramCode + '" data-paramCode1="' + val.paramCode1 
-                + '" data-paramCode2="' + val.paramCode2 + '" data-paramCodeType="' + val.paramCodeType + '">' + val.paramName + '</dd>';
-            });
+            // $.each(filterDatas.superviseTag, function (index, val) {
+            //     tagHtml += '<dd data-paramCode="' + val.paramCode + '" data-paramCode1="' + val.paramCode1 
+            //     + '" data-paramCode2="' + val.paramCode2 + '" data-paramCodeType="' + val.paramCodeType + '">' + val.paramName + '</dd>';
+            // });
             $('#MARKET_TYPE').html(marketHtml);
             $('#TASK_TYPE').html(typeHtml);
             $('#TASK_STATUS').html(statusHtml);
-            $('#SUPERVISE_TAG').html(tagHtml);
+            // $('#SUPERVISE_TAG').html(tagHtml);
             
             $(".filter_list dd").on('click', function (ev) {
                 $(this).siblings().removeClass('active')
@@ -151,11 +204,11 @@
                     case "TASK_STATUS":
                         taskStatus = $(ev.target)[0].dataset.paramcode;
                         break;
-                    case "SUPERVISE_TAG_LARGECLASS":
-                        legalEntityTag = $(ev.target)[0].dataset.paramcode;
-                        legalEntityTag1 = $(ev.target)[0].dataset.paramcode1;
-                        legalEntityTag2 = $(ev.target)[0].dataset.paramcode2;
-                        break;
+                    // case "SUPERVISE_TAG_LARGECLASS":
+                    //     legalEntityTag = $(ev.target)[0].dataset.paramcode;
+                    //     legalEntityTag1 = $(ev.target)[0].dataset.paramcode1;
+                    //     legalEntityTag2 = $(ev.target)[0].dataset.paramcode2;
+                    //     break;
                 }
             });
         }
@@ -230,6 +283,13 @@
                     $('#district-btn').removeClass('active');
                 }
             }
+            if (curMinTagCode) {
+                $('#tag-btn').text(curMinTagName);
+                $('#tag-btn').addClass('active');
+            } else {
+                $('#tag-btn').text('选择监管类型');
+                $('#tag-btn').removeClass('active');
+            }
             if (curLegalEntityCata) {
                 $('#MARKET_TYPE dd').removeClass('active');
                 var arr = jQuery.makeArray($('#MARKET_TYPE dd'));
@@ -254,18 +314,18 @@
             } else {
                 $('#TASK_TYPE dd').removeClass('active');
             }
-            if (curLegalEntityTag) {
-                $('#SUPERVISE_TAG dd').removeClass('active');
-                var arr = jQuery.makeArray($('#SUPERVISE_TAG dd'));
-                $.each(arr, function (index, val) {
-                    if (val.dataset.paramcode == legalEntityTag) {
-                        $(val).addClass('active');
-                        return true
-                    }
-                })
-            } else {
-                $('#SUPERVISE_TAG dd').removeClass('active');
-            }
+            // if (curLegalEntityTag) {
+            //     $('#SUPERVISE_TAG dd').removeClass('active');
+            //     var arr = jQuery.makeArray($('#SUPERVISE_TAG dd'));
+            //     $.each(arr, function (index, val) {
+            //         if (val.dataset.paramcode == legalEntityTag) {
+            //             $(val).addClass('active');
+            //             return true
+            //         }
+            //     })
+            // } else {
+            //     $('#SUPERVISE_TAG dd').removeClass('active');
+            // }
         });
 
         $('.custom-mask').on('touchmove', function (ev) {
@@ -328,6 +388,8 @@
             cityName = []; cityCode = [];
             $('#picker-btn').text('市|区|县');
             $('#district-btn').text('商圈/片区');
+            $('#tag-btn').text('选择监管类型');
+            $('#tag-btn').removeClass('active');
             if (userLevel) {
                 $('#picker-btn').removeClass('active');
                 $('#district-btn').removeClass('active');
@@ -342,19 +404,21 @@
             curTaskStatus = ''
             curLegalEntityCata = ''
             curCheckType = ''
-            curLegalEntityTag = ''
-            curLegalEntityTag1 = ''
-            curLegalEntityTag2 = ''
+            // curLegalEntityTag = ''
+            // curLegalEntityTag1 = ''
+            // curLegalEntityTag2 = ''
             currentAreaCode = ''
+            curMinTagCode = ''
             var preFilterData = {
                 taskStatus: '',
                 businessDistrict: '', //片区
                 legalEntityCata: '',
                 checkType: '',
-                legalEntityTag: '',
-                legalEntityTag1: '',
-                legalEntityTag2: '',
-                localAdm: ''
+                // legalEntityTag: '',
+                // legalEntityTag1: '',
+                // legalEntityTag2: '',
+                localAdm: '',
+                curMinTagCode: ''
             }
             dd.postMessage({type: 'businessDistrict', val: preFilterData});
         });
@@ -369,17 +433,19 @@
             curTaskStatus = taskStatus || ''
             curLegalEntityCata = legalEntityCata || ''
             curCheckType = checkType || ''
-            curLegalEntityTag = legalEntityTag || ''
-            curLegalEntityTag1 = legalEntityTag1 || ''
-            curLegalEntityTag2 = legalEntityTag2 || ''
+            curMinTagCode = minTagCode || ''
+            // curLegalEntityTag = legalEntityTag || ''
+            // curLegalEntityTag1 = legalEntityTag1 || ''
+            // curLegalEntityTag2 = legalEntityTag2 || ''
             var preFilterData = {
                     taskStatus: curTaskStatus,
                     // businessDistrict: currentAreaCode, //片区
                     legalEntityCata: curLegalEntityCata,
                     checkType: curCheckType,
-                    legalEntityTag: curLegalEntityTag,
-                    legalEntityTag1: curLegalEntityTag1,
-                    legalEntityTag2: curLegalEntityTag2
+                    minTagCode: curMinTagCode
+                    // legalEntityTag: curLegalEntityTag,
+                    // legalEntityTag1: curLegalEntityTag1,
+                    // legalEntityTag2: curLegalEntityTag2
             }
             if (cityCode.length == 1) {
                 preFilterData['localAdm'] = cityCode[0];
@@ -408,28 +474,6 @@
                 title: '市|区|县',
                 leftText: '取消',
                 rightText: '确定',
-                getAjaxData: false,
-                ajaxFn: function(index) {
-                    $.ajax({
-                        url: encodeURI("http://192.168.5.107:8080//superviseTag/selectSuperviseTagListByTagLargeCode"),
-                        data: {
-                            token: '',
-                            userId: '',
-                            tagLargeCategory: ''
-                        },
-                        dataType: "json",
-                        success: function(res) {
-                            newCenterData.latitude = parseFloat(res.latlon.split(',')[1])
-                            newCenterData.longitude = parseFloat(res.latlon.split(',')[0])
-                            newCenterData.location = res.city.value + res.dist.value + res.town.value + res.poi;
-                        },
-                        error: function (err) {
-                            dd.alert({
-                                content: "地址解析出错"
-                            });
-                        }
-                    });
-                },
                 rightFn: function( selectArr ){
                     // var indexArry = btn.getAttribute("selectcache");
                     cityName = [];
@@ -473,28 +517,6 @@
                 title: '商圈/片区',
                 leftText: '取消',
                 rightText: '确定',
-                getAjaxData: false,
-                ajaxFn: function(index) {
-                    $.ajax({
-                        url: encodeURI("http://192.168.5.107:8080/superviseTag/selectSuperviseTagListByTagLargeCode"),
-                        data: {
-                            userId: '',
-                            token: '',
-                            tagLargeCategory: '',
-                        },
-                        dataType: "json",
-                        success: function(res) {
-                            newCenterData.latitude = parseFloat(res.latlon.split(',')[1])
-                            newCenterData.longitude = parseFloat(res.latlon.split(',')[0])
-                            newCenterData.location = res.city.value + res.dist.value + res.town.value + res.poi;
-                        },
-                        error: function (err) {
-                            dd.alert({
-                                content: "地址解析出错"
-                            });
-                        }
-                    });
-                },
                 rightFn: function( selectArr ){
                     distName = [];
                     distCode = [];
@@ -516,6 +538,41 @@
 
                     distBtn.innerText = distName.join('-');
                     distBtn.setAttribute("class", 'active');
+                }
+            });
+        }
+
+        tagBtn.onclick = function(){
+            // data = {"小明家":[], "小红家":["小红爸爸", "小红妈妈"]}
+            // console.log(filterDatas.superviseTag);
+            var pickerView = new PickerView({
+                bindElem: tagBtn,
+                data: tagPickerOpt,
+                title: '监管类型',
+                leftText: '取消',
+                rightText: '确定',
+                getAjaxData: true,
+                ajaxFn: function(selectArr) {
+                    $.each(filterDatas.superviseTag, function (index, val) {
+                        if (val.paramName == selectArr[0]) {
+                            console.log(selectArr, val.paramCode);
+                            tagPickerOpt[val.paramName] = [];
+                            ajaxMinTagOpt(val.paramName, val.paramCode);
+                            return false;
+                        }
+                    })
+                },
+                rightFn: function(selectArr){
+                    $.each(preTagMinOpt, function (idx, value) {
+                        if (value.tagName == selectArr[1]) {
+                            minTagCode = value.tagCode;
+                            curMinTagName = value.tagName;
+                            $('#tag-btn').text(curMinTagName);
+                            $('#tag-btn').addClass('active');
+                            return false;
+                        }
+                        
+                    })
                 }
             });
         }

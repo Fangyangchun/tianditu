@@ -296,7 +296,13 @@
                 "transform": 'translate3d(0,' + len + 'px,0)'
             });
             if (_this.Opt.getAjaxData) {
-                _this.Opt.ajaxFn(index)
+                var selectArr = [];
+                for (var i = 0; i < _this.elem_contents.children.length; i++) {
+                    var items = _this.elem_contents.children[i].children[2],
+                        field = items.children.length > 0 ? items.children[_this.selectArr[i]].innerText : "";
+                    selectArr.push(field);
+                }
+                _this.Opt.ajaxFn(selectArr)
             }
             _this.changeNext(index);
             _this.moveObj.addEventListener("transitionend", function(event) {
@@ -349,7 +355,13 @@
                 "transform": 'translate3d(0,' + len + 'px,0)'
             });
             if (_this.Opt.getAjaxData) {
-                _this.Opt.ajaxFn(index);
+                var selectArr = [];
+                for (var i = 0; i < _this.elem_contents.children.length; i++) {
+                    var items = _this.elem_contents.children[i].children[2],
+                        field = items.children.length > 0 ? items.children[_this.selectArr[i]].innerText : "";
+                    selectArr.push(field);
+                }
+                _this.Opt.ajaxFn(selectArr)
             }
             _this.changeNext(index);
             _this.moveObj.addEventListener("transitionend", function(event) {
@@ -361,7 +373,6 @@
 
         },
         changeNext: function(index) {
-            console.log('------------test------------------');
             var data = this.Opt.data,
                 arr = [];
 
