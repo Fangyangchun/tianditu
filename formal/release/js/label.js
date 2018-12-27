@@ -1,1 +1,131 @@
-!function(t){var e={};function n(o){if(e[o])return e[o].exports;var a=e[o]={i:o,l:!1,exports:{}};return t[o].call(a.exports,a,a.exports,n),a.l=!0,a.exports}n.m=t,n.c=e,n.d=function(t,e,o){n.o(t,e)||Object.defineProperty(t,e,{enumerable:!0,get:o})},n.r=function(t){"undefined"!=typeof Symbol&&Symbol.toStringTag&&Object.defineProperty(t,Symbol.toStringTag,{value:"Module"}),Object.defineProperty(t,"__esModule",{value:!0})},n.t=function(t,e){if(1&e&&(t=n(t)),8&e)return t;if(4&e&&"object"==typeof t&&t&&t.__esModule)return t;var o=Object.create(null);if(n.r(o),Object.defineProperty(o,"default",{enumerable:!0,value:t}),2&e&&"string"!=typeof t)for(var a in t)n.d(o,a,function(e){return t[e]}.bind(null,a));return o},n.n=function(t){var e=t&&t.__esModule?function(){return t.default}:function(){return t};return n.d(e,"a",e),e},n.o=function(t,e){return Object.prototype.hasOwnProperty.call(t,e)},n.p="./",n(n.s=1)}([,function(t,e){navigator.userAgent.toLowerCase().indexOf("dingtalk")>-1&&document.writeln('<script src="https://appx/web-view.min.js"><\/script>');var n,o,a=17,l={};dd.postMessage({}),dd.onMessage=function(t){n={lon:t.lon,lat:t.lat}||{lon:120.14989,lat:30.27751},o=t.cityName||"杭州市",$.ajax({url:encodeURI("https://dh.ditu.zj.cn:9443/inverse/getInverseGeocoding.jsonp?&detail=1&zoom=11&latlon="+n.lon+","+n.lat+"&lat=&lon=&customer=2"),dataType:"jsonp",success:function(t){l.latitude=parseFloat(t.latlon.split(",")[1]),l.longitude=parseFloat(t.latlon.split(",")[0]),l.location=t.city.value+t.dist.value+t.town.value+t.poi},error:function(t){dd.alert({content:"地址解析出错"})}}),function(){var t=L.map("map",{crs:L.CRS.CustomEPSG4326,center:n,minZoom:5,zoom:a,inertiaDeceleration:15e3,zoomControl:!1}),e=new L.GXYZ("https://ditu.zjzwfw.gov.cn/mapserver/vmap/zjvmap/getMAP?x={x}&y={y}&l={z}&styleId=tdt_biaozhunyangshi_2017",{tileSize:512,minZoom:5});t.addLayer(e);var i=new L.GXYZ("https://ditu.zjzwfw.gov.cn/mapserver/label/zjvmap/getImg?x={x}&y={y}&l={z}&styleId=tdt_biaozhunyangshi_2017",{tileSize:512,hitDetection:!0,keepBuffer:0,updateWhenZooming:!1});t.addLayer(i);var r=L.icon({iconUrl:"../img/indoor_pub_poi_pressed.png",iconSize:[21,30],iconAnchor:[10,20]}),d=L.marker([t.getCenter().lat,t.getCenter().lng],{draggable:!1,opacity:1,icon:r});t.addLayer(d);var s=L.circle([t.getCenter().lat,t.getCenter().lng],{radius:30});t.addLayer(s),dd.postMessage({render:!0}),t.on("click",function(t){var e=encodeURI("https://dh.ditu.zj.cn:9443/inverse/getInverseGeocoding.jsonp?&detail=1&zoom=11&latlon="+t.latlng.lng+","+t.latlng.lat+"&lat=&lon=&customer=2");$.ajax({url:e,dataType:"jsonp",success:function(e){l.latitude=parseFloat(e.latlon.split(",")[1]),l.longitude=parseFloat(e.latlon.split(",")[0]),l.location=e.city.value+e.dist.value+e.town.value+e.poi,d.setLatLng(t.latlng),d.unbindTooltip().bindTooltip(e.city.value+e.dist.value+e.town.value+e.poi,{offset:[0,10],direction:"bottom"}).openTooltip()},error:function(t){dd.alert({content:"地址解析出错"})}})}),$(".iptSearch").on("keydown",function(e){if(13==e.keyCode)if(e.target.value){var n=o+e.target.value,a=encodeURI("https://dh.ditu.zj.cn:9446/geocoding/getLatLonByAddress.jsonp?&city="+o+"&keyword="+n+"&width=500&height=430&pn=1&customer=2&encode=UTF-8");$.ajax({url:a,dataType:"jsonp",success:function(n){if("0.0,0.0"==n.strlatlon)dd.alert({content:"未查询到相关信息"});else{l.latitude=parseFloat(n.strlatlon.split(",")[1]),l.longitude=parseFloat(n.strlatlon.split(",")[0]),l.location=n.city+e.target.value;var o={lon:l.longitude,lat:l.latitude};d.setLatLng(o),d.unbindTooltip().bindTooltip(e.target.value,{offset:[0,10],direction:"bottom"}).openTooltip(),t.panTo(o)}},error:function(t){dd.alert({content:"地址解析出错"})}})}else dd.alert({content:"请输入查询关键字"})}),$(".resetBtn").on("click",function(e){t.setView([Number(n.lat),Number(n.lon)],a),d.unbindTooltip().setLatLng(n)}),$(".modifyBtn").on("click",function(){dd.postMessage(l)})}()}}]);
+if (navigator.userAgent.toLowerCase().indexOf('dingtalk') > -1) {
+    document.writeln('<script src="https://appx/web-view.min.js"' + '>' + '<' + '/' + 'script>');
+  }
+  var initLatlng, initZoom = 17, cityName, newCenterData = {};
+  
+  dd.postMessage({});
+  dd.onMessage = function(e) {
+      initLatlng = {lon: e.lon, lat: e.lat} || {lon: 120.14989, lat: 30.27751};  // 默认经纬度为蓝天商务中心
+      cityName = e.cityName || "杭州市";
+      $.ajax({
+          url: encodeURI("https://dh.ditu.zj.cn:9443/inverse/getInverseGeocoding.jsonp?&detail=1&zoom=11&latlon=" + initLatlng.lon + "," + initLatlng.lat + "&lat=&lon=&customer=2"),
+          dataType: "jsonp",
+          // jsonp: "callback",
+          success: function(res) {
+              newCenterData.latitude = parseFloat(res.latlon.split(',')[1])
+              newCenterData.longitude = parseFloat(res.latlon.split(',')[0])
+              newCenterData.location = res.city.value + res.dist.value + res.town.value + res.poi;
+          },
+          error: function (err) {
+              dd.alert({
+                  content: "地址解析出错"
+              });
+          }
+      });
+    //   setTimeout(function () {
+        init()
+    //   }, 3000);
+  }
+  function init() {
+      var map = L.map('map',{crs:L.CRS.CustomEPSG4326,center: initLatlng, minZoom: 5, zoom: initZoom, inertiaDeceleration:15000, zoomControl: false});
+      var tileAddress = 'https://ditu.zjzwfw.gov.cn/mapserver/vmap/zjvmap/getMAP?x={x}&y={y}&l={z}&styleId=tdt_biaozhunyangshi_2017';
+
+      var layer = new L.GXYZ(tileAddress, {tileSize:512, minZoom: 5});
+      map.addLayer(layer);
+
+      // 添加注记图层
+    //   var labelLayer = new L.GWVTAnno({tileSize:512});
+    //   var dataSource = new Custom.URLDataSource();
+    //   dataSource.url = 'https://ditu.zjzwfw.gov.cn/mapserver/label/zjvmap/getDatas?x=${x}&y=${y}&l=${z}&styleId=tdt_biaozhunyangshi_2017';
+    //   labelLayer.addDataSource(dataSource);
+    //   map.addLayer(labelLayer);
+      var labelLayer = new L.GXYZ('https://ditu.zjzwfw.gov.cn/mapserver/label/zjvmap/getImg?x={x}&y={y}&l={z}&styleId=tdt_biaozhunyangshi_2017',{tileSize:512,hitDetection:true,keepBuffer:0,updateWhenZooming:false});
+      map.addLayer(labelLayer);
+      var customIcon = L.icon({ 
+          iconUrl: '../img/indoor_pub_poi_pressed.png',
+          iconSize: [21, 30],
+          iconAnchor:   [10, 20],
+      }); 
+      var marker = L.marker( 
+          [map.getCenter().lat, map.getCenter().lng], 
+          { 
+              draggable: false,
+              opacity: 1,
+              icon: customIcon
+          }
+      );
+      map.addLayer(marker);
+      var circle = L.circle([map.getCenter().lat, map.getCenter().lng], {radius: 30});
+      map.addLayer(circle);
+
+      dd.postMessage({render: true}); // 结束loading
+
+      map.on('click', function(e) {
+          var reverseResolutionUrl = encodeURI("https://dh.ditu.zj.cn:9443/inverse/getInverseGeocoding.jsonp?&detail=1&zoom=11&latlon=" + e.latlng.lng + "," + e.latlng.lat + "&lat=&lon=&customer=2");
+          $.ajax({
+              url: reverseResolutionUrl,
+              dataType: "jsonp",
+              // jsonp: "callback",
+              success: function(res) {
+                  newCenterData.latitude = parseFloat(res.latlon.split(',')[1])
+                  newCenterData.longitude = parseFloat(res.latlon.split(',')[0])
+                  newCenterData.location = res.city.value + res.dist.value + res.town.value + res.poi;
+                  marker.setLatLng(e.latlng);
+                  marker.unbindTooltip().bindTooltip(res.city.value + res.dist.value + res.town.value + res.poi, {offset: [0, 10], direction : "bottom"}).openTooltip();
+              },
+              error: function (err) {
+                  dd.alert({
+                      content: "地址解析出错"
+                  });
+              }
+          });
+      });
+
+      $('.iptSearch').on('keydown',function(e){
+          // e.preventDefault();
+          if(e.keyCode == 13){
+              if(e.target.value) {
+                  var keyWord = cityName + e.target.value;
+                  var resolutionUrl = encodeURI("https://dh.ditu.zj.cn:9446/geocoding/getLatLonByAddress.jsonp?&city=" + cityName + "&keyword=" + keyWord + "&width=500&height=430&pn=1&customer=2&encode=UTF-8");
+                  $.ajax({
+                      url: resolutionUrl,
+                      dataType: "jsonp",
+                      // jsonp: "callback",
+                      success: function(res) {
+                          if (res.strlatlon == "0.0,0.0") {
+                              dd.alert({
+                                  content: "未查询到相关信息"
+                              });
+                          } else {
+                              newCenterData.latitude = parseFloat(res.strlatlon.split(',')[1]);
+                              newCenterData.longitude = parseFloat(res.strlatlon.split(',')[0]);
+                              newCenterData.location = res.city + e.target.value;
+                              var newCenterLatlon = {lon: newCenterData.longitude, lat: newCenterData.latitude}
+                              marker.setLatLng(newCenterLatlon);
+                              marker.unbindTooltip().bindTooltip(e.target.value, {offset: [0, 10], direction : "bottom"}).openTooltip();
+                              map.panTo(newCenterLatlon)
+                          }
+                      },
+                      error: function (err) {
+                          dd.alert({
+                              content: "地址解析出错"
+                          });
+                      }
+                  });
+              } else {
+                  dd.alert({
+                      content: "请输入查询关键字"
+                  });
+              }
+              
+          }
+      });
+      $('.resetBtn').on('click',function(e){
+          map.setView([Number(initLatlng.lat), Number(initLatlng.lon)], initZoom);
+          marker.unbindTooltip().setLatLng(initLatlng);
+      });
+      $(".modifyBtn").on('click', function () {
+          dd.postMessage(newCenterData);
+      })
+
+  }
