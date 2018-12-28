@@ -5,26 +5,28 @@ if (navigator.userAgent.toLowerCase().indexOf('dingtalk') > -1) {
   
   dd.postMessage({});
   dd.onMessage = function(e) {
+      if (!e.init) {
+        dd.postMessage({});
+        return;
+      }
       initLatlng = {lon: e.lon, lat: e.lat} || {lon: 120.14989, lat: 30.27751};  // 默认经纬度为蓝天商务中心
-      cityName = e.cityName || "杭州市";
-      $.ajax({
-          url: encodeURI("https://dh.ditu.zj.cn:9443/inverse/getInverseGeocoding.jsonp?&detail=1&zoom=11&latlon=" + initLatlng.lon + "," + initLatlng.lat + "&lat=&lon=&customer=2"),
-          dataType: "jsonp",
-          // jsonp: "callback",
-          success: function(res) {
-              newCenterData.latitude = parseFloat(res.latlon.split(',')[1])
-              newCenterData.longitude = parseFloat(res.latlon.split(',')[0])
-              newCenterData.location = res.city.value + res.dist.value + res.town.value + res.poi;
-          },
-          error: function (err) {
-              dd.alert({
-                  content: "地址解析出错"
-              });
-          }
-      });
-    //   setTimeout(function () {
+        cityName = e.cityName || "杭州市";
+        $.ajax({
+            url: encodeURI("https://dh.ditu.zj.cn:9443/inverse/getInverseGeocoding.jsonp?&detail=1&zoom=11&latlon=" + initLatlng.lon + "," + initLatlng.lat + "&lat=&lon=&customer=2"),
+            dataType: "jsonp",
+            // jsonp: "callback",
+            success: function(res) {
+                newCenterData.latitude = parseFloat(res.latlon.split(',')[1])
+                newCenterData.longitude = parseFloat(res.latlon.split(',')[0])
+                newCenterData.location = res.city.value + res.dist.value + res.town.value + res.poi;
+            },
+            error: function (err) {
+                dd.alert({
+                    content: "地址解析出错"
+                });
+            }
+        });
         init()
-    //   }, 3000);
   }
   function init() {
       var map = L.map('map',{crs:L.CRS.CustomEPSG4326,center: initLatlng, minZoom: 5, zoom: initZoom, inertiaDeceleration:15000, zoomControl: false});
