@@ -410,6 +410,10 @@
             // curLegalEntityTag1 = ''
             // curLegalEntityTag2 = ''
             currentAreaCode = ''
+            minTagCode = ''
+            maxTagCode = ''
+            curMinTagName = ''
+            curMaxTagName = ''
             curMinTagCode = ''
             curMaxTagCode = ''
             var preFilterData = {
