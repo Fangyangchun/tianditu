@@ -17,8 +17,12 @@
             userId = e.userId;
             token = e.token;
             baseUrl = e.baseUrl;
-            tagAction = e.tagAction,
-            initLatlng = {lon: e.lon, lat: e.lat} || {lon: 120.14989, lat: 30.27751};  // 默认经纬度为蓝天商务中心
+            tagAction = e.tagAction;
+            if (e.lon && e.lat) {
+                initLatlng = {lon: e.lon, lat: e.lat}
+            } else {
+                initLatlng = {lon: 120.14989, lat: 30.27751};  // 默认经纬度为蓝天商务中心
+            }
             cityName = e.cityName || "杭州市";
             markDatas = e.markDatas;
             filterDatas = e.filterDatas;
