@@ -12,6 +12,7 @@
         var tagPickerOpt, preTagMinOpt, minTagCode, curMinTagCode, minTagName, curMinTagName, curMaxTagCode, maxTagCode, curMaxTagName, maxTagName;  // 监管标签-picker.data
         var btn = document.getElementById("picker-btn");
         var distBtn = document.getElementById("district-btn");
+        // var tagBtn = document.getElementById("tag-btn");
         dd.postMessage({type: 'init'});
         dd.onMessage = function(e) {
             switch(e.dataType){
@@ -102,6 +103,8 @@
                 distBtn.style.display = 'inline-block';
                 getDistPickerOpt();
             }
+
+            // getTagPickerOpt();
 
             map.on('click', function (e) {
                 if($(".detail_info").hasClass('active')) { 
@@ -204,6 +207,7 @@
             pickerOpt = {};
             $.each(filterDatas.SlicenoLDNameJson, function (index, val) {
                 var idxKey = val.name;
+                // pickerOpt[idxKey] = ['全部'];
                 pickerOpt[idxKey] = [];
                 if (val.children) {
                     $.each(val.children, function (idx, value) {
@@ -218,6 +222,7 @@
             $.each(filterDatas.DistrictJson, function (index, val) {
                 var idxKey = val.name;
                 distPickerOpt[idxKey] = ['全部'];
+                // distPickerOpt[idxKey] = [];
                 if (val.children) {
                     $.each(val.children, function (idx, value) {
                         distPickerOpt[idxKey].push(value.name);
@@ -225,6 +230,49 @@
                 }
             })
         }
+
+        // function getTagPickerOpt() {
+        //     tagPickerOpt = {};
+        //     $.each(filterDatas.superviseTag, function (index, val) {
+        //         var idxKey = val.paramName;
+        //         tagPickerOpt[idxKey] = [];
+        //         if (index == 0) {
+        //             ajaxMinTagOpt(idxKey, val.paramCode);
+        //         }
+        //     })
+        // }
+
+        // function ajaxMinTagOpt(name, code) {
+        //     // preTagMinOpt = [{tagName: '垃圾填埋场', tagCode: 'A01900000010000014'},
+        //     // {tagName: '环保部门20181126', tagCode: 'A01900000010000003'},
+        //     // {tagName: '垃圾填埋场20181126', tagCode: 'A01900000010000003'},
+        //     // {tagName: '环保部门', tagCode: 'A01900000010000003'}];
+        //     // $.each(preTagMinOpt, function (idx, value) {
+        //     //     tagPickerOpt[name].push(value.tagName);
+        //     //
+        //     // })
+        //     $.ajax({
+        //         async: false,
+        //         type: "POST",
+        //         url: encodeURI(baseUrl + tagAction),
+        //         data: JSON.stringify({ 'encParamsStr': encrypt(JSON.stringify({ token: token, userId: userId, tagLargeCategory: code }))}),
+        //         contentType: 'application/json',
+        //         // dataType: "jsonp",
+        //         success: function(res) {
+        //             if (typeof res == 'string') {
+        //                 preTagMinOpt = JSON.parse(res).data;
+        //             } else {
+        //                 preTagMinOpt = res.data;
+        //             }
+        //             $.each(preTagMinOpt, function (idx, value) {
+        //                 tagPickerOpt[name].push(value.tagName);
+        //             })
+        //         },
+        //         error: function (err) {
+        //             dd.alert({ content: err.msg });
+        //         }
+        //     });
+        // }
 
         function initFilterHtml () {
             var marketHtml = '', typeHtml = '', statusHtml = '', tagHtml = '';
@@ -237,12 +285,17 @@
             $.each(filterDatas.taskStatus, function (index, val) {
                 statusHtml += '<dd data-paramCode="' + val.paramCode + '" data-paramCodeType="' + val.paramCodeType + '">' + val.paramName + '</dd>';
             });
+            // $.each(filterDatas.superviseTag, function (index, val) {
+            //     tagHtml += '<dd data-paramCode="' + val.paramCode + '" data-paramCode1="' + val.paramCode1
+            //     + '" data-paramCode2="' + val.paramCode2 + '" data-paramCodeType="' + val.paramCodeType + '">' + val.paramName + '</dd>';
+            // });
             $.each(tagLineData, function (index, val) {
                 tagHtml += '<dd data-dutyDeptCode="' + val.dutyDeptCode + '">' + val.dutyDeptName + '</dd>';
             });
             $('#MARKET_TYPE').html(marketHtml);
             $('#TASK_TYPE').html(typeHtml);
             $('#TASK_STATUS').html(statusHtml);
+            // $('#SUPERVISE_TAG').html(tagHtml);
             $('#SUP_TAG_LINE').html(tagHtml);
             
             $(".filter_list dd").on('click', function (ev) {
@@ -261,6 +314,11 @@
                     case "TASK_STATUS":
                         taskStatus = $(ev.target)[0].dataset.paramcode;
                         break;
+                    // case "SUPERVISE_TAG_LARGECLASS":
+                    //     legalEntityTag = $(ev.target)[0].dataset.paramcode;
+                    //     legalEntityTag1 = $(ev.target)[0].dataset.paramcode1;
+                    //     legalEntityTag2 = $(ev.target)[0].dataset.paramcode2;
+                    //     break;
                 }
             });
 
@@ -350,6 +408,16 @@
                     $('#district-btn').removeClass('active');
                 }
             }
+            // if (curMinTagCode) {
+            //     $('#tag-btn').text(curMinTagName);
+            //     $('#tag-btn').addClass('active');
+            // } else if (curMaxTagCode) {
+            //     $('#tag-btn').text(curMaxTagName);
+            //     $('#tag-btn').addClass('active');
+            // } else {
+            //     $('#tag-btn').text('选择监管类型');
+            //     $('#tag-btn').removeClass('active');
+            // }
             $('.tagInfo-box').css('display', 'none');
             $('.large_tag_box').css('display', 'none');
             $('.small_tag_box').css('display', 'none');
@@ -400,6 +468,18 @@
             } else {
                 $('#TASK_TYPE dd').removeClass('active');
             }
+            // if (curLegalEntityTag) {
+            //     $('#SUPERVISE_TAG dd').removeClass('active');
+            //     var arr = jQuery.makeArray($('#SUPERVISE_TAG dd'));
+            //     $.each(arr, function (index, val) {
+            //         if (val.dataset.paramcode == legalEntityTag) {
+            //             $(val).addClass('active');
+            //             return true
+            //         }
+            //     })
+            // } else {
+            //     $('#SUPERVISE_TAG dd').removeClass('active');
+            // }
         });
 
         $('.custom-mask').on('touchmove', function (ev) {
@@ -412,6 +492,7 @@
 
 
         $('.iptSearch').on('keydown',function(e){
+            // e.preventDefault();
             if(e.keyCode == 13){
                 dd.postMessage({type: 'keyword', val: e.target.value || ''});
             }
@@ -461,6 +542,8 @@
             cityName = []; cityCode = [];
             $('#picker-btn').text('市|区|县');
             $('#district-btn').text('商圈/片区');
+            // $('#tag-btn').text('选择监管类型');
+            // $('#tag-btn').removeClass('active');
             if (userLevel) {
                 $('#picker-btn').removeClass('active');
                 $('#district-btn').removeClass('active');
@@ -475,6 +558,9 @@
             curTaskStatus = ''
             curLegalEntityCata = ''
             curCheckType = ''
+            // curLegalEntityTag = ''
+            // curLegalEntityTag1 = ''
+            // curLegalEntityTag2 = ''
             currentAreaCode = ''
             minTagCode = ''
             maxTagCode = ''
@@ -492,6 +578,9 @@
                 businessDistrict: '', //片区
                 legalEntityCata: '',
                 checkType: '',
+                // legalEntityTag: '',
+                // legalEntityTag1: '',
+                // legalEntityTag2: '',
                 localAdm: '',
                 curMinTagCode: '',
                 curMaxTagCode: ''
@@ -500,6 +589,12 @@
         });
 
         $(".confirm_btn").on("click", function () {
+            // areaCode = cityCode.concat(distCode);
+            // if (areaCode) {
+            //     currentAreaCode = areaCode.join(',');
+            // } else {    
+            //     currentAreaCode = '';
+            // }
             curTaskStatus = taskStatus || ''
             curLegalEntityCata = legalEntityCata || ''
             curCheckType = checkType || ''
@@ -510,12 +605,19 @@
             curLargeTagData = largeTagData || []
             curSmallTagData = smallTagData || [];
             curDutyDeptCode = dutyDeptCode || '';
+            // curLegalEntityTag = legalEntityTag || ''
+            // curLegalEntityTag1 = legalEntityTag1 || ''
+            // curLegalEntityTag2 = legalEntityTag2 || ''
             var preFilterData = {
                     taskStatus: curTaskStatus,
+                    // businessDistrict: currentAreaCode, //片区
                     legalEntityCata: curLegalEntityCata,
                     checkType: curCheckType,
                     curMinTagCode: curMinTagCode,
                     curMaxTagCode: curMaxTagCode
+                    // legalEntityTag: curLegalEntityTag,
+                    // legalEntityTag1: curLegalEntityTag1,
+                    // legalEntityTag2: curLegalEntityTag2
             }
             if (cityCode.length == 1) {
                 preFilterData['localAdm'] = cityCode[0];
@@ -536,19 +638,32 @@
         });
 
         btn.onclick = function(){
+            // data = {"小明家":[], "小红家":["小红爸爸", "小红妈妈"]}
             var pickerView = new PickerView({
                 bindElem: btn,
                 data: pickerOpt,
+                // data: data,
                 title: '市|区|县',
                 leftText: '取消',
                 rightText: '确定',
                 rightFn: function( selectArr ){
+                    // var indexArry = btn.getAttribute("selectcache");
                     cityName = [];
                     cityCode = [];
                     var selAll;
                     var subSlicenoLDNameJson;
                     var firstIdx = filterDatas.SlicenoLDNameJson.findIndex(function(obj){return obj.name == selectArr[0]});
                     cityCode.push(filterDatas.SlicenoLDNameJson[firstIdx].code);
+                    // if (selectArr[1] != '全部') {
+                    //     cityName = selectArr;
+                    //     selAll = false;
+                    //     subSlicenoLDNameJson = filterDatas.SlicenoLDNameJson[firstIdx].children;
+                    //     var subIdx = subSlicenoLDNameJson.findIndex(function(val){return val.name == selectArr[1]});
+                    //     cityCode.push(subSlicenoLDNameJson[subIdx].code);
+                    // } else {
+                    //     selAll = true;
+                    //     cityName.push(selectArr[0]);
+                    // }
                     cityName = selectArr;
                     selAll = false;
                     subSlicenoLDNameJson = filterDatas.SlicenoLDNameJson[firstIdx].children;
@@ -588,12 +703,67 @@
                     } else {
                         distName.push(selectArr[0]);
                     }
+                    // distName = selectArr;
+                    // subSlicenoLDNameJson = filterDatas.DistrictJson[firstIdx].children;
+                    // var subIdx = subSlicenoLDNameJson.findIndex(function(val){return val.name == selectArr[1]});
+                    // distCode.push(subSlicenoLDNameJson[subIdx].code);
+
                     distBtn.innerText = distName.join('-');
                     distBtn.setAttribute("class", 'active');
                 }
             });
         }
+
+        // tagBtn.onclick = function(){
+        //     // data = {"小明家":[], "小红家":["小红爸爸", "小红妈妈"]}
+        //     // console.log(filterDatas.superviseTag);
+        //     var pickerView = new PickerView({
+        //         bindElem: tagBtn,
+        //         data: tagPickerOpt,
+        //         title: '监管类型',
+        //         leftText: '取消',
+        //         rightText: '确定',
+        //         getAjaxData: true,
+        //         ajaxFn: function(selectArr) {
+        //             $.each(filterDatas.superviseTag, function (index, val) {
+        //                 if (val.paramName == selectArr[0]) {
+        //                     tagPickerOpt[val.paramName] = [];
+        //                     ajaxMinTagOpt(val.paramName, val.paramCode);
+        //                     return false;
+        //                 }
+        //             })
+        //         },
+        //         rightFn: function(selectArr){
+        //             minTagName = '';
+        //             maxTagName = '';
+        //             maxTagCode = '';
+        //             minTagCode = '';
+        //             $.each(filterDatas.superviseTag, function (idx, val) {
+        //                 if (val.paramName == selectArr[0]) {
+        //                     maxTagCode = val.paramCode;
+        //                     maxTagName = val.paramName;
+        //                     return false;
+        //                 }
+        //             });
+        //             $.each(preTagMinOpt, function (idx, value) {
+        //                 if (value.tagName == selectArr[1]) {
+        //                     minTagCode = value.tagCode;
+        //                     minTagName = value.tagName;
+        //                     return false;
+        //                 }
+        //             })
+        //             if (selectArr[1]) {
+        //                 $('#tag-btn').text(minTagName);
+        //                 $('#tag-btn').addClass('active');
+        //             } else {
+        //                 $('#tag-btn').text(maxTagName);
+        //                 $('#tag-btn').addClass('active');
+        //             }
+        //         }
+        //     });
+        // }
         
+
         function drawMarekers() {
             markDatas.forEach(function (val, index) {
                 var preState = val.checkState, marker;
@@ -629,6 +799,7 @@
             $.ajax({
                 url: reverseResolutionUrl,
                 dataType: "jsonp",
+                // jsonp: "callback",
                 success: function(res) {
                     var location = res.city.value + res.dist.value + res.town.value + res.poi;
                     $(".legalEntity_name").text(e.legalEntityName)
