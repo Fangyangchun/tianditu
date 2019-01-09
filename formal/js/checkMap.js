@@ -2,8 +2,8 @@
         if (navigator.userAgent.toLowerCase().indexOf('dingtalk') > -1) {
             document.writeln('<script src="https://appx/web-view.min.js"' + '>' + '<' + '/' + 'script>');
         }
-        var userId, token, baseUrl, tagAction;
-        var initLatlng, initZoom = 10, cityName, newCenterData,  markDatas = [],
+        var userId, token, baseUrl, tagAction, dataType;
+        var initLatlng, initZoom = 10, cityNames, newCenterData,  markDatas = [],
         map, curMarker, circle, markers, mapParams, idx, filterDatas, userLevel, showDistrict, pickerOpt, distPickerOpt;
         var taskStatus, curTaskStatus, legalEntityCata, curLegalEntityCata, checkType, curCheckType, 
         legalEntityTag, legalEntityTag1, legalEntityTag2, curLegalEntityTag, curLegalEntityTag1, curLegalEntityTag2,
@@ -14,35 +14,38 @@
         var tagBtn = document.getElementById("tag-btn");
         dd.postMessage({type: 'init'});
         dd.onMessage = function(e) {
-            userId = e.userId;
-            token = e.token;
-            baseUrl = e.baseUrl;
-            tagAction = e.tagAction;
-            if (e.lon && e.lat) {
-                initLatlng = {lon: e.lon, lat: e.lat}
-            } else {
-                initLatlng = {lon: 120.14989, lat: 30.27751};  // 默认经纬度为蓝天商务中心
+            switch(e.dataType){
+                case "init":
+                    userId = e.userId;
+                    token = e.token;
+                    baseUrl = e.baseUrl;
+                    tagAction = e.tagAction;
+                    if (e.lon && e.lat) {
+                        initLatlng = {lon: e.lon, lat: e.lat}
+                    } else {
+                        initLatlng = {lon: 120.14989, lat: 30.27751};  // 默认经纬度为蓝天商务中心
+                    }
+                    cityNames = e.cityName || "杭州市";
+                    markDatas = e.markDatas;
+                    filterDatas = e.filterDatas;
+                    userLevel = e.userLevel;
+                    showDistrict = e.showDistrict;
+                    init();
+                    break;
+                case "updateMarks":
+                    markDatas = e.markDatas;
+                    reductionMap();
+                    drawMarekers();
+                    break;
+                case "showDistrict":
+                    showDistrict = e.showDistrict;
+                    if (showDistrict) {
+                        filterDatas = e.filterDatas;
+                        distBtn.style.display =  'inline-block';
+                        getDistPickerOpt()
+                    }
+                    break;
             }
-            cityName = e.cityName || "杭州市";
-            markDatas = e.markDatas;
-            filterDatas = e.filterDatas;
-            userLevel = e.userLevel;
-            showDistrict = e.showDistrict;
-            if (!e.init) {
-                if (userLevel && showDistrict) {
-                    distBtn.style.display =  'inline-block';
-                    getDistPickerOpt()
-                }
-            }
-            drawMap(e.init);
-        }
-        function drawMap(e) {
-            if (e) {
-                init();
-                return; 
-            }
-            reductionMap()
-            drawMarekers()
         }
 
         function init() {
