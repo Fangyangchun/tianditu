@@ -2,16 +2,16 @@
         if (navigator.userAgent.toLowerCase().indexOf('dingtalk') > -1) {
             document.writeln('<script src="https://appx/web-view.min.js"' + '>' + '<' + '/' + 'script>');
         }
-        var userId, token, baseUrl, tagAction, dataType;
+        var userId, token, baseUrl, tagAction, dataType, tagLineData, largeTagData = [], smallTagData = [], curLargeTagData = [], curSmallTagData = [], tagInit = true;
         var initLatlng, initZoom = 10, cityNames, newCenterData,  markDatas = [],
         map, curMarker, circle, markers, mapParams, idx, filterDatas, userLevel, showDistrict, pickerOpt, distPickerOpt;
         var taskStatus, curTaskStatus, legalEntityCata, curLegalEntityCata, checkType, curCheckType, 
         legalEntityTag, legalEntityTag1, legalEntityTag2, curLegalEntityTag, curLegalEntityTag1, curLegalEntityTag2,
         cityName = [], cityCode = [], distName = [], distCode = [], areaName = [], areaCode = [], currentAreaCode; 
-        var tagPickerOpt, preTagMinOpt, minTagCode, curMinTagCode, curMinTagName, curMaxTagCode, maxTagCode, curMaxTagName;  // 监管标签-picker.data
+        var tagPickerOpt, preTagMinOpt, minTagCode, curMinTagCode, minTagName, curMinTagName, curMaxTagCode, maxTagCode, curMaxTagName, maxTagName;  // 监管标签-picker.data
         var btn = document.getElementById("picker-btn");
         var distBtn = document.getElementById("district-btn");
-        var tagBtn = document.getElementById("tag-btn");
+        // var tagBtn = document.getElementById("tag-btn");
         dd.postMessage({type: 'init'});
         dd.onMessage = function(e) {
             switch(e.dataType){
@@ -30,6 +30,7 @@
                     filterDatas = e.filterDatas;
                     userLevel = e.userLevel;
                     showDistrict = e.showDistrict;
+                    tagLineData = e.tagLineData;
                     init();
                     break;
                 case "updateMarks":
@@ -44,6 +45,14 @@
                         distBtn.style.display =  'inline-block';
                         getDistPickerOpt()
                     }
+                    break;
+                case "queryLargeTag":
+                    largeTagData = e.largeTagData;
+                    renderLargeTag(true);
+                    break;
+                case "querySmallTag":
+                    smallTagData = e.smallTagData;
+                    renderSmallTag(true);
                     break;
             }
         }
@@ -94,7 +103,7 @@
                 getDistPickerOpt();
             }
 
-            getTagPickerOpt();
+            // getTagPickerOpt();
 
             map.on('click', function (e) {
                 if($(".detail_info").hasClass('active')) { 
@@ -103,6 +112,94 @@
             });
             
 
+        }
+
+        function renderLargeTag(flag) {
+            var largeTagHtml = '';
+            var largeData = [];
+            if (flag && tagInit) {
+                largeData = largeTagData;
+            } else {
+                largeData = curLargeTagData;
+            }
+            $.each(largeData, function (index, val) {
+                if (val.paramName.length > 6) {
+                    if (val.paramCode == curMaxTagCode && !flag) {
+                        largeTagHtml += '<dd class="active" data-paramCode="' + val.paramCode + '" data-paramCode1="' + val.paramCode1
+                        + '" data-paramCode2="' + val.paramCode2 + '" data-paramName="' + val.paramName + '">' + val.paramName.substring(0, 5) + '…' + '</dd>';
+                    } else {
+                        largeTagHtml += '<dd data-paramCode="' + val.paramCode + '" data-paramCode1="' + val.paramCode1
+                        + '" data-paramCode2="' + val.paramCode2 + '" data-paramName="' + val.paramName + '">' + val.paramName.substring(0, 5) + '…' + '</dd>';
+                    }
+                } else {
+                    if (val.paramCode == curMaxTagCode && !flag) {
+                        largeTagHtml += '<dd class="active" data-paramCode="' + val.paramCode + '" data-paramCode1="' + val.paramCode1
+                        + '" data-paramCode2="' + val.paramCode2 + '" data-paramName="' + val.paramName + '">' + val.paramName + '</dd>';
+                    } else {
+                        largeTagHtml += '<dd data-paramCode="' + val.paramCode + '" data-paramCode1="' + val.paramCode1
+                    + '" data-paramCode2="' + val.paramCode2 + '" data-paramName="' + val.paramName + '">' + val.paramName + '</dd>';
+                    }
+                }
+            });
+            $('#Large_TAG').html(largeTagHtml);
+            $('.large_tag_box').css('display', 'block');
+
+            $("#Large_TAG dd").on('click', function () {
+                $(this).siblings().removeClass('active');
+                if (!$(this).hasClass('active')) {
+                    $(this).addClass('active');
+                }
+                var data = $(this).data('paramcode');
+                maxTagCode = data;
+                maxTagName = $(this).data('paramname');
+                minTagName = '';
+                minTagCode = '';
+                $('.tagInfo').text(maxTagName);
+                dd.postMessage({type: 'smallTag', val: data});
+            });
+        }
+
+        function renderSmallTag(flag) {
+            var smallData = [];
+            if (flag && tagInit) {
+                smallData = smallTagData;
+            } else {
+                smallData = curSmallTagData
+            }
+            if (smallData.length > 0) {
+                var smallTagHtml = '';
+                $.each(smallData, function (index, val) {
+                    if (val.tagName.length > 6) {
+                        if (val.tagCode == curMinTagCode && !flag) {
+                            smallTagHtml += '<dd class="active" data-tagCode="' + val.tagCode + '" data-tagName="' + val.tagName + '">' + val.tagName.substring(0, 5) + '…' + '</dd>';
+                        } else {
+                            smallTagHtml += '<dd data-tagCode="' + val.tagCode + '" data-tagName="' + val.tagName + '">' + val.tagName.substring(0, 5) + '…' + '</dd>';
+                        }
+                    } else {
+                        if (val.tagCode == curMinTagCode && !flag) {
+                            smallTagHtml += '<dd class="active" data-tagCode="' + val.tagCode + '" data-tagName="' + val.tagName + '">' + val.tagName + '</dd>';
+                        } else {
+                            smallTagHtml += '<dd data-tagCode="' + val.tagCode + '" data-tagName="' + val.tagName + '">' + val.tagName + '</dd>';
+                        }
+                    }
+                });
+                $('#SMALL_TAG').html(smallTagHtml);
+                $('.small_tag_box').css('display', 'block');
+    
+                $("#SMALL_TAG dd").on('click', function () {
+                    $(this).siblings().removeClass('active');
+                    if (!$(this).hasClass('active')) {
+                        $(this).addClass('active');
+                    }
+                    var data = $(this).data('tagcode');
+                    minTagCode = data;
+                    minTagName = $(this).data('tagname');
+                    $('.tagInfo').text(maxTagName + ' - ' + minTagName);
+                });
+            } else {
+                $('#SMALL_TAG').html('');
+                $('.small_tag_box').css('display', 'none');
+            }
         }
 
         function getPickerOpt() {
@@ -133,48 +230,48 @@
             })
         }
 
-        function getTagPickerOpt() {
-            tagPickerOpt = {};
-            $.each(filterDatas.superviseTag, function (index, val) {
-                var idxKey = val.paramName;
-                tagPickerOpt[idxKey] = [];
-                if (index == 0) {
-                    ajaxMinTagOpt(idxKey, val.paramCode);
-                }
-            })
-        }
+        // function getTagPickerOpt() {
+        //     tagPickerOpt = {};
+        //     $.each(filterDatas.superviseTag, function (index, val) {
+        //         var idxKey = val.paramName;
+        //         tagPickerOpt[idxKey] = [];
+        //         if (index == 0) {
+        //             ajaxMinTagOpt(idxKey, val.paramCode);
+        //         }
+        //     })
+        // }
 
-        function ajaxMinTagOpt(name, code) {
-            // preTagMinOpt = [{tagName: '垃圾填埋场', tagCode: 'A01900000010000014'},
-            // {tagName: '环保部门20181126', tagCode: 'A01900000010000003'},
-            // {tagName: '垃圾填埋场20181126', tagCode: 'A01900000010000003'},
-            // {tagName: '环保部门', tagCode: 'A01900000010000003'}];
-            // $.each(preTagMinOpt, function (idx, value) {
-            //     tagPickerOpt[name].push(value.tagName);
-            //
-            // })
-            $.ajax({
-                async: false,
-                type: "POST",
-                url: encodeURI(baseUrl + tagAction),
-                data: JSON.stringify({ 'encParamsStr': encrypt(JSON.stringify({ token: token, userId: userId, tagLargeCategory: code }))}),
-                contentType: 'application/json',
-                // dataType: "jsonp",
-                success: function(res) {
-                    if (typeof res == 'string') {
-                        preTagMinOpt = JSON.parse(res).data;
-                    } else {
-                        preTagMinOpt = res.data;
-                    }
-                    $.each(preTagMinOpt, function (idx, value) {
-                        tagPickerOpt[name].push(value.tagName);
-                    })
-                },
-                error: function (err) {
-                    dd.alert({ content: err.msg });
-                }
-            });
-        }
+        // function ajaxMinTagOpt(name, code) {
+        //     // preTagMinOpt = [{tagName: '垃圾填埋场', tagCode: 'A01900000010000014'},
+        //     // {tagName: '环保部门20181126', tagCode: 'A01900000010000003'},
+        //     // {tagName: '垃圾填埋场20181126', tagCode: 'A01900000010000003'},
+        //     // {tagName: '环保部门', tagCode: 'A01900000010000003'}];
+        //     // $.each(preTagMinOpt, function (idx, value) {
+        //     //     tagPickerOpt[name].push(value.tagName);
+        //     //
+        //     // })
+        //     $.ajax({
+        //         async: false,
+        //         type: "POST",
+        //         url: encodeURI(baseUrl + tagAction),
+        //         data: JSON.stringify({ 'encParamsStr': encrypt(JSON.stringify({ token: token, userId: userId, tagLargeCategory: code }))}),
+        //         contentType: 'application/json',
+        //         // dataType: "jsonp",
+        //         success: function(res) {
+        //             if (typeof res == 'string') {
+        //                 preTagMinOpt = JSON.parse(res).data;
+        //             } else {
+        //                 preTagMinOpt = res.data;
+        //             }
+        //             $.each(preTagMinOpt, function (idx, value) {
+        //                 tagPickerOpt[name].push(value.tagName);
+        //             })
+        //         },
+        //         error: function (err) {
+        //             dd.alert({ content: err.msg });
+        //         }
+        //     });
+        // }
 
         function initFilterHtml () {
             var marketHtml = '', typeHtml = '', statusHtml = '', tagHtml = '';
@@ -188,17 +285,23 @@
                 statusHtml += '<dd data-paramCode="' + val.paramCode + '" data-paramCodeType="' + val.paramCodeType + '">' + val.paramName + '</dd>';
             });
             // $.each(filterDatas.superviseTag, function (index, val) {
-            //     tagHtml += '<dd data-paramCode="' + val.paramCode + '" data-paramCode1="' + val.paramCode1 
+            //     tagHtml += '<dd data-paramCode="' + val.paramCode + '" data-paramCode1="' + val.paramCode1
             //     + '" data-paramCode2="' + val.paramCode2 + '" data-paramCodeType="' + val.paramCodeType + '">' + val.paramName + '</dd>';
             // });
+            $.each(tagLineData, function (index, val) {
+                tagHtml += '<dd data-dutyDeptCode="' + val.dutyDeptCode + '">' + val.dutyDeptName + '</dd>';
+            });
             $('#MARKET_TYPE').html(marketHtml);
             $('#TASK_TYPE').html(typeHtml);
             $('#TASK_STATUS').html(statusHtml);
             // $('#SUPERVISE_TAG').html(tagHtml);
+            $('#SUP_TAG_LINE').html(tagHtml);
             
             $(".filter_list dd").on('click', function (ev) {
                 $(this).siblings().removeClass('active')
-                $(this).addClass('active');
+                if (!$(this).hasClass('active')) {
+                    $(this).addClass('active');
+                }
                 var type = $(ev.target)[0].dataset.paramcodetype;
                 switch(type){
                     case "MARKET_TYPE":
@@ -217,6 +320,21 @@
                     //     break;
                 }
             });
+
+            $("#SUP_TAG_LINE dd").on('click', function () {
+                var dutyDeptCode = $(this).data('dutydeptcode');
+                $(this).siblings().removeClass('active');
+                if (!$(this).hasClass('active')) {
+                    $(this).addClass('active');
+                }
+                $('.large_tag_box').css('display', 'none');
+                $('.small_tag_box').css('display', 'none');
+                tagInit = true;
+                $('.tagInfo').text($(this).text());
+                $('.tagInfo-box').css('display', 'block');
+                dd.postMessage({type: 'superTag', val: dutyDeptCode});
+            });
+
         }
 
         $('.filterBtn').on('click', function () {
@@ -289,15 +407,34 @@
                     $('#district-btn').removeClass('active');
                 }
             }
-            if (curMinTagCode) {
-                $('#tag-btn').text(curMinTagName);
-                $('#tag-btn').addClass('active');
-            } else if (curMaxTagCode) {
-                $('#tag-btn').text(curMaxTagName);
-                $('#tag-btn').addClass('active');
+            // if (curMinTagCode) {
+            //     $('#tag-btn').text(curMinTagName);
+            //     $('#tag-btn').addClass('active');
+            // } else if (curMaxTagCode) {
+            //     $('#tag-btn').text(curMaxTagName);
+            //     $('#tag-btn').addClass('active');
+            // } else {
+            //     $('#tag-btn').text('选择监管类型');
+            //     $('#tag-btn').removeClass('active');
+            // }
+            $('.tagInfo-box').css('display', 'none');
+            $('.large_tag_box').css('display', 'none');
+            $('.small_tag_box').css('display', 'none');
+            tagInit = false;
+            if (curMaxTagCode) {
+                renderLargeTag(false);
+                renderSmallTag(false);
+                if (curMinTagCode) {
+                    $('.tagInfo').text(curMaxTagName + ' - ' + curMinTagName);
+                } else {
+                    $('.tagInfo').text(curMaxTagName);
+                }
+                $('.tagInfo-box').css('display', 'block');
             } else {
-                $('#tag-btn').text('选择监管类型');
-                $('#tag-btn').removeClass('active');
+                $('#SUP_TAG_LINE dd').removeClass('active');
+                $('.tagInfo').text('');
+                $('#Large_TAG').html('');
+                $('#SMALL_TAG').html('');
             }
             if (curLegalEntityCata) {
                 $('#MARKET_TYPE dd').removeClass('active');
@@ -397,8 +534,8 @@
             cityName = []; cityCode = [];
             $('#picker-btn').text('市|区|县');
             $('#district-btn').text('商圈/片区');
-            $('#tag-btn').text('选择监管类型');
-            $('#tag-btn').removeClass('active');
+            // $('#tag-btn').text('选择监管类型');
+            // $('#tag-btn').removeClass('active');
             if (userLevel) {
                 $('#picker-btn').removeClass('active');
                 $('#district-btn').removeClass('active');
@@ -419,10 +556,14 @@
             currentAreaCode = ''
             minTagCode = ''
             maxTagCode = ''
+            minTagName = ''
+            maxTagName = ''
             curMinTagName = ''
             curMaxTagName = ''
             curMinTagCode = ''
             curMaxTagCode = ''
+            curLargeTagData = [];
+            curSmallTagData = [];
             var preFilterData = {
                 taskStatus: '',
                 businessDistrict: '', //片区
@@ -450,6 +591,10 @@
             curCheckType = checkType || ''
             curMinTagCode = minTagCode || ''
             curMaxTagCode = maxTagCode || ''
+            curMinTagName = minTagName || ''
+            curMaxTagName = maxTagName || ''
+            curLargeTagData = largeTagData || []
+            curSmallTagData = smallTagData || [];
             // curLegalEntityTag = legalEntityTag || ''
             // curLegalEntityTag1 = legalEntityTag1 || ''
             // curLegalEntityTag2 = legalEntityTag2 || ''
@@ -559,54 +704,54 @@
             });
         }
 
-        tagBtn.onclick = function(){
-            // data = {"小明家":[], "小红家":["小红爸爸", "小红妈妈"]}
-            // console.log(filterDatas.superviseTag);
-            var pickerView = new PickerView({
-                bindElem: tagBtn,
-                data: tagPickerOpt,
-                title: '监管类型',
-                leftText: '取消',
-                rightText: '确定',
-                getAjaxData: true,
-                ajaxFn: function(selectArr) {
-                    $.each(filterDatas.superviseTag, function (index, val) {
-                        if (val.paramName == selectArr[0]) {
-                            tagPickerOpt[val.paramName] = [];
-                            ajaxMinTagOpt(val.paramName, val.paramCode);
-                            return false;
-                        }
-                    })
-                },
-                rightFn: function(selectArr){
-                    curMinTagName = '';
-                    curMaxTagName = '';
-                    maxTagCode = '';
-                    minTagCode = '';
-                    $.each(filterDatas.superviseTag, function (idx, val) {
-                        if (val.paramName == selectArr[0]) {
-                            maxTagCode = val.paramCode;
-                            curMaxTagName = val.paramName;
-                            return false;
-                        }
-                    });
-                    $.each(preTagMinOpt, function (idx, value) {
-                        if (value.tagName == selectArr[1]) {
-                            minTagCode = value.tagCode;
-                            curMinTagName = value.tagName;
-                            return false;
-                        }
-                    })
-                    if (selectArr[1]) {
-                        $('#tag-btn').text(curMinTagName);
-                        $('#tag-btn').addClass('active');
-                    } else {
-                        $('#tag-btn').text(curMaxTagName);
-                        $('#tag-btn').addClass('active');
-                    }
-                }
-            });
-        }
+        // tagBtn.onclick = function(){
+        //     // data = {"小明家":[], "小红家":["小红爸爸", "小红妈妈"]}
+        //     // console.log(filterDatas.superviseTag);
+        //     var pickerView = new PickerView({
+        //         bindElem: tagBtn,
+        //         data: tagPickerOpt,
+        //         title: '监管类型',
+        //         leftText: '取消',
+        //         rightText: '确定',
+        //         getAjaxData: true,
+        //         ajaxFn: function(selectArr) {
+        //             $.each(filterDatas.superviseTag, function (index, val) {
+        //                 if (val.paramName == selectArr[0]) {
+        //                     tagPickerOpt[val.paramName] = [];
+        //                     ajaxMinTagOpt(val.paramName, val.paramCode);
+        //                     return false;
+        //                 }
+        //             })
+        //         },
+        //         rightFn: function(selectArr){
+        //             minTagName = '';
+        //             maxTagName = '';
+        //             maxTagCode = '';
+        //             minTagCode = '';
+        //             $.each(filterDatas.superviseTag, function (idx, val) {
+        //                 if (val.paramName == selectArr[0]) {
+        //                     maxTagCode = val.paramCode;
+        //                     maxTagName = val.paramName;
+        //                     return false;
+        //                 }
+        //             });
+        //             $.each(preTagMinOpt, function (idx, value) {
+        //                 if (value.tagName == selectArr[1]) {
+        //                     minTagCode = value.tagCode;
+        //                     minTagName = value.tagName;
+        //                     return false;
+        //                 }
+        //             })
+        //             if (selectArr[1]) {
+        //                 $('#tag-btn').text(minTagName);
+        //                 $('#tag-btn').addClass('active');
+        //             } else {
+        //                 $('#tag-btn').text(maxTagName);
+        //                 $('#tag-btn').addClass('active');
+        //             }
+        //         }
+        //     });
+        // }
         
 
         function drawMarekers() {
