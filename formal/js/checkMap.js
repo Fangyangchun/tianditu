@@ -124,22 +124,29 @@
                 largeData = curLargeTagData;
             }
             $.each(largeData, function (index, val) {
-                if (val.paramName.length > 6) {
-                    if (val.paramCode == curMaxTagCode && !flag) {
-                        largeTagHtml += '<dd class="active" data-paramCode="' + val.paramCode + '" data-paramCode1="' + val.paramCode1
-                        + '" data-paramCode2="' + val.paramCode2 + '" data-paramName="' + val.paramName + '">' + val.paramName.substring(0, 5) + '…' + '</dd>';
-                    } else {
-                        largeTagHtml += '<dd data-paramCode="' + val.paramCode + '" data-paramCode1="' + val.paramCode1
-                        + '" data-paramCode2="' + val.paramCode2 + '" data-paramName="' + val.paramName + '">' + val.paramName.substring(0, 5) + '…' + '</dd>';
-                    }
-                } else {
-                    if (val.paramCode == curMaxTagCode && !flag) {
-                        largeTagHtml += '<dd class="active" data-paramCode="' + val.paramCode + '" data-paramCode1="' + val.paramCode1
-                        + '" data-paramCode2="' + val.paramCode2 + '" data-paramName="' + val.paramName + '">' + val.paramName + '</dd>';
-                    } else {
-                        largeTagHtml += '<dd data-paramCode="' + val.paramCode + '" data-paramCode1="' + val.paramCode1
+                // if (val.paramName.length > 6) {
+                //     if (val.paramCode == curMaxTagCode && !flag) {
+                //         largeTagHtml += '<dd class="active" data-paramCode="' + val.paramCode + '" data-paramCode1="' + val.paramCode1
+                //         + '" data-paramCode2="' + val.paramCode2 + '" data-paramName="' + val.paramName + '">' + val.paramName.substring(0, 5) + '…' + '</dd>';
+                //     } else {
+                //         largeTagHtml += '<dd data-paramCode="' + val.paramCode + '" data-paramCode1="' + val.paramCode1
+                //         + '" data-paramCode2="' + val.paramCode2 + '" data-paramName="' + val.paramName + '">' + val.paramName.substring(0, 5) + '…' + '</dd>';
+                //     }
+                // } else {
+                //     if (val.paramCode == curMaxTagCode && !flag) {
+                //         largeTagHtml += '<dd class="active" data-paramCode="' + val.paramCode + '" data-paramCode1="' + val.paramCode1
+                //         + '" data-paramCode2="' + val.paramCode2 + '" data-paramName="' + val.paramName + '">' + val.paramName + '</dd>';
+                //     } else {
+                //         largeTagHtml += '<dd data-paramCode="' + val.paramCode + '" data-paramCode1="' + val.paramCode1
+                //     + '" data-paramCode2="' + val.paramCode2 + '" data-paramName="' + val.paramName + '">' + val.paramName + '</dd>';
+                //     }
+                // }
+                if (val.paramCode == curMaxTagCode && !flag) {
+                    largeTagHtml += '<dd class="active" data-paramCode="' + val.paramCode + '" data-paramCode1="' + val.paramCode1
                     + '" data-paramCode2="' + val.paramCode2 + '" data-paramName="' + val.paramName + '">' + val.paramName + '</dd>';
-                    }
+                } else {
+                    largeTagHtml += '<dd data-paramCode="' + val.paramCode + '" data-paramCode1="' + val.paramCode1
+                + '" data-paramCode2="' + val.paramCode2 + '" data-paramName="' + val.paramName + '">' + val.paramName + '</dd>';
                 }
             });
             $('#Large_TAG').html(largeTagHtml);
@@ -170,18 +177,23 @@
             if (smallData.length > 0) {
                 var smallTagHtml = '';
                 $.each(smallData, function (index, val) {
-                    if (val.tagName.length > 6) {
-                        if (val.tagCode == curMinTagCode && !flag) {
-                            smallTagHtml += '<dd class="active" data-tagCode="' + val.tagCode + '" data-tagName="' + val.tagName + '">' + val.tagName.substring(0, 5) + '…' + '</dd>';
-                        } else {
-                            smallTagHtml += '<dd data-tagCode="' + val.tagCode + '" data-tagName="' + val.tagName + '">' + val.tagName.substring(0, 5) + '…' + '</dd>';
-                        }
+                    // if (val.tagName.length > 6) {
+                    //     if (val.tagCode == curMinTagCode && !flag) {
+                    //         smallTagHtml += '<dd class="active" data-tagCode="' + val.tagCode + '" data-tagName="' + val.tagName + '">' + val.tagName.substring(0, 5) + '…' + '</dd>';
+                    //     } else {
+                    //         smallTagHtml += '<dd data-tagCode="' + val.tagCode + '" data-tagName="' + val.tagName + '">' + val.tagName.substring(0, 5) + '…' + '</dd>';
+                    //     }
+                    // } else {
+                    //     if (val.tagCode == curMinTagCode && !flag) {
+                    //         smallTagHtml += '<dd class="active" data-tagCode="' + val.tagCode + '" data-tagName="' + val.tagName + '">' + val.tagName + '</dd>';
+                    //     } else {
+                    //         smallTagHtml += '<dd data-tagCode="' + val.tagCode + '" data-tagName="' + val.tagName + '">' + val.tagName + '</dd>';
+                    //     }
+                    // }
+                    if (val.tagCode == curMinTagCode && !flag) {
+                        smallTagHtml += '<dd class="active" data-tagCode="' + val.tagCode + '" data-tagName="' + val.tagName + '">' + val.tagName + '</dd>';
                     } else {
-                        if (val.tagCode == curMinTagCode && !flag) {
-                            smallTagHtml += '<dd class="active" data-tagCode="' + val.tagCode + '" data-tagName="' + val.tagName + '">' + val.tagName + '</dd>';
-                        } else {
-                            smallTagHtml += '<dd data-tagCode="' + val.tagCode + '" data-tagName="' + val.tagName + '">' + val.tagName + '</dd>';
-                        }
+                        smallTagHtml += '<dd data-tagCode="' + val.tagCode + '" data-tagName="' + val.tagName + '">' + val.tagName + '</dd>';
                     }
                 });
                 $('#SMALL_TAG').html(smallTagHtml);
@@ -195,7 +207,8 @@
                     var data = $(this).data('tagcode');
                     minTagCode = data;
                     minTagName = $(this).data('tagname');
-                    $('.tagInfo').text(maxTagName + ' - ' + minTagName);
+                    // $('.tagInfo').text(maxTagName + ' - ' + minTagName);
+                    $('.tagInfo').text(minTagName);
                 });
             } else {
                 $('#SMALL_TAG').html('');
@@ -437,7 +450,8 @@
                 renderLargeTag(false);
                 renderSmallTag(false);
                 if (curMinTagCode) {
-                    $('.tagInfo').text(curMaxTagName + ' - ' + curMinTagName);
+                    // $('.tagInfo').text(curMaxTagName + ' - ' + curMinTagName);
+                    $('.tagInfo').text(curMinTagName);
                 } else {
                     $('.tagInfo').text(curMaxTagName);
                 }
