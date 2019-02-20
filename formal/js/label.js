@@ -1,22 +1,34 @@
 if (navigator.userAgent.toLowerCase().indexOf('dingtalk') > -1) {
     document.writeln('<script src="https://appx/web-view.min.js"' + '>' + '<' + '/' + 'script>');
   }
-  var initLatlng, initZoom = 17, cityName, newCenterData = {};
+  var map, marker, initLatlng, initZoom = 17, cityName, newCenterData = {}, resetLatlng;
   
-  dd.postMessage({});
+  dd.postMessage({type: 'init'});
   dd.onMessage = function(e) {
-    if (!e.init) {
-    dd.postMessage({});
-    return;
+    switch(e.dataType){
+        case "render":
+            if (e.lon && e.lat) {
+                initLatlng = {lon: e.lon, lat: e.lat}
+            } else {
+                initLatlng = {lon: 120.14989, lat: 30.27751};  // 默认经纬度为蓝天商务中心
+            }
+            cityName = e.cityName || "杭州市";
+            locationInfo(initLatlng)
+            init()
+            break;
+        case "location":
+            map.setView([Number(e.localLat), Number(e.localLon)], initZoom);
+            marker.unbindTooltip().setLatLng({lon: e.localLon, lat: e.localLat});
+            locationInfo({lon: e.localLon, lat: e.localLat})
+            break;
+        case "init":
+            dd.postMessage({type: 'init'});
+            break;
     }
-    if (e.lon && e.lat) {
-        initLatlng = {lon: e.lon, lat: e.lat}
-    } else {
-        initLatlng = {lon: 120.14989, lat: 30.27751};  // 默认经纬度为蓝天商务中心
-    }
-    cityName = e.cityName || "杭州市";
+  }
+  function locationInfo (latlng) {
     $.ajax({
-        url: encodeURI("https://dh.ditu.zj.cn:9443/inverse/getInverseGeocoding.jsonp?&detail=1&zoom=11&latlon=" + initLatlng.lon + "," + initLatlng.lat + "&lat=&lon=&customer=2"),
+        url: encodeURI("https://dh.ditu.zj.cn:9443/inverse/getInverseGeocoding.jsonp?&detail=1&zoom=11&latlon=" + latlng.lon + "," + latlng.lat + "&lat=&lon=&customer=2"),
         dataType: "jsonp",
         // jsonp: "callback",
         success: function(res) {
@@ -30,10 +42,9 @@ if (navigator.userAgent.toLowerCase().indexOf('dingtalk') > -1) {
             });
         }
     });
-    init()
   }
   function init() {
-      var map = L.map('map',{crs:L.CRS.CustomEPSG4326,center: initLatlng, minZoom: 5, zoom: initZoom, inertiaDeceleration:15000, zoomControl: false});
+      map = L.map('map',{crs:L.CRS.CustomEPSG4326,center: initLatlng, minZoom: 5, zoom: initZoom, inertiaDeceleration:15000, zoomControl: false});
       var tileAddress = 'https://ditu.zjzwfw.gov.cn/mapserver/vmap/zjvmap/getMAP?x={x}&y={y}&l={z}&styleId=tdt_biaozhunyangshi_2017';
 
       var layer = new L.GXYZ(tileAddress, {tileSize:512, minZoom: 5});
@@ -52,7 +63,7 @@ if (navigator.userAgent.toLowerCase().indexOf('dingtalk') > -1) {
           iconSize: [21, 30],
           iconAnchor:   [10, 20],
       }); 
-      var marker = L.marker( 
+      marker = L.marker( 
           [map.getCenter().lat, map.getCenter().lng], 
           { 
               draggable: false,
@@ -64,7 +75,7 @@ if (navigator.userAgent.toLowerCase().indexOf('dingtalk') > -1) {
       var circle = L.circle([map.getCenter().lat, map.getCenter().lng], {radius: 30});
       map.addLayer(circle);
 
-      dd.postMessage({render: true}); // 结束loading
+      dd.postMessage({type: 'render'}); // 结束loading
 
       map.on('click', function(e) {
           var reverseResolutionUrl = encodeURI("https://dh.ditu.zj.cn:9443/inverse/getInverseGeocoding.jsonp?&detail=1&zoom=11&latlon=" + e.latlng.lng + "," + e.latlng.lat + "&lat=&lon=&customer=2");
@@ -126,12 +137,11 @@ if (navigator.userAgent.toLowerCase().indexOf('dingtalk') > -1) {
               
           }
       });
-      $('.resetBtn').on('click',function(e){
-          map.setView([Number(initLatlng.lat), Number(initLatlng.lon)], initZoom);
-          marker.unbindTooltip().setLatLng(initLatlng);
+      $('.resetBtn').on('click', function(e){
+        dd.postMessage({type: 'location'});
       });
       $(".modifyBtn").on('click', function () {
-          dd.postMessage(newCenterData);
+          dd.postMessage($.extend({type: 'tagging'}, newCenterData));
       })
 
   }
