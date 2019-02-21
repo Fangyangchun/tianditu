@@ -17,15 +17,14 @@
         dd.onMessage = function(e) {
             switch(e.dataType){
                 case "init":
+                    dd.postMessage({type: 'init'});
+                    break;
+                case "render":
                     userId = e.userId;
                     token = e.token;
                     baseUrl = e.baseUrl;
                     tagAction = e.tagAction;
-                    if (e.lon && e.lat) {
-                        initLatlng = {lon: e.lon, lat: e.lat}
-                    } else {
-                        initLatlng = {lon: 120.14989, lat: 30.27751};  // 默认经纬度为蓝天商务中心
-                    }
+                    initLatlng = {lon: e.lon, lat: e.lat}
                     cityNames = e.cityName || "杭州市";
                     markDatas = e.markDatas;
                     filterDatas = e.filterDatas;
