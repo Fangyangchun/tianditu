@@ -4,7 +4,7 @@
         }
         var userId, token, baseUrl, tagAction, dataType, tagLineData, largeTagData = [], smallTagData = [], curLargeTagData = [], curSmallTagData = [],
         dutyDeptCode, curDutyDeptCode;
-        var initLatlng, initZoom = 10, cityNames, newCenterData,  markDatas = [],
+        var initLatlng, initZoom = 16, cityNames, newCenterData,  markDatas = [],
         map, curMarker, circle, markers, mapParams, idx, filterDatas, userLevel, showDistrict, pickerOpt, distPickerOpt;
         var taskStatus, curTaskStatus, legalEntityCata, curLegalEntityCata, checkType, curCheckType, 
         legalEntityTag, legalEntityTag1, legalEntityTag2, curLegalEntityTag, curLegalEntityTag1, curLegalEntityTag2,
