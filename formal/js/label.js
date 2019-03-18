@@ -34,7 +34,8 @@ if (navigator.userAgent.toLowerCase().indexOf('dingtalk') > -1) {
         success: function(res) {
             newCenterData.latitude = parseFloat(res.latlon.split(',')[1])
             newCenterData.longitude = parseFloat(res.latlon.split(',')[0])
-            newCenterData.location = res.city.value + res.dist.value + res.town.value + res.poi;
+            // newCenterData.location = res.city.value + res.dist.value + res.town.value + res.poi;
+            newCenterData.location = res.dist.value + res.town.value + res.poi;
         },
         error: function (err) {
             dd.alert({
@@ -86,7 +87,8 @@ if (navigator.userAgent.toLowerCase().indexOf('dingtalk') > -1) {
               success: function(res) {
                   newCenterData.latitude = parseFloat(res.latlon.split(',')[1])
                   newCenterData.longitude = parseFloat(res.latlon.split(',')[0])
-                  newCenterData.location = res.city.value + res.dist.value + res.town.value + res.poi;
+                //   newCenterData.location = res.city.value + res.dist.value + res.town.value + res.poi;
+                newCenterData.location = res.dist.value + res.town.value + res.poi;
                   marker.setLatLng(e.latlng);
                   marker.unbindTooltip().bindTooltip(res.city.value + res.dist.value + res.town.value + res.poi, {offset: [0, 10], direction : "bottom"}).openTooltip();
               },
@@ -117,7 +119,8 @@ if (navigator.userAgent.toLowerCase().indexOf('dingtalk') > -1) {
                           } else {
                               newCenterData.latitude = parseFloat(res.strlatlon.split(',')[1]);
                               newCenterData.longitude = parseFloat(res.strlatlon.split(',')[0]);
-                              newCenterData.location = res.city + e.target.value;
+                            //   newCenterData.location = res.city + e.target.value;
+                            newCenterData.location = e.target.value;
                               var newCenterLatlon = {lon: newCenterData.longitude, lat: newCenterData.latitude}
                               marker.setLatLng(newCenterLatlon);
                               marker.unbindTooltip().bindTooltip(e.target.value, {offset: [0, 10], direction : "bottom"}).openTooltip();
