@@ -514,3 +514,31 @@
 .title {
     margin: 8px 0;
 }
+
+.search-box {
+    width: calc(100% - 100px);
+    top: 10px;
+    left: 10px;
+    position: relative;
+}
+
+.iptSearch {
+    width: 100%;
+    top: 0;
+    position: relative;
+    padding-left: 10px;
+    padding-right: 40px;
+    background: #ffffff;
+    left: 0;
+    box-sizing: border-box;
+}
+
+.search-box .search-btn {
+    width: 40px;
+    height: 36px;
+    background: url(../img/search.png) no-repeat center;
+    z-index: 1000000;
+    position: absolute;
+    top: 0;
+    right: 0;
+}
