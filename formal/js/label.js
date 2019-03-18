@@ -102,7 +102,8 @@ if (navigator.userAgent.toLowerCase().indexOf('dingtalk') > -1) {
           // e.preventDefault();
           if(e.keyCode == 13){
               if(e.target.value) {
-                  var keyWord = cityName + e.target.value;
+                //   var keyWord = cityName + e.target.value;
+                  var keyWord = e.target.value;
                   var resolutionUrl = encodeURI("https://dh.ditu.zj.cn:9446/geocoding/getLatLonByAddress.jsonp?&city=" + cityName + "&keyword=" + keyWord + "&width=500&height=430&pn=1&customer=2&encode=UTF-8");
                   $.ajax({
                       url: resolutionUrl,
