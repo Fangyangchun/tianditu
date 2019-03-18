@@ -531,7 +531,11 @@
                 $('.check_title').fadeOut();
                 markers.clearLayers();
                 map.setView([Number(initLatlng.lat), Number(initLatlng.lon)], initZoom);
-                circle = L.circle([map.getCenter().lat, map.getCenter().lng], {radius: 30});
+                if (circle) {
+                    circle.setLatLng([Number(initLatlng.lat), Number(initLatlng.lon)]);
+                } else {
+                    circle = L.circle([map.getCenter().lat, map.getCenter().lng], {radius: 30});
+                }
                 map.addLayer(circle);
                 return
             }
