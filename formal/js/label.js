@@ -100,47 +100,47 @@ if (navigator.userAgent.toLowerCase().indexOf('dingtalk') > -1) {
           });
       });
 
-    //   $('.iptSearch').on('keydown',function(e){
-    //       // e.preventDefault();
-    //       if(e.keyCode == 13){
-    //           if(e.target.value) {
-    //             //   var keyWord = cityName + e.target.value;
-    //               var keyWord = e.target.value;
-    //               var resolutionUrl = encodeURI("https://dh.ditu.zj.cn:9446/geocoding/getLatLonByAddress.jsonp?&city=" + cityName + "&keyword=" + keyWord + "&width=500&height=430&pn=1&customer=2&encode=UTF-8");
-    //               $.ajax({
-    //                   url: resolutionUrl,
-    //                   dataType: "jsonp",
-    //                   // jsonp: "callback",
-    //                   success: function(res) {
-    //                       if (res.strlatlon == "0.0,0.0") {
-    //                           dd.alert({
-    //                               content: "未查询到相关信息"
-    //                           });
-    //                       } else {
-    //                           newCenterData.latitude = parseFloat(res.strlatlon.split(',')[1]);
-    //                           newCenterData.longitude = parseFloat(res.strlatlon.split(',')[0]);
-    //                         //   newCenterData.location = res.city + e.target.value;
-    //                         newCenterData.location = e.target.value;
-    //                           var newCenterLatlon = {lon: newCenterData.longitude, lat: newCenterData.latitude}
-    //                           marker.setLatLng(newCenterLatlon);
-    //                           marker.unbindTooltip().bindTooltip(e.target.value, {offset: [0, 10], direction : "bottom"}).openTooltip();
-    //                           map.panTo(newCenterLatlon)
-    //                       }
-    //                   },
-    //                   error: function (err) {
-    //                       dd.alert({
-    //                           content: "地址解析出错"
-    //                       });
-    //                   }
-    //               });
-    //           } else {
-    //               dd.alert({
-    //                   content: "请输入查询关键字"
-    //               });
-    //           }
+      $('.iptSearch').on('keydown',function(e){
+          // e.preventDefault();
+          if(e.keyCode == 13){
+              if(e.target.value) {
+                //   var keyWord = cityName + e.target.value;
+                  var keyWord = e.target.value;
+                  var resolutionUrl = encodeURI("https://dh.ditu.zj.cn:9446/geocoding/getLatLonByAddress.jsonp?&city=" + cityName + "&keyword=" + keyWord + "&width=500&height=430&pn=1&customer=2&encode=UTF-8");
+                  $.ajax({
+                      url: resolutionUrl,
+                      dataType: "jsonp",
+                      // jsonp: "callback",
+                      success: function(res) {
+                          if (res.strlatlon == "0.0,0.0") {
+                              dd.alert({
+                                  content: "未查询到相关信息"
+                              });
+                          } else {
+                              newCenterData.latitude = parseFloat(res.strlatlon.split(',')[1]);
+                              newCenterData.longitude = parseFloat(res.strlatlon.split(',')[0]);
+                            //   newCenterData.location = res.city + e.target.value;
+                            newCenterData.location = e.target.value;
+                              var newCenterLatlon = {lon: newCenterData.longitude, lat: newCenterData.latitude}
+                              marker.setLatLng(newCenterLatlon);
+                              marker.unbindTooltip().bindTooltip(e.target.value, {offset: [0, 10], direction : "bottom"}).openTooltip();
+                              map.panTo(newCenterLatlon)
+                          }
+                      },
+                      error: function (err) {
+                          dd.alert({
+                              content: "地址解析出错"
+                          });
+                      }
+                  });
+              } else {
+                  dd.alert({
+                      content: "请输入查询关键字"
+                  });
+              }
               
-    //       }
-    //   });
+          }
+      });
     $('.search-btn').on('click',function(e){
         var keyWord = $('.iptSearch').val();
         if(keyWord) {

@@ -507,15 +507,14 @@
         });
 
 
-        // $('.iptSearch').on('keydown',function(e){
-        //     // e.preventDefault();
-        //     if(e.keyCode == 13){
-        //         dd.postMessage({type: 'keyword', val: e.target.value || ''});
-        //     }
-        // });
+        $('.iptSearch').on('keydown',function(e){
+            // e.preventDefault();
+            if(e.keyCode == 13){
+                dd.postMessage({type: 'keyword', val: e.target.value || ''});
+            }
+        });
         $('.search-btn').on('click',function(e){
             var keyword = $('.iptSearch').val() || '';
-            console.log(keyword)
             dd.postMessage({type: 'keyword', val: keyword});
         });
 
