@@ -54,6 +54,19 @@
                     smallTagData = e.smallTagData;
                     renderSmallTag(true);
                     break;
+                case "location":
+                    initLatlng.lat = e.lat;
+                    initLatlng.lon = e.lon;
+                    $('.check_title').fadeOut();
+                    markers.clearLayers();
+                    map.setView([Number(initLatlng.lat), Number(initLatlng.lon)], initZoom);
+                    if (circle) {
+                        circle.setLatLng([Number(initLatlng.lat), Number(initLatlng.lon)]);
+                    } else {
+                        circle = L.circle([map.getCenter().lat, map.getCenter().lng], {radius: 30});
+                    }
+                    map.addLayer(circle);
+                    break;
             }
         }
 
@@ -528,16 +541,8 @@
                 return
             }
             if (filter == "reset") {
-                $('.check_title').fadeOut();
-                markers.clearLayers();
-                map.setView([Number(initLatlng.lat), Number(initLatlng.lon)], initZoom);
-                if (circle) {
-                    circle.setLatLng([Number(initLatlng.lat), Number(initLatlng.lon)]);
-                } else {
-                    circle = L.circle([map.getCenter().lat, map.getCenter().lng], {radius: 30});
-                }
-                map.addLayer(circle);
-                return
+                dd.postMessage({type: 'location'});
+                return;
             }
         });
         $(".call_tel").on("click", function () {
