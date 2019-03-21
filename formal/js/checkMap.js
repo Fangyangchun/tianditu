@@ -63,7 +63,8 @@
                     if (circle) {
                         circle.setLatLng([Number(initLatlng.lat), Number(initLatlng.lon)]);
                     } else {
-                        circle = L.circle([map.getCenter().lat, map.getCenter().lng], {radius: 30});
+                        // circle = L.circle([map.getCenter().lat, map.getCenter().lng], {radius: 30});
+                        circle = L.circle([Number(initLatlng.lat), Number(initLatlng.lon)], {radius: 30});
                         map.addLayer(circle);
                     }
                     curMarker.unbindTooltip().setLatLng([Number(initLatlng.lat), Number(initLatlng.lon)]);

@@ -21,7 +21,8 @@ if (navigator.userAgent.toLowerCase().indexOf('dingtalk') > -1) {
             if (circle) {
                 circle.setLatLng([Number(e.localLat), Number(e.localLon)]);
             } else {
-                circle = L.circle([map.getCenter().lat, map.getCenter().lng], {radius: 30});
+                // circle = L.circle([map.getCenter().lat, map.getCenter().lng], {radius: 30});
+                circle = L.circle([Number(e.localLat), Number(e.localLon)], {radius: 30});
                 map.addLayer(circle);
             }
             marker.unbindTooltip().setLatLng({lon: e.localLon, lat: e.localLat});
