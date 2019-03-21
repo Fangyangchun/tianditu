@@ -64,12 +64,27 @@
                         circle.setLatLng([Number(initLatlng.lat), Number(initLatlng.lon)]);
                     } else {
                         circle = L.circle([map.getCenter().lat, map.getCenter().lng], {radius: 30});
+                        map.addLayer(circle);
                     }
-                    map.addLayer(circle);
+                    curMarker.unbindTooltip().setLatLng([Number(initLatlng.lat), Number(initLatlng.lon)]);
+                    locationInfo({lon: e.lon, lat: e.lat})
                     break;
             }
         }
-
+        function locationInfo (latlng) {
+            $.ajax({
+                url: encodeURI("https://dh.ditu.zj.cn:9443/inverse/getInverseGeocoding.jsonp?&detail=1&zoom=11&latlon=" + latlng.lon + "," + latlng.lat + "&lat=&lon=&customer=2"),
+                dataType: "jsonp",
+                success: function(res) {
+                    curMarker.bindTooltip(res.city.value + res.dist.value + res.town.value + res.poi, {offset: [0, 10], direction : "bottom"}).openTooltip();
+                },
+                error: function (err) {
+                    dd.alert({
+                        content: "地址解析出错"
+                    });
+                }
+            });
+          }
         function init() {
             map = L.map('map',{crs:L.CRS.CustomEPSG4326,center: initLatlng, minZoom: 5, zoom: initZoom, inertiaDeceleration:15000, zoomControl: false});
             var tileAddress = 'https://ditu.zjzwfw.gov.cn/mapserver/vmap/zjvmap/getMAP?x={x}&y={y}&l={z}&styleId=tdt_biaozhunyangshi_2017';
@@ -94,7 +109,7 @@
                 iconSize: [21, 30],
                 iconAnchor:   [10, 20],
             }); 
-            var curMarker = L.marker( 
+            curMarker = L.marker( 
                 [map.getCenter().lat, map.getCenter().lng], 
                 { 
                     draggable: false,

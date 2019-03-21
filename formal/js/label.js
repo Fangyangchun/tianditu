@@ -1,7 +1,7 @@
 if (navigator.userAgent.toLowerCase().indexOf('dingtalk') > -1) {
     document.writeln('<script src="https://appx/web-view.min.js"' + '>' + '<' + '/' + 'script>');
   }
-  var map, marker, initLatlng, initZoom = 17, cityName, newCenterData = {}, resetLatlng;
+  var map, marker, initLatlng, initZoom = 17, cityName, newCenterData = {}, resetLatlng, circle;
   
   dd.postMessage({type: 'init'});
   dd.onMessage = function(e) {
@@ -18,15 +18,21 @@ if (navigator.userAgent.toLowerCase().indexOf('dingtalk') > -1) {
             break;
         case "location":
             map.setView([Number(e.localLat), Number(e.localLon)], initZoom);
+            if (circle) {
+                circle.setLatLng([Number(e.localLat), Number(e.localLon)]);
+            } else {
+                circle = L.circle([map.getCenter().lat, map.getCenter().lng], {radius: 30});
+                map.addLayer(circle);
+            }
             marker.unbindTooltip().setLatLng({lon: e.localLon, lat: e.localLat});
-            locationInfo({lon: e.localLon, lat: e.localLat})
+            locationInfo({lon: e.localLon, lat: e.localLat}, 'location')
             break;
         case "init":
             dd.postMessage({type: 'init'});
             break;
     }
   }
-  function locationInfo (latlng) {
+  function locationInfo (latlng, type) {
     $.ajax({
         url: encodeURI("https://dh.ditu.zj.cn:9443/inverse/getInverseGeocoding.jsonp?&detail=1&zoom=11&latlon=" + latlng.lon + "," + latlng.lat + "&lat=&lon=&customer=2"),
         dataType: "jsonp",
@@ -36,6 +42,9 @@ if (navigator.userAgent.toLowerCase().indexOf('dingtalk') > -1) {
             newCenterData.longitude = parseFloat(res.latlon.split(',')[0])
             // newCenterData.location = res.city.value + res.dist.value + res.town.value + res.poi;
             newCenterData.location = res.dist.value + res.town.value + res.poi;
+            if (type && type == 'location') {
+                marker.bindTooltip(res.city.value + res.dist.value + res.town.value + res.poi, {offset: [0, 10], direction : "bottom"}).openTooltip();
+            }
         },
         error: function (err) {
             dd.alert({
@@ -77,7 +86,7 @@ if (navigator.userAgent.toLowerCase().indexOf('dingtalk') > -1) {
           }
       );
       map.addLayer(marker);
-      var circle = L.circle([map.getCenter().lat, map.getCenter().lng], {radius: 30});
+      circle = L.circle([map.getCenter().lat, map.getCenter().lng], {radius: 30});
       map.addLayer(circle);
 
       dd.postMessage({type: 'render'}); // 结束loading
