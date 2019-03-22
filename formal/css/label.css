@@ -39,7 +39,7 @@
     height: 36px;
     background: url(../img/search.png) no-repeat center;
     margin-right: 10px;
-    z-index: 1000000;
+    z-index: 100000;
     position: absolute;
     top: 0;
     right: 0;
