@@ -42,7 +42,7 @@
                     showDistrict = e.showDistrict;
                     if (showDistrict) {
                         filterDatas = e.filterDatas;
-                        distBtn.style.display =  'inline-block';
+                        distBtn.style.display =  '-webkit-box';
                         getDistPickerOpt()
                     }
                     break;
@@ -64,7 +64,11 @@
                         circle.setLatLng([Number(initLatlng.lat), Number(initLatlng.lon)]);
                     } else {
                         // circle = L.circle([map.getCenter().lat, map.getCenter().lng], {radius: 30});
-                        circle = L.circle([Number(initLatlng.lat), Number(initLatlng.lon)], {radius: 30});
+                        circle = L.circle([Number(initLatlng.lat), Number(initLatlng.lon)], 60, {
+                            color: 'rgba(255, 255, 255, 0)',
+                            fillColor: '#3296FA',
+                            // fillOpacity: 0.5
+                        });
                         map.addLayer(circle);
                     }
                     curMarker.unbindTooltip().setLatLng([Number(initLatlng.lat), Number(initLatlng.lon)]);
@@ -125,14 +129,16 @@
             map.addLayer(markers);
 
             $('.whiteBtn').addClass('active');
-            $('.check_title').text($('.whiteBtn').data('title')).fadeIn();
+            // $('.check_title').text($('.whiteBtn').data('title')).fadeIn();
+            $('.check_title .check_title-txt').text($('.whiteBtn').data('title'))
+            $('.check_title').fadeIn();
             initFilterHtml();
             
             if (userLevel) {
-                btn.style.display = 'inline-block';
+                btn.style.display = '-webkit-box';
                 getPickerOpt();
             } else {
-                distBtn.style.display = 'inline-block';
+                distBtn.style.display = '-webkit-box';
                 getDistPickerOpt();
             }
 
@@ -393,6 +399,10 @@
             $('.custom-container li').addClass('active');
         });
 
+        $(".clear-txt").on("click", function () {
+            $('.check_title').fadeOut();
+        })
+
         $('.custom-mask').on('click', function () {
             $('.custom-mask').removeClass('custom-mask--visible');
             if ($(".floating_box").hasClass('active')) {
@@ -551,12 +561,14 @@
             dd.postMessage({type: 'keyword', val: keyword});
         });
 
-        $('.btn_handler_box li').on('click', function (ev) {
+        $('.btn_type_box li').on('click', function (ev) {
             var filter = $(ev.target).data('filter');
             var title = $(ev.target).data('title');
             $(this).closest("li").addClass('active').siblings().removeClass('active')
             if (filter == "" || filter == "1" || filter == "2" || filter == "3") {
-                $('.check_title').text(title).fadeIn();
+                // $('.check_title').text(title).fadeIn();
+                $('.check_title .check_title-txt').text(title);
+                $('.check_title').fadeIn();
                 dd.postMessage({type: 'checkState', val: filter});
                 return
             }
@@ -564,6 +576,10 @@
                 dd.postMessage({type: 'location'});
                 return;
             }
+        });
+        $('.positioning').on('click', function (ev) {
+            dd.postMessage({type: 'location'});
+            return;
         });
         $(".call_tel").on("click", function () {
             var phoneNum = $(".call_tel").data("tel");

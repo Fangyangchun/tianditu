@@ -45,19 +45,19 @@
 }
 .whiteBtn {
     background: url("../img/icon-1.png") no-repeat center #ffffff;
-    background-size: 32px 32px;
+    background-size: 17px 20px;
 }
 .greenBtn {
     background: url("../img/icon-2.png") no-repeat center #ffffff;
-    background-size: 32px 32px;
+    background-size: 17px 20px;
 }
 .blueBtn {
     background: url("../img/icon-3.png") no-repeat center #ffffff;
-    background-size: 32px 32px;
+    background-size: 17px 20px;
 }
 .redBtn {
     background: url("../img/icon-4.png") no-repeat center #ffffff;
-    background-size: 32px 32px;
+    background-size: 17px 20px;
 }
 .filterBtn {
     position: absolute;
