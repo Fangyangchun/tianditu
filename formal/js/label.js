@@ -1,7 +1,7 @@
 if (navigator.userAgent.toLowerCase().indexOf('dingtalk') > -1) {
     document.writeln('<script src="https://appx/web-view.min.js"' + '>' + '<' + '/' + 'script>');
   }
-  var map, marker, initLatlng, initZoom = 17, cityName, newCenterData = {}, resetLatlng, circle;
+  var map, marker, initLatlng, initZoom = 17, cityName, newCenterData = {}, resetLatlng, circle, taggingMarker;
   
   dd.postMessage({type: 'init'});
   dd.onMessage = function(e) {
@@ -17,12 +17,18 @@ if (navigator.userAgent.toLowerCase().indexOf('dingtalk') > -1) {
             init()
             break;
         case "location":
+            map.removeLayer(taggingMarker)
             map.setView([Number(e.localLat), Number(e.localLon)], initZoom);
             if (circle) {
                 circle.setLatLng([Number(e.localLat), Number(e.localLon)]);
             } else {
                 // circle = L.circle([map.getCenter().lat, map.getCenter().lng], {radius: 30});
-                circle = L.circle([Number(e.localLat), Number(e.localLon)], {radius: 30});
+                // circle = L.circle([Number(e.localLat), Number(e.localLon)], {radius: 30});
+                circle = L.circle([Number(e.localLat), Number(e.localLon)], 60, {
+                    color: 'rgba(255, 255, 255, 0)',
+                    fillColor: '#3296FA',
+                    // fillOpacity: 0.5
+                });
                 map.addLayer(circle);
             }
             marker.unbindTooltip().setLatLng({lon: e.localLon, lat: e.localLat});
@@ -87,7 +93,12 @@ if (navigator.userAgent.toLowerCase().indexOf('dingtalk') > -1) {
           }
       );
       map.addLayer(marker);
-      circle = L.circle([map.getCenter().lat, map.getCenter().lng], {radius: 30});
+    //   circle = L.circle([map.getCenter().lat, map.getCenter().lng], {radius: 30});
+      circle = L.circle([map.getCenter().lat, map.getCenter().lng], 60, {
+        color: 'rgba(255, 255, 255, 0)',
+        fillColor: '#3296FA',
+        // fillOpacity: 0.5
+    });
       map.addLayer(circle);
 
       dd.postMessage({type: 'render'}); // 结束loading
@@ -99,12 +110,32 @@ if (navigator.userAgent.toLowerCase().indexOf('dingtalk') > -1) {
               dataType: "jsonp",
               // jsonp: "callback",
               success: function(res) {
-                  newCenterData.latitude = parseFloat(res.latlon.split(',')[1])
-                  newCenterData.longitude = parseFloat(res.latlon.split(',')[0])
-                //   newCenterData.location = res.city.value + res.dist.value + res.town.value + res.poi;
+                newCenterData.latitude = parseFloat(res.latlon.split(',')[1])
+                newCenterData.longitude = parseFloat(res.latlon.split(',')[0])
+                // newCenterData.location = res.city.value + res.dist.value + res.town.value + res.poi;
                 newCenterData.location = res.dist.value + res.town.value + res.poi;
-                  marker.setLatLng(e.latlng);
-                  marker.unbindTooltip().bindTooltip(res.city.value + res.dist.value + res.town.value + res.poi, {offset: [0, 10], direction : "bottom"}).openTooltip();
+                // marker.setLatLng(e.latlng);
+                // marker.unbindTooltip().bindTooltip(res.city.value + res.dist.value + res.town.value + res.poi, {offset: [0, 10], direction : "bottom"}).openTooltip();
+                if (!taggingMarker) {
+                    var taggingIcon = L.icon({ 
+                        iconUrl: '../img/marker.png',
+                        iconSize: [46, 60],
+                        iconAnchor:   [23, 45],
+                    }); 
+                    taggingMarker = L.marker(
+                        [e.latlng.lat, e.latlng.lng], 
+                        { 
+                            draggable: false,
+                            opacity: 1,
+                            icon: taggingIcon
+                        }
+                    );
+                } else {
+                    map.removeLayer(taggingMarker)
+                    taggingMarker.setLatLng(e.latlng);
+                }
+                map.addLayer(taggingMarker);
+                taggingMarker.unbindTooltip().bindTooltip(res.city.value + res.dist.value + res.town.value + res.poi, {offset: [0, 10], direction : "bottom"}).openTooltip();
               },
               error: function (err) {
                   dd.alert({
