@@ -17,7 +17,9 @@ if (navigator.userAgent.toLowerCase().indexOf('dingtalk') > -1) {
             init()
             break;
         case "location":
-            map.removeLayer(taggingMarker)
+            if (taggingMarker) {
+                map.removeLayer(taggingMarker)
+            }
             map.setView([Number(e.localLat), Number(e.localLon)], initZoom);
             if (circle) {
                 circle.setLatLng([Number(e.localLat), Number(e.localLon)]);
