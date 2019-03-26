@@ -27,6 +27,9 @@ button, input {
     background: white;
     font-size: 14px;
 }
+.mt7 {
+    margin-top: 7px;
+}
 .mt15 {
     margin-top: 15px;
 }
@@ -37,27 +40,29 @@ button, input {
 }
 .green-marker, .blue-marker, .red-marker {
     width: 32px!important;
-    height: 32px!important;
+    height: 40px!important;
 }
 .green-marker p, .blue-marker p, .red-marker p {
     margin: 0;
     padding: 0;
-    color: white;
+    /* color: white; */
+    color: rgba(255, 255, 255, 0);
     font-size: 12px;
     text-align: center;
-    line-height: 32px;
+    line-height: 40px;
+    height: 40px;
 }
 .green-marker {
-    background: url("../img/icon-2.png") no-repeat center;
-    background-size: 32px 32px;
+    background: url("../img/icon-green.png") no-repeat center;
+    background-size: 32px 39px;
 }
 .blue-marker {
-    background: url("../img/icon-3.png") no-repeat center;
-    background-size: 32px 32px;
+    background: url("../img/icon-blue.png") no-repeat center;
+    background-size: 32px 39px;
 }
 .red-marker {
-    background: url("../img/icon-4.png") no-repeat center;
-    background-size: 32px 32px;
+    background: url("../img/icon-red.png") no-repeat center;
+    background-size: 32px 39px;
 }
 .iptSearch {
     width: calc(100% - 130px);

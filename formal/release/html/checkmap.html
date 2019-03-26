@@ -21,14 +21,17 @@
         <div class="search-btn"></div>
     </div>
     
-    <p class="check_title"></p>
+    <p class="check_title"><span class="check_title-txt"></span><i class="clear-txt"></i></p>
     <div class="filterBtn new">
         <span>附近<i class="icon-arrow"></i></span></div>
     
     <ul class="btn_handler_box">
-        <li class="whiteBtn" data-filter="" data-title="全部检查企业"></li><li class="greenBtn" data-filter="1" data-title="已查完的企业"></li>
-        <li class="blueBtn" data-filter="2" data-title="待查任务不紧急的企业"></li><li class="redBtn" data-filter="3" data-title="有紧急检查任务的企业"></li>
         <li class="positioning" data-filter="reset"></li>
+    </ul>
+
+    <ul class="btn_type_box">
+        <li class="whiteBtn" data-filter="" data-title="全部检查企业">A</li><li class="greenBtn" data-filter="1" data-title="已查完的企业"></li>
+        <li class="blueBtn" data-filter="2" data-title="待查任务不紧急的企业"></li><li class="redBtn" data-filter="3" data-title="有紧急检查任务的企业"></li>
     </ul>
     
     <div class="custom-mask"></div>
@@ -40,23 +43,31 @@
         <div class="info_tip clearfix">
             <div class="info_box">
                 <p class="legalEntity_info"><span class="legalEntity_name"></span><span class="regState"><i>存续</i></span></p>
-                <p class="mt15 ellips"><i class="menu_icon menu_icon_1"></i>工商联络员：<span class="legalRep_name"></span>&nbsp;<span class="legalRep_tel"></span></p>
-                <p class="mt15 ellips"><i class="menu_icon menu_icon_2"></i>地址：<span class="address_info"></span></p>
+                <p class="mt7 ellips">
+                    <!-- <i class="menu_icon menu_icon_1"></i> -->
+                    工商联络员：<span class="legalRep_name"></span>&nbsp;<span class="legalRep_tel"></span></p>
+                <p class="mt7 ellips">
+                    <!-- <i class="menu_icon menu_icon_2"></i> -->
+                    地址：<span class="address_info"></span></p>
             </div>
             <div class="location_box">
                 <p><span class="distance_info"></span>km</p>
-                <i class="menu_icon menu_icon_3"></i>
+                <p>
+                    <i class="menu_icon menu_icon_3"></i>
+                </p>
             </div>
         </div>
         <ul class="menu_box clearfix">
-            <li class="gocheck new"><p><!-- <i class="menu_icon menu_icon_4"></i> -->去检查</p></li>
-            <!-- <li class="unfind"><p><i class="menu_icon menu_icon_5"></i>查无下落</p></li> -->
-            <li class="detail new"><p><!-- <i class="menu_icon menu_icon_6"></i> -->详情</p></li>
-            <li class="call_tel new"><p><!-- <i class="menu_icon menu_icon_7"></i> -->打电话</p></li>
+            <div class="inner-menu-container">
+                <li class="gocheck new"><p><!-- <i class="menu_icon menu_icon_4"></i> -->去检查</p></li>
+                <!-- <li class="unfind"><p><i class="menu_icon menu_icon_5"></i>查无下落</p></li> -->
+                <li class="detail new"><p><!-- <i class="menu_icon menu_icon_6"></i> -->详情</p></li>
+                <li class="call_tel new special"><p><!-- <i class="menu_icon menu_icon_7"></i> -->打电话</p></li>
+            </div>
         </ul>
     </div>
 
-    <p class="floating_box">筛选</p>
+    <p class="floating_box"></p>
     <div class="filter_list_box">
         <div style="width: 100%; height: 100%; overflow: auto;">
             <dl class="filter_type">
@@ -82,7 +93,7 @@
                     <dt>
                         <!-- <i></i> -->
                         查询范围</dt>
-                    <div>
+                    <div class="super-lable clearfix">
                         <dd id="picker-btn" style="display: none;">市|区|所</dd>
                         <dd id="district-btn" style="display: none;">管辖单位|片区</dd>
                     </div> 

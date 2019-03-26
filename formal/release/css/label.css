@@ -12,12 +12,13 @@
 
 .resetBtn {
     bottom: 30%;
-    border: 1px solid rgb(51, 136, 255);
-    width: 32px;
-    height: 32px;
-    border-radius: 2px;
+    /* border: 1px solid rgb(51, 136, 255); */
+    width: 37px;
+    height: 37px;
+    border-radius: 50%;
+    box-sizing: border-box;
     background: url("../img/location.png") no-repeat center #ffffff;
-    background-size: 20px 20px;
+    background-size: 21px 20px;
     padding: 0;
     margin: 0;
 }
@@ -43,4 +44,5 @@
     position: absolute;
     top: 0;
     right: 0;
+    background-size: 18px;
 }
