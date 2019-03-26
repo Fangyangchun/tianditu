@@ -58,6 +58,7 @@
                     initLatlng.lat = e.lat;
                     initLatlng.lon = e.lon;
                     $('.check_title').fadeOut();
+                    $('.btn_type_box li').removeClass('active');
                     markers.clearLayers();
                     map.setView([Number(initLatlng.lat), Number(initLatlng.lon)], initZoom);
                     if (circle) {
