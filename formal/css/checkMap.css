@@ -444,7 +444,8 @@
     z-index: 100001;
     top: 0;
     right: 0;
-    left: 15%;
+    /* left: 15%; */
+    left: 25%;
     bottom: 0;
     transform: translateX(100%);
     -ms-transform: translateX(100%);
@@ -546,7 +547,8 @@
     padding: 3px;
     border: 1px solid rgba(226, 226, 226, 1);
     border-radius: 3px;
-    width: 32%;
+    /* width: 32%; */
+    width: 49%;
     line-height: 20px;
     margin-right: 2%;
     margin-bottom: 5px;
@@ -566,7 +568,10 @@
     height: 48px;
 }
 
-.filter_type dd:nth-child(3n+3) {
+/* .filter_type dd:nth-child(3n+3) {
+    margin-right: 0;
+} */
+.filter_type dd:nth-child(2n+2) {
     margin-right: 0;
 }
 
