@@ -83,6 +83,18 @@
 .redBtn.active {
     border: 2px solid rgb(255, 84, 47);
 } */
+.blueBtn.active {
+    background: url("../img/icon-6.png") no-repeat center #ffffff;
+    background-size: 17px 20px;
+}
+.greenBtn.active {
+    background: url("../img/icon-5.png") no-repeat center #ffffff;
+    background-size: 17px 20px;
+}
+.redBtn.active {
+    background: url("../img/icon-7.png") no-repeat center #ffffff;
+    background-size: 17px 20px;
+}
 .positioning {
     background: url("../img/location.png") no-repeat center #ffffff;
     background-size: 21px 20px;
@@ -386,21 +398,24 @@
 
 .regState {
     display: inline-block;
-    padding: 0 5px;
-    background: #1EB300;
+    /* padding: 0 5px; */
+    padding: 0 3px;
+    /* background: #1EB300; */
+    background: #3296FA;
     font-size: 12px;
     line-height: 16px;
     color: white;
-    border-radius: 10px;
+    /* border-radius: 10px; */
+    border-radius: 2px;
     vertical-align: 1px;
     margin-left: 10px;
 }
 
 .regState i {
     display: inline-block;
-    transform: scale(0.7, 0.7);
+    /* transform: scale(0.7, 0.7);
     -webkit-transform:scale(0.7, 0.7);
-    -ms-transform:scale(0.7, 0.7);
+    -ms-transform:scale(0.7, 0.7); */
 }
 
 .floating_box {

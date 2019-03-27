@@ -39,7 +39,8 @@ button, input {
     text-overflow: ellipsis;
 }
 .green-marker, .blue-marker, .red-marker {
-    width: 32px!important;
+    /* width: 32px!important; */
+    width: 34px!important;
     height: 40px!important;
 }
 .green-marker p, .blue-marker p, .red-marker p {
@@ -53,16 +54,22 @@ button, input {
     height: 40px;
 }
 .green-marker {
-    background: url("../img/icon-green.png") no-repeat center;
-    background-size: 32px 39px;
+    /* background: url("../img/icon-green.png") no-repeat center;
+    background-size: 32px 39px; */
+    background: url("../img/icon-5.png") no-repeat center;
+    background-size: 34px 39px;
 }
 .blue-marker {
-    background: url("../img/icon-blue.png") no-repeat center;
-    background-size: 32px 39px;
+    /* background: url("../img/icon-blue.png") no-repeat center;
+    background-size: 32px 39px; */
+    background: url("../img/icon-6.png") no-repeat center;
+    background-size: 34px 39px;
 }
 .red-marker {
-    background: url("../img/icon-red.png") no-repeat center;
-    background-size: 32px 39px;
+    /* background: url("../img/icon-red.png") no-repeat center;
+    background-size: 32px 39px; */
+    background: url("../img/icon-7.png") no-repeat center;
+    background-size: 34px 39px;
 }
 .iptSearch {
     width: calc(100% - 130px);
