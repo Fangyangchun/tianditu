@@ -21,13 +21,16 @@
 
 <script>
     function init(){
-        var map = L.map('map',{crs: L.CRS.CustomEPSG4326, center: {lon: 120.09215287988154,  lat: 30.277052933991797}, zoom:12, inertiaDeceleration: 15000, maxZoom: 20});
+        var map = L.map('map',{crs: L.CRS.CustomEPSG4326, center: {lon: 120.09215287988154,  lat: 30.277052933991797}, zoom:16, inertiaDeceleration: 15000, maxZoom: 20});
         //添加底图
         // https://ditu.zjzwfw.gov.cn/mapserver/raster/wmts/1.0.0/imgmap/getTile/{TileMatrix}/{TileRow}/{TileCol}
-        var layerUrl = 'https://ditu.zjzwfw.gov.cn/mapserver/raster/wmts/1.0.0/imgmap/getTile/{z}/{y}/{x}'
-        // var layerUrl = 'http://ditu.zjzwfw.gov.cn/services/wmts/imgmap/default/oss?service=WMTS&request=GetTile&version=1.0.0&layer=imgmap&tilematrixSet=esritilematirx&format=image%2Fjpgpng&height=256&width=256&tileSize=256&fullExtent=%5Bobject%20Object%5D&tilematrix={z}&tilerow={y}&tilecol={x}'
-        var layer = new L.TileLayer(layerUrl, {maxZoom: 19});
+        var tileAddress = 'https://ditu.zjzwfw.gov.cn/mapserver/raster/wmts/1.0.0/imgmap/getTile/{z}/{y}/{x}'
+        // var tileAddress = 'https://ditu.zjzwfw.gov.cn/services/wmts/imgmap/default/oss?service=WMTS&request=GetTile&version=1.0.0&layer=imgmap&tilematrixSet=esritilematirx&format=image%2Fjpgpng&height=256&width=256&tileSize=256&fullExtent=%5Bobject%20Object%5D&tilematrix={z}&tilerow={y}&tilecol={x}'
+        var layer = new L.TileLayer(tileAddress, {maxZoom: 19});
         map.addLayer(layer);
+        // 添加注记图层
+        var labelLayer = new L.GXYZ('https://ditu.zjzwfw.gov.cn/mapserver/label/zjvmap/getImg?x={x}&y={y}&l={z}&styleId=tdt_biaozhunyangshi_2017',{tileSize:512,hitDetection:true,keepBuffer:0,updateWhenZooming:false});
+        map.addLayer(labelLayer);
     }
 
 </script>
