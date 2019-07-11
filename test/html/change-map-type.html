@@ -34,7 +34,6 @@
         //添加底图 前端绘制
         var layer_2 = new L.GVMapGrid('https://ditu.zjzwfw.gov.cn/mapserver/data/zjvmap/getData?x={x}&y={y}&l={z}&styleId=tdt_biaozhunyangshi_2017',{tileSize:512,maxZoom: 21,keepBuffer:0,updateWhenZooming:false});
         map.addLayer(layer_2);
-
         // 添加注记图层
         var labelLayer_2 = new L.GXYZ('https://ditu.zjzwfw.gov.cn/mapserver/label/zjvmap/getImg?x={x}&y={y}&l={z}&styleId=tdt_biaozhunyangshi_2017',{tileSize:512,hitDetection:true,keepBuffer:0,updateWhenZooming:false});
         map.addLayer(labelLayer_2);
