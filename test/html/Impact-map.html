@@ -21,7 +21,7 @@
 
 <script>
     function init(){
-        var map = L.map('map',{crs: L.CRS.CustomEPSG4326, center: {lon: 120.09215287988154,  lat: 30.277052933991797}, zoom:16, inertiaDeceleration: 15000, maxZoom: 20});
+        var map = L.map('map',{crs: L.CRS.CustomEPSG4326, center: {lon: 120.09215287988154,  lat: 30.277052933991797}, zoom:16, inertiaDeceleration: 15000, maxZoom: 20, zoomControl: false});
         //添加底图
         // https://ditu.zjzwfw.gov.cn/mapserver/raster/wmts/1.0.0/imgmap/getTile/{TileMatrix}/{TileRow}/{TileCol}
         var tileAddress = 'https://ditu.zjzwfw.gov.cn/mapserver/raster/wmts/1.0.0/imgmap/getTile/{z}/{y}/{x}'

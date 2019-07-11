@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html  style="overflow : hidden; ">
+<head>
+    <title>影像地图</title>
+    <meta name="keywords" content="矢量瓦片,矢量索引">
+    <meta name="description" content="矢量瓦片">
+    <meta name="content-type" content="text/html; charset=UTF-8">
+    <meta name="viewport" content="width=device-width,target-densitydpi=high-dpi,initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+    <link rel="stylesheet" href="../sdk_web/LeafletSDK_es6/css/leaflet.css" />
+
+    <script src="../sdk_web/LeafletSDK_es6/dist/leaflet-src.js"></script>
+    <script src="../sdk_web/LeafletSDK_es6/dist/leaflet.js"></script>
+    <script src="../sdk_web/LeafletSDK_es6/dist/CustomWebSDK.min.js"></script> 
+    <script src="../libs/jquery-1.12.3.min.js"></script>
+
+</head>
+
+<body onload="init()"  style="margin : 0; ">
+<div id="map" class="map" style ="position:absolute;bottom:0px;top:0px;width:100%"></div>
+
+
+<script>
+    function init(){
+        var map = L.map('map',{crs: L.CRS.CustomEPSG4326, center: {lon: 120.09215287988154,  lat: 30.277052933991797}, zoom:16, inertiaDeceleration: 15000, maxZoom: 20, zoomControl: false});
+        //添加影像底图
+        var layer_1 = new L.TileLayer('https://ditu.zjzwfw.gov.cn/mapserver/raster/wmts/1.0.0/imgmap/getTile/{z}/{y}/{x}', {maxZoom: 19});
+        map.addLayer(layer_1);
+        // 添加影像注记图层
+        var labelLayer_1 = new L.GXYZ('https://ditu.zjzwfw.gov.cn/mapserver/label/zjvmap/getImg?x={x}&y={y}&l={z}&styleId=tdt_biaozhunyangshi_2017',{tileSize:512,hitDetection:true,keepBuffer:0,updateWhenZooming:false});
+        map.addLayer(labelLayer_1);
+
+        
+            
+        //添加底图 前端绘制
+        var layer_2 = new L.GVMapGrid('https://ditu.zjzwfw.gov.cn/mapserver/data/zjvmap/getData?x={x}&y={y}&l={z}&styleId=tdt_biaozhunyangshi_2017',{tileSize:512,maxZoom: 21,keepBuffer:0,updateWhenZooming:false});
+        map.addLayer(layer_2);
+
+        // 添加注记图层
+        var labelLayer_2 = new L.GXYZ('https://ditu.zjzwfw.gov.cn/mapserver/label/zjvmap/getImg?x={x}&y={y}&l={z}&styleId=tdt_biaozhunyangshi_2017',{tileSize:512,hitDetection:true,keepBuffer:0,updateWhenZooming:false});
+        map.addLayer(labelLayer_2);
+
+        function changeMapType(type) {
+            switch(type) {
+                case 1:
+                    map.removeLayer(layer_1)
+                    map.removeLayer(labelLayer_1)
+                    break;
+                case 2:
+                    map.removeLayer(layer_2)
+                    map.removeLayer(labelLayer_2)
+                    break;
+            } 
+
+        }
+
+        
+    }
+
+</script>
+
+</body>
+</html>
