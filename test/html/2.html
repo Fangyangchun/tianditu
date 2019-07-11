@@ -15,9 +15,10 @@
     <div id="map" class="map" style ="position:absolute;bottom:0px;top:0px;width:100%"></div>
 
 
-    <script src="../sdk_web/leafletSDK/js/uuid.js"></script>
-    <script src="../sdk_web/leafletSDK/js/leaflet.js"></script>
-    <script src="../sdk_web/leafletSDK/js/CustomWebSDK.min.js"></script>
+    <script src="../sdk_web/LeafletSDK_es6/dist/leaflet-src.js"></script>
+    <script src="../sdk_web/LeafletSDK_es6/dist/leaflet.js"></script>
+    <script src="../sdk_web/LeafletSDK_es6/dist/CustomWebSDK.min.js"></script> 
+    <script src="../libs/jquery-1.12.3.min.js"></script>
     <script>
         function init(){
             var map = L.map('map',{crs:L.CRS.CustomEPSG4326,center: {lon:121.24, lat:29.268},maxZoom: 20,zoom:7,inertiaDeceleration:15000,inertiaThreshold:2000});
