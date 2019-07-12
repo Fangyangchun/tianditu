@@ -12,48 +12,81 @@
     <script src="../sdk_web/LeafletSDK_es6/dist/leaflet.js"></script>
     <script src="../sdk_web/LeafletSDK_es6/dist/CustomWebSDK.min.js"></script> 
     <script src="../libs/jquery-1.12.3.min.js"></script>
+    <style>
+        .map {
+            position: absolute;
+            bottom: 0px;
+            top: 0px;
+            width: 100%
+        }
 
+        .loadType {
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            z-index: 1000;
+        }
+
+        .loadType .type-list {
+            width: 50px; 
+            height: 50px; 
+            line-height: 50px; 
+            color: sandybrown; 
+            font-size: 20px; 
+            text-align: center; 
+            background: darkslategray;
+            margin-bottom: 10px;
+        }
+    </style>
 </head>
 
 <body onload="init()"  style="margin : 0; ">
-<div id="map" class="map" style ="position:absolute;bottom:0px;top:0px;width:100%"></div>
+<div id="map" class="map"></div>
+<ul class="loadType">
+    <li class="type-list" data-type="image">影像</li>
+    <li class="type-list" data-type="vector">矢量</li>
+</ul>
 
 
 <script>
+    var map, layer_1, layer_2, labelLayer, type='vector';
     function init(){
-        var map = L.map('map',{crs: L.CRS.CustomEPSG4326, center: {lon: 120.09215287988154,  lat: 30.277052933991797}, zoom:16, inertiaDeceleration: 15000, maxZoom: 20, zoomControl: false});
-        //添加影像底图
-        var layer_1 = new L.TileLayer('https://ditu.zjzwfw.gov.cn/mapserver/raster/wmts/1.0.0/imgmap/getTile/{z}/{y}/{x}', {maxZoom: 19});
-        map.addLayer(layer_1);
-        // 添加影像注记图层
-        var labelLayer_1 = new L.GXYZ('https://ditu.zjzwfw.gov.cn/mapserver/label/zjvmap/getImg?x={x}&y={y}&l={z}&styleId=tdt_biaozhunyangshi_2017',{tileSize:512,hitDetection:true,keepBuffer:0,updateWhenZooming:false});
-        map.addLayer(labelLayer_1);
-
-        
-            
-        //添加底图 前端绘制
-        var layer_2 = new L.GVMapGrid('https://ditu.zjzwfw.gov.cn/mapserver/data/zjvmap/getData?x={x}&y={y}&l={z}&styleId=tdt_biaozhunyangshi_2017',{tileSize:512,maxZoom: 21,keepBuffer:0,updateWhenZooming:false});
-        map.addLayer(layer_2);
+        map = L.map('map',{crs: L.CRS.CustomEPSG4326, center: {lon: 120.09215287988154,  lat: 30.277052933991797}, zoom:16, inertiaDeceleration: 15000, maxZoom: 20, zoomControl: false}); 
+        //添加影像底图 type='image'
+        layer_1 = new L.TileLayer('https://ditu.zjzwfw.gov.cn/mapserver/raster/wmts/1.0.0/imgmap/getTile/{z}/{y}/{x}', {maxZoom: 19});
+        //添加矢量底图 前端绘制 type='vector'
+        layer_2 = new L.GVMapGrid('https://ditu.zjzwfw.gov.cn/mapserver/data/zjvmap/getData?x={x}&y={y}&l={z}&styleId=tdt_biaozhunyangshi_2017',{tileSize:512,maxZoom: 21,keepBuffer:0,updateWhenZooming:false});
+        switch(type) {
+            case 'image':
+                map.addLayer(layer_1);
+                break;
+            case 'vector':
+                map.addLayer(layer_2);
+                break;
+        } 
         // 添加注记图层
-        var labelLayer_2 = new L.GXYZ('https://ditu.zjzwfw.gov.cn/mapserver/label/zjvmap/getImg?x={x}&y={y}&l={z}&styleId=tdt_biaozhunyangshi_2017',{tileSize:512,hitDetection:true,keepBuffer:0,updateWhenZooming:false});
-        map.addLayer(labelLayer_2);
-
-        function changeMapType(type) {
-            switch(type) {
-                case 1:
-                    map.removeLayer(layer_1)
-                    map.removeLayer(labelLayer_1)
-                    break;
-                case 2:
-                    map.removeLayer(layer_2)
-                    map.removeLayer(labelLayer_2)
-                    break;
-            } 
-
-        }
-
-        
+        labelLayer = new L.GXYZ('https://ditu.zjzwfw.gov.cn/mapserver/label/zjvmap/getImg?x={x}&y={y}&l={z}&styleId=tdt_biaozhunyangshi_2017',{tileSize:512,hitDetection:true,keepBuffer:0,updateWhenZooming:false});
+        map.addLayer(labelLayer);
     }
+    $('.loadType li').on('click', function () {
+        var curType = $(this).data('type')
+        switch(curType) {
+            case 'image':
+                if (type == 'image') return;
+                type = 'image';
+                if (layer_2) map.removeLayer(layer_2);
+                map.addLayer(layer_1);
+                break;
+            case 'vector':
+                if (type == 'vector') return;
+                type = 'vector';
+                if (layer_1) map.removeLayer(layer_1);
+                map.addLayer(layer_2);
+                break;
+        } 
+        map.removeLayer(labelLayer);
+        map.addLayer(labelLayer);
+    });
 
 </script>
 
