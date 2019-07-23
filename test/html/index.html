@@ -52,10 +52,10 @@
     <script src="../sdk_web/LeafletSDK_es6/dist/leaflet.js"></script>
     <script src="../sdk_web/LeafletSDK_es6/dist/CustomWebSDK.min.js"></script> 
     <script src="../sdk_web/LeafletSDK_es6/src/leaflet.markercluster.js"></script>
-    <!-- <script src="../libs/jquery-1.12.3.min.js"></script> -->
-    <script src="//code.jquery.com/jquery-3.2.1.min.js"></script>
+    <script src="../libs/jquery-1.12.3.min.js"></script>
     <script>
         function init(){
+            var centerLonLat = {lon: 120.14989, lat: 30.27751};
             var map = L.map('map',{crs:L.CRS.CustomEPSG4326,center: {lon: 120.14989, lat: 30.27751},minZoom: 5, zoom: 10,inertiaDeceleration:15000, zoomControl: false});
             //添加底图
             var layer = new L.GXYZ('http://ditu.zjzwfw.gov.cn/mapserver/vmap/zjvmap/getMAP?x={x}&y={y}&l={z}&styleId=tdt_biaozhunyangshi_2017',{tileSize:512,attribution: '&copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors',});
@@ -162,7 +162,7 @@
                 // jsonp: "callback",
                 success: function(res) {
                     var orig = 120.186792 + "," + 29.329037;
-                    getPolyLineData(orig, res.strlatlon)
+                    // getPolyLineData(orig, res.strlatlon)
                 },
                 error: function (err) {
 
@@ -194,7 +194,7 @@
                         newRoutelalon.forEach(function (val) {
                             latlngs.push([parseFloat(val.split(",")[1]), parseFloat(val.split(",")[0])]);
                         })
-                        // drawPolyLine(latlngs);
+                        drawPolyLine(latlngs);
                         
                     },
                     error: function (err) {
@@ -216,9 +216,16 @@
                 // map.addLayer(polyline);                        
                 // // zoom the map to the polyline
                 // map.fitBounds(polyline.getBounds());
-
-                var polyline = L.polyline(latlngs, {color: 'blue'}).addTo(map);
+                // console.log(map.getCenter().lat, map.getCenter().lng)
+                var polyline = L.polyline(latlngs, { color: 'blue', weight: 6, opacity: 0.9 }).addTo(map);
                 map.fitBounds(polyline.getBounds());
+                setTimeout(function () {
+                    map.removeLayer(polyline);
+                    // console.log(map.getCenter().lat, map.getCenter().lng)
+                    // map.setView([map.getCenter().lat, map.getCenter().lng], 10);
+                    map.setView([centerLonLat.lat, centerLonLat.lon], 10);
+                }, 3000);
+                
             }
 
             // 返回中心位置
