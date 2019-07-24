@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html  style="overflow : hidden; ">
+<head>
+    <title>标记</title>
+    <meta name="keywords" content="矢量瓦片,矢量索引">
+    <meta name="description" content="矢量瓦片">
+    <meta name="content-type" content="text/html; charset=UTF-8">
+    <meta name="viewport" content="width=device-width,target-densitydpi=high-dpi,initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+    <link rel="stylesheet" href="./leaflet.css" />
+    <style>
+        .pos-box {
+            position: absolute;
+            z-index: 10000;
+            padding: 10px;
+        }
+        input {
+            width: 35%;
+            padding: 0 5px;
+        }
+        input, button {
+            height: 24px;
+            margin: 0;
+            box-sizing: border-box;
+        }
+        button {
+            padding: 0 15px;
+            vertical-align: bottom;
+        }
+        .search-box, .polyline-box {
+            margin-bottom: 10px;
+        }
+        .date, .user {
+            width: 80%;
+            margin-bottom: 5px;
+        }
+    </style>
+</head>
+
+<body onload="init()"  style="margin : 0; ">
+<div id="map" class="map" style ="position:absolute;bottom:0px;top:0px;width:100%"></div>
+<div class="pos-box">
+    <div class="search-box">
+        <input type="number" id="lon" value="120.15" placeholder="经度">
+        <input type="number" id="lat" value="30.268" placeholder="纬度">
+        <button id="search">搜索</button>
+    </div>
+    <div class="polyline-box">
+        <input type="number" id="user" class="date" value="04031764541186475" placeholder="用户userId">
+        <input type="number" id="date" class="user" value="20190723" placeholder="查询日期(格式为yyyyMMdd，如20190712)">
+        <button id="draw">绘制轨迹</button>
+    </div>
+</div>
+
+
+
+<script src="./leaflet.js"></script>
+<script src="./CustomWebSDK.min.js"></script> 
+<script src="./md5.js"></script>
+<script src="./jquery-1.12.3.min.js"></script>
+<script>
+    function init(){
+        var map = L.map('map',{crs:L.CRS.CustomEPSG4326,center: {lon:120.15, lat:30.268},maxZoom: 21,zoom:18,inertiaDeceleration:15000,inertiaThreshold:2000,fadeAnimation:false, zoomControl: false});
+        var layer = new L.GVMapGrid('http://ditu.zjzwfw.gov.cn/mapserver/data/zjvmap/getData?x={x}&y={y}&l={z}&styleId=tdt_biaozhunyangshi_2017',{tileSize:512,maxZoom: 21,keepBuffer:0,updateWhenZooming:false});
+        map.addLayer(layer);
+
+        var labelLayer = new L.GWVTAnno({tileSize:512});
+        var dataSource = new Custom.URLDataSource();
+        dataSource.url = 'http://ditu.zjzwfw.gov.cn/mapserver/label/zjvmap/getDatas?x=${x}&y=${y}&l=${z}&styleId=tdt_biaozhunyangshi_2017';
+        labelLayer.addDataSource(dataSource);
+        map.addLayer(labelLayer);
+        var customIcon = L.icon({ 
+            iconUrl: './position.png',
+            iconSize: [21, 30],
+            iconAnchor:   [10, 20],
+        }); 
+        var marker = L.marker( 
+            [map.getCenter().lat, map.getCenter().lng], 
+            { 
+                draggable: false,
+                opacity: 1,
+                icon: customIcon
+            }
+        ).addTo(map);
+        var polyline, appId = '767a2c8714cc46f294e5d3ef833160b8', appSecret = 'b0bb6527b59345978e016fe45ea79c7a';
+        $.ajax({
+            url: encodeURI("https://dh.ditu.zj.cn:9443/inverse/getInverseGeocoding.jsonp?&detail=1&zoom=11&latlon=120.15,30.268&lat=&lon=&customer=2"),
+            dataType: "jsonp",
+            success: function(res) {
+                marker.bindTooltip(res.city.value + res.dist.value + res.town.value + res.poi, {offset: [0, 10], direction : "bottom"}).openTooltip();
+            },
+            error: function (err) {
+                alert("地址解析出错");
+            }
+        });
+        $('#search').on('click', function() {
+            var lon = $('#lon').val();
+            var lat = $('#lat').val();
+            if (lon && lat && !isNaN(lon) && !isNaN(lat)) {
+                $.ajax({
+                    url: encodeURI("https://dh.ditu.zj.cn:9443/inverse/getInverseGeocoding.jsonp?&detail=1&zoom=11&latlon=" + lon + "," + lat + "&lat=&lon=&customer=2"),
+                    dataType: "jsonp",
+                    success: function(res) {
+                        map.setView([Number(lat), Number(lon)], 18);
+                        marker.unbindTooltip().setLatLng([Number(lat), Number(lon)]);
+                        marker.bindTooltip(res.city.value + res.dist.value + res.town.value + res.poi, {offset: [0, 10], direction : "bottom"}).openTooltip();
+                    },
+                    error: function (err) {
+                        alert("地址解析出错");
+                    }
+                });
+            } else {
+                alert("请输入合法的经纬度");
+            }
+        })
+        $('#draw').on('click', function () {
+            var userId = $('#user').val();
+            var queryDate = $('#date').val();
+            if (userId && date) {
+                var timestamp = Date.parse(new Date());
+                console.log({ appId: appId, queryDate: queryDate, userId: userId, signData: md5(appId + timestamp + queryDate + appSecret + userId), timestamp: timestamp });
+                $.ajax({
+                    type: "post",
+                    url: "http://127.0.0.1:5500/api/locus/api/getLocus",
+                    contentType: "application/x-www-form-urlencoded",
+                    timeout: 300000,
+                    xhrFields: {
+                        withCredentials: true
+                    },
+                    crossDomain: true,
+                    data: {
+                        appId: appId,
+                        queryDate: queryDate,
+                        userId: userId,
+                        signData: md5(appId + timestamp + queryDate + appSecret + userId),
+                        timestamp: timestamp,
+                    },
+                    success: function(res) {
+                        if (res.value.count < 0) {
+                            alert('无轨迹数据');
+                        }
+                        var trajectoryData = res.value.data.split(';');
+                        var latlngs = [];
+                        trajectoryData.forEach(function (val) {
+                            var v = val.split(',')
+                            latlngs.push([v[0], v[1]])
+                        })
+                        console.log(latlngs)
+                        if (polyline) {
+                            map.removeLayer(polyline)
+                        }
+                        polyline = L.polyline(latlngs, { color: 'blue', weight: 6, opacity: 0.9 }).addTo(map);
+                        map.fitBounds(polyline.getBounds());
+                    },
+                    error: function (err) {
+                        console.log("服务器出错");
+                    }
+                });
+            } else {
+                alert("请输入用户Id、查询日期");
+            }
+            
+        })
+    }
+</script>
+
+</body>
+</html>
