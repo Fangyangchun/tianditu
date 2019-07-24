@@ -418,26 +418,27 @@
     -ms-transform:scale(0.7, 0.7); */
 }
 
-.floating_box {
+.single-box {
     display: block;
     position: absolute;
     z-index: 100000;
     right: 10px;
-    /* top: 30%; */
-    top: 212px;
     /* background: rgba(0,0,0,.6); */
     color: white;
     line-height: 38px;
     width: 38px;
     height: 38px;
-    background: url("../img/filter-icon.png") #ffffff no-repeat center;
     border-radius: 6px;
-    background-size: 19px 20px;
     box-shadow: 0px 0px 6px 0px rgba(0,0,0,0.35);
     /* padding-left: 15px;
     padding-right: 5px; */
     /* border-top-left-radius: 20px;
     border-bottom-left-radius: 20px; */
+}
+.single-box.floating_box {
+    top: 212px;
+    background: url("../img/filter-icon.png") #ffffff no-repeat center;
+    background-size: 19px 20px;
     /* transform: translateX(0%);
     -ms-transform: translateX(0%);
     -webkit-transform: translateX(0%);
@@ -446,12 +447,24 @@
     transition: transform .3s;
     transition: transform .3s,-webkit-transform .3s; */
 }
-/* .floating_box.active {
+/* .single-box.floating_box.active {
     transform: translateX(100%);
     -ms-transform: translateX(100%);
     -webkit-transform: translateX(100%);
     display: none;
 } */
+
+.single-box.vector {
+    top: 255px;
+    background: url("../img/bg-2d.png") #ffffff no-repeat center;
+    background-size: 20px 20px;
+}
+
+.single-box.portrait {
+    top: 255px;
+    background: url("../img/bg-3d.png") #ffffff no-repeat center;
+    background-size: 20px 20px;
+}
 
 .filter_list_box {
     background: white;

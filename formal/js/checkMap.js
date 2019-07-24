@@ -5,7 +5,7 @@
         var userId, token, baseUrl, tagAction, dataType, tagLineData, largeTagData = [], smallTagData = [], curLargeTagData = [], curSmallTagData = [],
         dutyDeptCode, curDutyDeptCode;
         var initLatlng, initZoom = 16, cityNames, newCenterData,  markDatas = [],
-        map, curMarker, circle, markers, mapParams, idx, filterDatas, userLevel, showDistrict, pickerOpt, distPickerOpt;
+        map, layer_2d, layer_3d, labelLayer, curMarker, circle, markers, mapParams, idx, filterDatas, userLevel, showDistrict, pickerOpt, distPickerOpt;
         var taskStatus, curTaskStatus, legalEntityCata, curLegalEntityCata, checkType, curCheckType, 
         legalEntityTag, legalEntityTag1, legalEntityTag2, curLegalEntityTag, curLegalEntityTag1, curLegalEntityTag2,
         cityName = [], cityCode = [], distName = [], distCode = [], areaName = [], areaCode = [], currentAreaCode; 
@@ -93,22 +93,24 @@
           }
         function init() {
             map = L.map('map',{crs:L.CRS.CustomEPSG4326,center: initLatlng, minZoom: 5, zoom: initZoom, inertiaDeceleration:15000, zoomControl: false});
-            var tileAddress = 'https://ditu.zjzwfw.gov.cn/mapserver/vmap/zjvmap/getMAP?x={x}&y={y}&l={z}&styleId=tdt_biaozhunyangshi_2017';
-            // 添加底图 后端绘制
-            // var layer = new L.GXYZ(tileAddress, {tileSize:512, minZoom: 5});
-            // map.addLayer(layer);
+            // 添加底图 后端绘制 type='vector'
+            // layer_2d = new L.GXYZ('https://ditu.zjzwfw.gov.cn/mapserver/vmap/zjvmap/getMAP?x={x}&y={y}&l={z}&styleId=tdt_biaozhunyangshi_2017', {tileSize:512, minZoom: 5});
+            // map.addLayer(layer_2d);
+
+            //添加影像底图 type='image'
+            layer_3d = new L.TileLayer('https://ditu.zjzwfw.gov.cn/mapserver/raster/wmts/1.0.0/imgmap/getTile/{z}/{y}/{x}', {maxZoom: 19});
             
-            //添加底图 前端绘制
-            var layer = new L.GVMapGrid('https://ditu.zjzwfw.gov.cn/mapserver/data/zjvmap/getData?x={x}&y={y}&l={z}&styleId=tdt_biaozhunyangshi_2017',{tileSize:512,maxZoom: 21,keepBuffer:0,updateWhenZooming:false});
-            map.addLayer(layer);
+            //添加底图 前端绘制 type='vector'
+            layer_2d = new L.GVMapGrid('https://ditu.zjzwfw.gov.cn/mapserver/data/zjvmap/getData?x={x}&y={y}&l={z}&styleId=tdt_biaozhunyangshi_2017',{tileSize:512,maxZoom: 21,keepBuffer:0,updateWhenZooming:false});
+            map.addLayer(layer_2d);
 
             // 添加注记图层
-            // var labelLayer = new L.GWVTAnno({tileSize:512});
+            // labelLayer = new L.GWVTAnno({tileSize:512});
             // var dataSource = new Custom.URLDataSource();
             // dataSource.url = 'https://ditu.zjzwfw.gov.cn/mapserver/label/zjvmap/getDatas?x=${x}&y=${y}&l=${z}&styleId=tdt_biaozhunyangshi_2017';
             // labelLayer.addDataSource(dataSource);
             // map.addLayer(labelLayer);
-            var labelLayer = new L.GXYZ('https://ditu.zjzwfw.gov.cn/mapserver/label/zjvmap/getImg?x={x}&y={y}&l={z}&styleId=tdt_biaozhunyangshi_2017',{tileSize:512,hitDetection:true,keepBuffer:0,updateWhenZooming:false});
+            labelLayer = new L.GXYZ('https://ditu.zjzwfw.gov.cn/mapserver/label/zjvmap/getImg?x={x}&y={y}&l={z}&styleId=tdt_biaozhunyangshi_2017',{tileSize:512,hitDetection:true,keepBuffer:0,updateWhenZooming:false});
             map.addLayer(labelLayer);
             var customIcon = L.icon({ 
                 iconUrl: '../img/indoor_pub_poi_pressed.png',
@@ -372,6 +374,21 @@
                     //     legalEntityTag2 = $(ev.target)[0].dataset.paramcode2;
                     //     break;
                 }
+            });
+
+            $('.change-map-type').on('click', function () {
+                var classStr = $(this).attr('class')
+                if (classStr.indexOf('portrait') >= 0) { // 影像
+                    map.removeLayer(layer_2d);
+                    map.addLayer(layer_3d);
+                    $(this).removeClass('portrait').addClass('vector');
+                } else { // 2d  vector
+                    map.removeLayer(layer_3d);
+                    map.addLayer(layer_2d);
+                    $(this).removeClass('vector').addClass('portrait');
+                }
+                map.removeLayer(labelLayer);
+                map.addLayer(labelLayer);
             });
 
             $("#SUP_TAG_LINE dd").on('click', function () {
