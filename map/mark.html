@@ -142,9 +142,8 @@
                         var latlngs = [];
                         trajectoryData.forEach(function (val) {
                             var v = val.split(',')
-                            latlngs.push([v[0], v[1]])
+                            latlngs.push([v[1], v[0]])
                         })
-                        console.log(latlngs)
                         if (polyline) {
                             map.removeLayer(polyline)
                         }
