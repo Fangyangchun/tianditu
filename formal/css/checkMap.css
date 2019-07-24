@@ -456,13 +456,13 @@
 
 .single-box.vector {
     top: 255px;
-    background: url("../img/bg-2d.png") #ffffff no-repeat center;
+    background: url("../img/bg-2D.png") #ffffff no-repeat center;
     background-size: 20px 20px;
 }
 
 .single-box.portrait {
     top: 255px;
-    background: url("../img/bg-3d.png") #ffffff no-repeat center;
+    background: url("../img/bg-3D.png") #ffffff no-repeat center;
     background-size: 20px 20px;
 }
 
