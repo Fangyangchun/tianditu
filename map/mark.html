@@ -12,6 +12,8 @@
             position: absolute;
             z-index: 10000;
             padding: 10px;
+            box-sizing: border-box;
+            width: 100%;
         }
         input {
             width: 35%;
@@ -24,13 +26,14 @@
         }
         button {
             padding: 0 15px;
-            vertical-align: bottom;
+            vertical-align: -2px;
         }
         .search-box, .polyline-box {
             margin-bottom: 10px;
         }
-        .date, .user {
-            width: 80%;
+        .appId, .appSecret, .date, .user {
+            max-width: 80%;
+            min-width: 260px;
             margin-bottom: 5px;
         }
     </style>
@@ -45,8 +48,10 @@
         <button id="search">搜索</button>
     </div>
     <div class="polyline-box">
-        <input type="number" id="user" class="date" value="04031764541186475" placeholder="用户userId">
-        <input type="number" id="date" class="user" value="20190723" placeholder="查询日期(格式为yyyyMMdd，如20190712)">
+        <input type="text" id="appId" class="appId" value="767a2c8714cc46f294e5d3ef833160b8" placeholder="appId">
+        <input type="text" id="appSecret" class="appSecret" value="b0bb6527b59345978e016fe45ea79c7a" placeholder="appSecret">
+        <input type="text" id="user" class="date" value="04031764541186475" placeholder="userId">
+        <input type="text" id="date" class="user" value="20190723" placeholder="查询日期(格式为yyyyMMdd，如20190712)"></<input>
         <button id="draw">绘制轨迹</button>
     </div>
 </div>
@@ -81,7 +86,7 @@
                 icon: customIcon
             }
         ).addTo(map);
-        var polyline, appId = '767a2c8714cc46f294e5d3ef833160b8', appSecret = 'b0bb6527b59345978e016fe45ea79c7a';
+        var polyline;
         $.ajax({
             url: encodeURI("https://dh.ditu.zj.cn:9443/inverse/getInverseGeocoding.jsonp?&detail=1&zoom=11&latlon=120.15,30.268&lat=&lon=&customer=2"),
             dataType: "jsonp",
@@ -115,7 +120,9 @@
         $('#draw').on('click', function () {
             var userId = $('#user').val();
             var queryDate = $('#date').val();
-            if (userId && date) {
+            var appId = $('#appId').val();
+            var appSecret = $('#appSecret').val();
+            if (userId && date && appId && appSecret) {
                 var timestamp = Date.parse(new Date());
                 console.log({ appId: appId, queryDate: queryDate, userId: userId, signData: md5(appId + timestamp + queryDate + appSecret + userId), timestamp: timestamp });
                 $.ajax({
@@ -155,7 +162,7 @@
                     }
                 });
             } else {
-                alert("请输入用户Id、查询日期");
+                alert("请输入appId、appSecret、用户Id、查询日期");
             }
             
         })
