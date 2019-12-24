@@ -98,7 +98,7 @@
             // map.addLayer(layer_2d);
 
             //添加影像底图 type='image'
-            layer_3d = new L.TileLayer('https://ditu.zjzwfw.gov.cn/mapserver/raster/wmts/1.0.0/imgmap/getTile/{z}/{y}/{x}', {maxZoom: 19});
+            layer_3d = new L.TileLayer('https://ditu.zjzwfw.gov.cn/services/wmts/imgmap/default/oss/getTile/{z}/{y}/{x}', {maxZoom: 19});
             
             //添加底图 前端绘制 type='vector'
             layer_2d = new L.GVMapGrid('https://ditu.zjzwfw.gov.cn/mapserver/data/zjvmap/getData?x={x}&y={y}&l={z}&styleId=tdt_biaozhunyangshi_2017',{tileSize:512,maxZoom: 21,keepBuffer:0,updateWhenZooming:false});
